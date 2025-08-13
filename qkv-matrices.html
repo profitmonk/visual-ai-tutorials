@@ -25,6 +25,38 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
         
+        .nav-bar {
+            background: #2d2d2d;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-home {
+            background: #ffffff;
+            color: #2d2d2d;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-home:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
         .matrix-visual {
             display: grid;
             gap: 15px;
@@ -164,6 +196,11 @@
     </style>
 </head>
 <body>
+    <div class="nav-bar">
+        <div class="nav-title">🎯 Q, K, V Matrix Dimensions Tutorial</div>
+        <a href="index.html" class="nav-home">🏠 Home</a>
+    </div>
+
     <div class="container">
         <h1>🎯 Q, K, V Matrix Sizes: d vs m Correlation</h1>
         <p>Understanding how model dimension (d) and sequence position (m) affect matrix sizes</p>
@@ -381,6 +418,23 @@
             html += `<div class="matrix" style="border-color: #FF6B6B;">
                         <div class="matrix-label">Attention Scores</div>
                         <div class="matrix-size">[${seqLen} × ${seqLen}]</div>
+                     </div>`;
+            html += '</div>';
+            
+            html += '<div class="matrix-row">';
+            html += `<div class="matrix" style="border-color: #FF6B6B;">
+                        <div class="matrix-label">Softmax(Attention)</div>
+                        <div class="matrix-size">[${seqLen} × ${seqLen}]</div>
+                     </div>`;
+            html += '<div class="arrow">×</div>';
+            html += `<div class="matrix">
+                        <div class="matrix-label">V</div>
+                        <div class="matrix-size">[${seqLen} × ${dHead}]</div>
+                     </div>`;
+            html += '<div class="arrow">=</div>';
+            html += `<div class="matrix" style="border-color: #4ECDC4;">
+                        <div class="matrix-label">Output</div>
+                        <div class="matrix-size">[${seqLen} × ${dHead}]</div>
                      </div>`;
             html += '</div>';
             
