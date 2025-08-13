@@ -212,21 +212,6 @@
         <a href="index.html" class="nav-home">🏠 Home</a>
     </div>
 
-    <div class="container">
-        <h2>🔄 RoPE Frequency Calculation: Fixed vs Dynamic</h2>
-        
-        <div class="step">
-            <h3>Understanding What Changes and What Doesn't</h3>
-            <p>A common question: <span class="highlight">As conversations get longer, are RoPE frequencies recalculated?</span></p>
-            
-            <div class="warning">
-                <strong>🔑 Answer: NO!</strong> RoPE frequencies (θ values) are calculated ONCE based on model dimension and NEVER change during inference.
-            </div>
-        </div>
-        
-        <button onclick="demonstrateRoPEFrequencies()">🧮 Show What's Fixed vs Dynamic in RoPE</button>
-        <div id="ropeFrequencyDemo"></div>
-    </div>
 
     <div class="container">
         <h1>🎯 Context Length Impact: Training vs Inference</h1>
