@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Length Impact Tutorial</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background: #ffffff;
+            color: #2d2d2d;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-bar {
+            background: #2d2d2d;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-home {
+            background: #ffffff;
+            color: #2d2d2d;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-home:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border-left: 4px solid #2d2d2d;
+        }
+        
+        .example-box {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            border: 1px solid #4a4a4a;
+        }
+        
+        .highlight {
+            background: #f8f9fa;
+            color: #2d2d2d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        button {
+            background: #2d2d2d;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #2d2d2d;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .scenario {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            border-radius: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #2d2d2d;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .math-formula {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">📊 Context Length Impact: Training vs Inference</div>
+        <a href="index.html" class="nav-home">🏠 Home</a>
+    </div>
+
+    <div class="container">
+        <h2>🔄 RoPE Frequency Calculation: Fixed vs Dynamic</h2>
+        
+        <div class="step">
+            <h3>Understanding What Changes and What Doesn't</h3>
+            <p>A common question: <span class="highlight">As conversations get longer, are RoPE frequencies recalculated?</span></p>
+            
+            <div class="warning">
+                <strong>🔑 Answer: NO!</strong> RoPE frequencies (θ values) are calculated ONCE based on model dimension and NEVER change during inference.
+            </div>
+        </div>
+        
+        <button onclick="demonstrateRoPEFrequencies()">🧮 Show What's Fixed vs Dynamic in RoPE</button>
+        <div id="ropeFrequencyDemo"></div>
+    </div>
+
+    <div class="container">
+        <h1>🎯 Context Length Impact: Training vs Inference</h1>
+        <p>Explore how models trained on long contexts perform on shorter sequences with step-by-step mathematical analysis</p>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Interactive Model Configuration</h2>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Training Context Length:</strong></label>
+                <select id="trainingContext">
+                    <option value="4096">4K (Standard)</option>
+                    <option value="32768">32K (Extended)</option>
+                    <option value="200000">200K (Long)</option>
+                    <option value="1000000" selected>1M (Claude-scale)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Inference Context Length:</strong></label>
+                <select id="inferenceContext">
+                    <option value="10">10 tokens (Very Short)</option>
+                    <option value="100" selected>100 tokens (Short)</option>
+                    <option value="1000">1K tokens (Medium)</option>
+                    <option value="4096">4K tokens (Standard)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Model Dimension:</strong></label>
+                <select id="modelDim">
+                    <option value="64">64D (Toy)</option>
+                    <option value="512">512D (Small)</option>
+                    <option value="4096" selected>4096D (GPT-scale)</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="analyzeContextImpact()">🧮 Analyze Context Length Impact</button>
+        
+        <div id="analysisResults"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔄 RoPE Frequency Calculation: Fixed vs Dynamic</h2>
+        
+        <div class="step">
+            <h3>Understanding What Changes and What Doesn't</h3>
+            <p>A common question: <span class="highlight">As conversations get longer, are RoPE frequencies recalculated?</span></p>
+            
+            <div class="warning">
+                <strong>🔑 Answer: NO!</strong> RoPE frequencies (θ values) are calculated ONCE based on model dimension and NEVER change during inference.
+            </div>
+        </div>
+        
+        <button onclick="demonstrateRoPEFrequencies()">🧮 Show What's Fixed vs Dynamic in RoPE</button>
+        <div id="ropeFrequencyDemo"></div>
+    </div>
+
+    <div class="container">
+        <h2>📚 Step-by-Step Mathematical Analysis</h2>
+        
+    <div class="container">
+        <h2>📚 Step-by-Step Mathematical Analysis</h2>
+        
+        <div class="step">
+            <h3>Understanding the Question</h3>
+            <p>We want to understand: <span class="highlight">If a model is trained on very long contexts, how does it perform on much shorter contexts?</span></p>
+            
+            <div class="warning">
+                <strong>🤔 Key Question:</strong> Do the learned parameters (W_Q, W_K, W_V, token embeddings) work well when the positional encodings are completely different due to shorter sequences?
+            </div>
+        </div>
+        
+        <button onclick="demonstrateStepByStep()">📋 Show Step-by-Step Analysis</button>
+        <div id="stepByStepDemo"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Mathematical Proof with Concrete Examples</h2>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Example Text:</strong></label>
+                <select id="exampleText">
+                    <option value="The cat sat on the mat">The cat sat on the mat (6 tokens)</option>
+                    <option value="Hello world how are you today my friend">Hello world how are you today my friend (8 tokens)</option>
+                    <option value="Artificial intelligence models process natural language sequences using transformer architectures with attention mechanisms">AI models process sequences... (12 tokens)</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="demonstrateMathematicalProof()">🧮 Show Mathematical Proof</button>
+        <div id="mathematicalProof"></div>
+    </div>
+
+    <div class="container">
+        <h2>📊 Performance Comparison</h2>
+        <button onclick="comparePerformance()">📈 Compare Training vs Inference Performance</button>
+        <div id="performanceComparison"></div>
+    </div>
+
+    <script>
+        function analyzeContextImpact() {
+            const trainingLen = parseInt(document.getElementById('trainingContext').value);
+            const inferenceLen = parseInt(document.getElementById('inferenceContext').value);
+            const modelDim = parseInt(document.getElementById('modelDim').value);
+            
+            let html = '<div class="step"><h3>📊 Context Length Analysis</h3>';
+            
+            // Model configuration
+            html += '<div class="example-box">';
+            html += '<strong>Model Configuration:</strong><br>';
+            html += `• Training Context: ${trainingLen.toLocaleString()} tokens<br>`;
+            html += `• Inference Context: ${inferenceLen.toLocaleString()} tokens<br>`;
+            html += `• Model Dimension: ${modelDim}D<br>`;
+            html += `• Dimension Pairs: ${modelDim/2}`;
+            html += '</div>';
+            
+            // Fixed parameters analysis
+            html += '<div class="example-box">';
+            html += '<strong>🔒 FIXED Parameters (Same for Both):</strong><br>';
+            const headDim = 128; // Standard head dimension
+            const qkvSize = modelDim * headDim; // Each matrix size
+            const tokenEmbedSize = 50000 * modelDim; // Assuming 50k vocab
+            html += `• W_Q, W_K, W_V matrices: [${modelDim} × ${headDim}] each = ${(qkvSize * 3 * 4 / 1024 / 1024).toFixed(1)} MB<br>`;
+            html += `• Token embeddings: [50k × ${modelDim}] = ${(tokenEmbedSize * 4 / 1024 / 1024).toFixed(1)} MB<br>`;
+            html += `• RoPE frequencies (θ): ${modelDim/2} unique values<br>`;
+            html += '• All neural network weights: Identical';
+            html += '</div>';
+            
+            // Positional encoding analysis
+            const base = 10000;
+            const maxTrainingAngle = (trainingLen - 1) * Math.pow(base, 0); // Fastest rotating
+            const maxInferenceAngle = (inferenceLen - 1) * Math.pow(base, 0);
+            const minTrainingAngle = (trainingLen - 1) * Math.pow(base, -2 * (modelDim/2 - 1) / modelDim);
+            const minInferenceAngle = (inferenceLen - 1) * Math.pow(base, -2 * (modelDim/2 - 1) / modelDim);
+            
+            html += '<div class="example-box">';
+            html += '<strong>🔄 DYNAMIC Positional Encodings:</strong><br>';
+            html += `Training - Fast rotation range: 0 to ${maxTrainingAngle.toFixed(1)} radians<br>`;
+            html += `Training - Slow rotation range: 0 to ${minTrainingAngle.toFixed(6)} radians<br>`;
+            html += `Inference - Fast rotation range: 0 to ${maxInferenceAngle.toFixed(1)} radians<br>`;
+            html += `Inference - Slow rotation range: 0 to ${minInferenceAngle.toFixed(6)} radians<br><br>`;
+            
+            const angleRatio = maxInferenceAngle / maxTrainingAngle;
+            if (angleRatio <= 1.0) {
+                html += `<strong style="color: #28a745;">✅ EXCELLENT:</strong> Inference angles are ${(angleRatio * 100).toFixed(1)}% of training range!`;
+            } else {
+                html += `<strong style="color: #dc3545;">⚠️ EXTRAPOLATION:</strong> Inference exceeds training by ${(angleRatio * 100 - 100).toFixed(1)}%`;
+            }
+            html += '</div>';
+            
+            // Memory comparison
+            const trainingAttentionMem = trainingLen * trainingLen * 4 / (1024 * 1024 * 1024); // GB
+            const inferenceAttentionMem = inferenceLen * inferenceLen * 4 / (1024 * 1024 * 1024); // GB
+            
+            html += '<div class="example-box">';
+            html += '<strong>💾 Memory Requirements:</strong><br>';
+            html += `Training attention matrix: ${trainingLen.toLocaleString()} × ${trainingLen.toLocaleString()} = ${trainingAttentionMem.toFixed(2)} GB<br>`;
+            html += `Inference attention matrix: ${inferenceLen.toLocaleString()} × ${inferenceLen.toLocaleString()} = ${inferenceAttentionMem.toFixed(4)} GB<br>`;
+            html += `Memory reduction: ${(inferenceAttentionMem / trainingAttentionMem * 100).toFixed(4)}% of training memory`;
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('analysisResults').innerHTML = html;
+        }
+        
+        function demonstrateStepByStep() {
+            let html = '<div class="step"><h3>📋 Step-by-Step Mathematical Analysis</h3>';
+            
+            // Step 1: What stays the same
+            html += '<div class="math-formula">';
+            html += '<strong>Step 1: Fixed Components</strong><br><br>';
+            html += 'Token Embedding: "cat" → [0.2, -0.5, 0.8, 0.1, ...] (SAME)<br>';
+            html += 'W_Q matrix: [4096 × 128] (SAME)<br>';
+            html += 'W_K matrix: [4096 × 128] (SAME)<br>';
+            html += 'W_V matrix: [4096 × 128] (SAME)<br>';
+            html += 'θ frequencies: [1.0, 0.464, 0.215, 0.1, ...] (SAME)';
+            html += '</div>';
+            
+            // Step 2: What changes
+            html += '<div class="math-formula">';
+            html += '<strong>Step 2: Dynamic Components</strong><br><br>';
+            html += 'Training: "cat" at position 500,000<br>';
+            html += '→ Rotation angle = 500,000 × 1.0 = 500,000 radians<br><br>';
+            html += 'Inference: "cat" at position 50<br>';
+            html += '→ Rotation angle = 50 × 1.0 = 50 radians<br><br>';
+            html += '<strong>Key insight: 50 << 500,000 (well within training range!)</strong>';
+            html += '</div>';
+            
+            // Step 3: Mathematical proof
+            html += '<div class="math-formula">';
+            html += '<strong>Step 3: Mathematical Relationship</strong><br><br>';
+            html += 'Q_inference = RoPE(token_embedding, pos_small) @ W_Q<br>';
+            html += 'K_inference = RoPE(token_embedding, pos_small) @ W_K<br><br>';
+            html += 'Since pos_small < pos_training_max:<br>';
+            html += '• All rotation angles are familiar to the model<br>';
+            html += '• No extrapolation beyond training distribution<br>';
+            html += '• Optimal performance guaranteed';
+            html += '</div>';
+            
+            // Step 4: Concrete example
+            html += '<div class="example-box">';
+            html += '<strong>Step 4: Concrete Mathematical Example</strong><br><br>';
+            
+            html += '<table>';
+            html += '<tr><th>Scenario</th><th>Position</th><th>Rotation Angle</th><th>Status</th></tr>';
+            html += '<tr><td>Training Max</td><td>999,999</td><td>999,999 rad</td><td>Learned</td></tr>';
+            html += '<tr><td>Training Mid</td><td>500,000</td><td>500,000 rad</td><td>Learned</td></tr>';
+            html += '<tr><td>Inference</td><td>100</td><td>100 rad</td><td>✅ Well-known</td></tr>';
+            html += '<tr><td>Ratio</td><td>-</td><td>0.01% of max</td><td>✅ Easy</td></tr>';
+            html += '</table>';
+            html += '</div>';
+            
+            html += '<div class="success">';
+            html += '<strong>🎯 Conclusion:</strong> Models trained on long contexts perform BETTER on short contexts because they use the same learned parameters with much simpler (familiar) positional patterns!';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('stepByStepDemo').innerHTML = html;
+        }
+        
+        function demonstrateMathematicalProof() {
+            const exampleText = document.getElementById('exampleText').value;
+            const tokens = exampleText.split(' ');
+            const seqLen = tokens.length;
+            
+            let html = '<div class="step"><h3>🧮 Mathematical Proof with Real Example</h3>';
+            
+            html += '<div class="example-box">';
+            html += `<strong>Example Text:</strong> "${exampleText}"<br>`;
+            html += `<strong>Tokens:</strong> [${tokens.map((t, i) => `"${t}"(${i})`).join(', ')}]<br>`;
+            html += `<strong>Sequence Length:</strong> ${seqLen} tokens`;
+            html += '</div>';
+            
+            // Generate example embeddings
+            const modelDim = 8; // Simplified for demo
+            const base = 10000;
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Step 1: Fixed Token Embeddings</strong><br><br>';
+            html += 'Token embeddings (same for training and inference):<br>';
+            for (let i = 0; i < Math.min(seqLen, 4); i++) {
+                const embedding = [];
+                for (let j = 0; j < modelDim; j++) {
+                    embedding.push((Math.random() - 0.5).toFixed(2));
+                }
+                html += `"${tokens[i]}": [${embedding.join(', ')}]<br>`;
+            }
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Step 2: RoPE Frequencies (Same for Both)</strong><br><br>';
+            const thetas = [];
+            for (let i = 0; i < modelDim / 2; i++) {
+                thetas.push(Math.pow(base, -2 * i / modelDim));
+            }
+            html += 'θ values for dimension pairs:<br>';
+            for (let i = 0; i < thetas.length; i++) {
+                html += `θ${i} = ${thetas[i].toFixed(6)} (for dims ${2*i}, ${2*i+1})<br>`;
+            }
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Step 3: Position-Dependent Rotations</strong><br><br>';
+            html += '<table>';
+            html += '<tr><th>Token</th><th>Position</th><th>Fast Angle (θ₀)</th><th>Slow Angle (θ₃)</th></tr>';
+            for (let i = 0; i < seqLen; i++) {
+                const fastAngle = i * thetas[0];
+                const slowAngle = i * thetas[thetas.length - 1];
+                html += `<tr><td>"${tokens[i]}"</td><td>${i}</td><td>${fastAngle.toFixed(3)}</td><td>${slowAngle.toFixed(6)}</td></tr>`;
+            }
+            html += '</table>';
+            html += '</div>';
+            
+            html += '<div class="success">';
+            html += '<strong>🔬 Mathematical Proof:</strong><br>';
+            html += `• Training saw positions up to 1,000,000<br>`;
+            html += `• This inference uses positions 0 to ${seqLen-1}<br>`;
+            html += `• All rotation angles are ${((seqLen-1)/1000000*100).toFixed(4)}% of training maximum<br>`;
+            html += `• Model has seen much larger angles → perfect performance on smaller ones!`;
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('mathematicalProof').innerHTML = html;
+        }
+        
+        function comparePerformance() {
+            let html = '<div class="step"><h3>📈 Meaningful Performance Metrics</h3>';
+            
+            const scenarios = [
+                { name: "Training Context", length: 1000000, color: "#dc3545" },
+                { name: "Long Inference", length: 10000, color: "#ffc107" },
+                { name: "Medium Inference", length: 1000, color: "#20c997" },
+                { name: "Short Inference", length: 100, color: "#28a745" }
+            ];
+            
+            html += '<div class="example-box">';
+            html += '<strong>🚀 Concrete Performance Metrics:</strong><br><br>';
+            
+            const baseScenario = scenarios[0]; // Training context as baseline
+            
+            for (let scenario of scenarios) {
+                // Calculate meaningful metrics
+                const speedRatio = Math.pow(baseScenario.length / scenario.length, 2); // O(n²) scaling
+                const memoryGB = scenario.length * scenario.length * 4 / (1024 * 1024 * 1024);
+                const memoryReduction = baseScenario.length * baseScenario.length / (scenario.length * scenario.length);
+                const positionFamiliarity = Math.min(100, (scenario.length / 1000000) * 100);
+                
+                html += `<div style="margin: 20px 0; padding: 15px; border: 1px solid #e9ecef; border-radius: 8px;">`;
+                html += `<strong>${scenario.name}</strong> (${scenario.length.toLocaleString()} tokens)<br><br>`;
+                
+                html += `<strong>🏃 Processing Speed:</strong> ${speedRatio >= 1 ? speedRatio.toFixed(0) + 'x faster' : (1/speedRatio).toFixed(1) + 'x slower'}<br>`;
+                html += `<strong>💾 Memory Usage:</strong> ${memoryGB.toFixed(3)} GB attention matrix<br>`;
+                html += `<strong>📉 Memory vs Training:</strong> ${memoryReduction >= 1 ? (1/memoryReduction*100).toFixed(4) + '% of training memory' : memoryReduction.toFixed(1) + 'x more memory'}<br>`;
+                html += `<strong>🎯 Position Familiarity:</strong> ${positionFamiliarity.toFixed(2)}% of training range<br>`;
+                html += `<strong>⚡ Computational Load:</strong> O(${scenario.length.toLocaleString()}²) operations<br>`;
+                
+                // Visual indicator
+                const efficiency = Math.min(100, 100 - Math.log10(scenario.length / 100) * 10);
+                html += `<div class="progress-bar">`;
+                html += `<div class="progress-fill" style="width: ${efficiency}%; background: ${scenario.color};"></div>`;
+                html += `</div>`;
+                html += `Overall Efficiency: ${efficiency.toFixed(1)}%<br>`;
+                html += `</div>`;
+            }
+            html += '</div>';
+            
+            html += '<div class="comparison-grid">';
+            
+            html += '<div class="scenario">';
+            html += '<h4>🎯 Why Shorter = Dramatically Better</h4>';
+            html += '<ul>';
+            html += '<li><strong>Quadratic Speed Gain:</strong> 100 tokens = 10,000x faster than 1M</li>';
+            html += '<li><strong>Memory Efficiency:</strong> 100 tokens uses 0.000001% of 1M memory</li>';
+            html += '<li><strong>Position Mastery:</strong> All angles well within learned range</li>';
+            html += '<li><strong>Zero Extrapolation:</strong> Model operates in perfect comfort zone</li>';
+            html += '</ul>';
+            html += '</div>';
+            
+            html += '<div class="scenario">';
+            html += '<h4>📊 Real Performance Factors</h4>';
+            html += '<ul>';
+            html += '<li><strong>Attention Quality:</strong> Better focus with fewer distractions</li>';
+            html += '<li><strong>Latency:</strong> Near-instant responses vs seconds/minutes</li>';
+            html += '<li><strong>Accuracy:</strong> No position interpolation artifacts</li>';
+            html += '<li><strong>Stability:</strong> Consistent performance across runs</li>';
+            html += '</ul>';
+            html += '</div>';
+            
+            html += '</div>';
+            
+            html += '<div class="warning">';
+            html += '<strong>📊 Key Insight:</strong> The performance difference isn\'t just "better" - it\'s exponentially better. A 1M-trained model on 100 tokens is like using a supercomputer to solve basic math - massive overkill that guarantees perfect results!';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('performanceComparison').innerHTML = html;
+        }
+        
+        function demonstrateRoPEFrequencies() {
+            let html = '<div class="step"><h3>🔄 RoPE: What\'s Fixed vs What\'s Dynamic</h3>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>🔒 FIXED Forever (Calculated Once):</strong><br><br>';
+            html += 'θ₀ = 10000^(-0/4096) = 1.000000<br>';
+            html += 'θ₁ = 10000^(-2/4096) = 0.998776<br>';
+            html += 'θ₂ = 10000^(-4/4096) = 0.997553<br>';
+            html += '...<br>';
+            html += 'θ₂₀₄₇ = 10000^(-4094/4096) = 0.000100<br><br>';
+            html += '<strong>These NEVER change, regardless of sequence length!</strong>';
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>🔄 DYNAMIC (Changes with Position):</strong><br><br>';
+            html += 'Token "hello" at position 0: angle = 0 × θᵢ<br>';
+            html += 'Token "world" at position 1: angle = 1 × θᵢ<br>';
+            html += 'Token "how" at position 2: angle = 2 × θᵢ<br>';
+            html += '...<br>';
+            html += 'Token "end" at position 999,999: angle = 999,999 × θᵢ<br><br>';
+            html += '<strong>Only the position × θᵢ calculation changes!</strong>';
+            html += '</div>';
+            
+            html += '<div class="example-box">';
+            html += '<strong>🕐 Timeline Example:</strong><br><br>';
+            html += '<table>';
+            html += '<tr><th>Time</th><th>Conversation Length</th><th>θ Values</th><th>What Changes</th></tr>';
+            html += '<tr><td>Model Training</td><td>-</td><td>Calculated once</td><td>θ values set forever</td></tr>';
+            html += '<tr><td>Conversation Start</td><td>5 tokens</td><td>SAME θ values</td><td>Positions 0-4 × θ</td></tr>';
+            html += '<tr><td>Mid Conversation</td><td>500 tokens</td><td>SAME θ values</td><td>Positions 0-499 × θ</td></tr>';
+            html += '<tr><td>Long Conversation</td><td>50,000 tokens</td><td>SAME θ values</td><td>Positions 0-49,999 × θ</td></tr>';
+            html += '</table>';
+            html += '</div>';
+            
+            html += '<div class="success">';
+            html += '<strong>🎯 Key Insight:</strong> RoPE frequencies are architectural constants, like the size of W_Q matrices. They\'re baked into the model design and never change. Only the position multiplier changes as you add more tokens!';
+            html += '</div>';
+            
+            html += '<div class="example-box">';
+            html += '<strong>📐 Mathematical Proof:</strong><br><br>';
+            html += 'RoPE Formula: θᵢ = base^(-2i/d)<br>';
+            html += '• base = 10000 (constant)<br>';
+            html += '• i = dimension pair index (0, 1, 2, ..., d/2-1) (constant)<br>';
+            html += '• d = model dimension (constant)<br><br>';
+            html += 'Result: θᵢ values are determined entirely by model architecture!<br><br>';
+            html += 'Rotation Angle: position_m × θᵢ<br>';
+            html += '• position_m = 0, 1, 2, 3, ... (ONLY this changes)<br>';
+            html += '• θᵢ stays the same (fixed constant)';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('ropeFrequencyDemo').innerHTML = html;
+        }
+        
+        // Initialize with default analysis
+        document.addEventListener('DOMContentLoaded', function() {
+            analyzeContextImpact();
+        });
+    </script>
+</body>
+</html>
