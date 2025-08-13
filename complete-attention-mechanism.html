@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Attention Mechanism Tutorial</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background: #ffffff;
+            color: #2d2d2d;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-bar {
+            background: #2d2d2d;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-home {
+            background: #ffffff;
+            color: #2d2d2d;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-home:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border-left: 4px solid #2d2d2d;
+        }
+        
+        .example-box {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            border: 1px solid #4a4a4a;
+        }
+        
+        .highlight {
+            background: #f8f9fa;
+            color: #2d2d2d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        button {
+            background: #2d2d2d;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #2d2d2d;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #2d2d2d;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .matrix-grid {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0;
+            justify-items: center;
+        }
+        
+        .matrix-visual {
+            background: #f8f9fa;
+            border: 2px solid #2d2d2d;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .matrix-label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2d2d2d;
+        }
+        
+        .matrix-data {
+            font-size: 12px;
+            background: #2d2d2d;
+            color: #e0e0e0;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .step-indicator {
+            background: #e9ecef;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 10px 5px;
+            font-weight: bold;
+        }
+        
+        .step-active {
+            background: #28a745;
+            color: white;
+        }
+        
+        .attention-cell {
+            padding: 8px;
+            margin: 2px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            min-width: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">⚡ Complete Attention Mechanism Tutorial</div>
+        <a href="index.html" class="nav-home">🏠 Home</a>
+    </div>
+
+    <div class="container">
+        <h1>⚡ Complete Attention Mechanism</h1>
+        <p>Interactive step-by-step walkthrough of how Q, K, V matrices work together in transformer attention</p>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Interactive Configuration</h2>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Example Text:</strong></label>
+                <select id="exampleText">
+                    <option value="The cat sat on">The cat sat on (4 tokens)</option>
+                    <option value="Hello world how are you">Hello world how are you (5 tokens)</option>
+                    <option value="AI models process text efficiently">AI models process text efficiently (5 tokens)</option>
+                    <option value="Transformers use attention mechanisms">Transformers use attention mechanisms (4 tokens)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Head Dimension:</strong></label>
+                <select id="headDim">
+                    <option value="4">4 (simplified)</option>
+                    <option value="8">8</option>
+                    <option value="16">16</option>
+                    <option value="64" selected>64 (realistic)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Show Step:</strong></label>
+                <select id="currentStep">
+                    <option value="0">All Steps</option>
+                    <option value="1">1. Q, K, V Creation</option>
+                    <option value="2">2. Q × K^T (Attention Scores)</option>
+                    <option value="3">3. Softmax (Probabilities)</option>
+                    <option value="4">4. Attention × V (Final Output)</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="demonstrateAttention()">⚡ Run Complete Attention Process</button>
+        
+        <div id="attentionResults"></div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Understanding Each Step</h2>
+        
+        <div class="step">
+            <h3>The Complete Attention Formula</h3>
+            <div class="example-box">
+                <strong>Attention(Q, K, V) = softmax(Q × K^T / √d_k) × V</strong><br><br>
+                
+                Step 1: Q × K^T → Raw attention scores<br>
+                Step 2: / √d_k → Scale for stability<br>  
+                Step 3: softmax() → Convert to probabilities<br>
+                Step 4: × V → Apply to actual content
+            </div>
+        </div>
+        
+        <button onclick="explainSteps()">📚 Explain Each Step in Detail</button>
+        <div id="stepExplanations"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Interactive Matrix Explorer</h2>
+        
+        <div class="warning">
+            <strong>🎯 Key Question:</strong> How does each matrix contribute to the final output?
+        </div>
+        
+        <button onclick="exploreMatrices()">🔬 Explore Matrix Interactions</button>
+        <div id="matrixExplorer"></div>
+    </div>
+
+    <script>
+        function demonstrateAttention() {
+            const text = document.getElementById('exampleText').value;
+            const headDim = parseInt(document.getElementById('headDim').value);
+            const stepToShow = parseInt(document.getElementById('currentStep').value);
+            
+            const tokens = text.split(' ');
+            const seqLen = tokens.length;
+            
+            let html = '<div class="step"><h3>⚡ Complete Attention Process</h3>';
+            
+            // Step indicators
+            html += '<div style="text-align: center; margin: 20px 0;">';
+            for (let i = 1; i <= 4; i++) {
+                const isActive = (stepToShow === 0 || stepToShow === i) ? 'step-active' : '';
+                html += `<span class="step-indicator ${isActive}">Step ${i}</span>`;
+            }
+            html += '</div>';
+            
+            // Input tokens
+            html += '<div class="example-box">';
+            html += `<strong>Input:</strong> "${text}"<br>`;
+            html += `<strong>Tokens:</strong> [${tokens.map((t, i) => `"${t}"(${i})`).join(', ')}]<br>`;
+            html += `<strong>Sequence Length:</strong> ${seqLen}, <strong>Head Dimension:</strong> ${headDim}`;
+            html += '</div>';
+            
+            // Generate random Q, K, V matrices for demonstration
+            const Q = generateMatrix(seqLen, headDim, 'Q');
+            const K = generateMatrix(seqLen, headDim, 'K');
+            const V = generateMatrix(seqLen, headDim, 'V');
+            
+            if (stepToShow === 0 || stepToShow === 1) {
+                // Step 1: Show Q, K, V matrices
+                html += '<h4>📊 Step 1: Q, K, V Matrices</h4>';
+                html += '<div class="matrix-grid" style="grid-template-columns: 1fr 1fr 1fr;">';
+                
+                html += '<div class="matrix-visual">';
+                html += '<div class="matrix-label">Q (Query) - "What I\'m looking for"</div>';
+                html += `<div>Size: [${seqLen} × ${headDim}]</div>`;
+                html += '<div class="matrix-data">';
+                for (let i = 0; i < Math.min(seqLen, 3); i++) {
+                    html += `${tokens[i]}: [${Q[i].slice(0, 4).map(x => x.toFixed(2)).join(', ')}...]<br>`;
+                }
+                html += '</div></div>';
+                
+                html += '<div class="matrix-visual">';
+                html += '<div class="matrix-label">K (Key) - "What I can offer"</div>';
+                html += `<div>Size: [${seqLen} × ${headDim}]</div>`;
+                html += '<div class="matrix-data">';
+                for (let i = 0; i < Math.min(seqLen, 3); i++) {
+                    html += `${tokens[i]}: [${K[i].slice(0, 4).map(x => x.toFixed(2)).join(', ')}...]<br>`;
+                }
+                html += '</div></div>';
+                
+                html += '<div class="matrix-visual">';
+                html += '<div class="matrix-label">V (Value) - "My actual content"</div>';
+                html += `<div>Size: [${seqLen} × ${headDim}]</div>`;
+                html += '<div class="matrix-data">';
+                for (let i = 0; i < Math.min(seqLen, 3); i++) {
+                    html += `${tokens[i]}: [${V[i].slice(0, 4).map(x => x.toFixed(2)).join(', ')}...]<br>`;
+                }
+                html += '</div></div>';
+                
+                html += '</div>';
+            }
+            
+            if (stepToShow === 0 || stepToShow === 2) {
+                // Step 2: Q × K^T
+                const scores = matrixMultiply(Q, transpose(K));
+                html += '<h4>🎯 Step 2: Attention Scores (Q × K^T)</h4>';
+                html += '<div class="example-box">';
+                html += `Matrix operation: [${seqLen} × ${headDim}] × [${headDim} × ${seqLen}] = [${seqLen} × ${seqLen}]<br><br>`;
+                html += '<table style="font-size: 12px;">';
+                html += '<tr><th></th>';
+                for (let j = 0; j < seqLen; j++) {
+                    html += `<th>"${tokens[j]}"</th>`;
+                }
+                html += '</tr>';
+                for (let i = 0; i < seqLen; i++) {
+                    html += `<tr><th>"${tokens[i]}"</th>`;
+                    for (let j = 0; j < seqLen; j++) {
+                        html += `<td>${scores[i][j].toFixed(2)}</td>`;
+                    }
+                    html += '</tr>';
+                }
+                html += '</table>';
+                html += 'Raw compatibility scores between queries and keys';
+                html += '</div>';
+            }
+            
+            if (stepToShow === 0 || stepToShow === 3) {
+                // Step 3: Softmax
+                const scores = matrixMultiply(Q, transpose(K));
+                const attention = applySoftmax(scores);
+                html += '<h4>🎲 Step 3: Softmax (Convert to Probabilities)</h4>';
+                html += '<div class="example-box">';
+                html += 'Each row now sums to 1.0 (probability distribution)<br><br>';
+                html += '<table style="font-size: 12px;">';
+                html += '<tr><th></th>';
+                for (let j = 0; j < seqLen; j++) {
+                    html += `<th>"${tokens[j]}"</th>`;
+                }
+                html += '<th>Sum</th></tr>';
+                for (let i = 0; i < seqLen; i++) {
+                    html += `<tr><th>"${tokens[i]}"</th>`;
+                    let sum = 0;
+                    for (let j = 0; j < seqLen; j++) {
+                        html += `<td style="background: rgba(40, 167, 69, ${attention[i][j]}); color: white;">${attention[i][j].toFixed(3)}</td>`;
+                        sum += attention[i][j];
+                    }
+                    html += `<td><strong>${sum.toFixed(3)}</strong></td>`;
+                    html += '</tr>';
+                }
+                html += '</table>';
+                html += 'Darker green = higher attention weight';
+                html += '</div>';
+            }
+            
+            if (stepToShow === 0 || stepToShow === 4) {
+                // Step 4: Apply to V
+                const scores = matrixMultiply(Q, transpose(K));
+                const attention = applySoftmax(scores);
+                const output = matrixMultiply(attention, V);
+                
+                html += '<h4>🎯 Step 4: Apply Attention to Values (Attention × V)</h4>';
+                html += '<div class="example-box">';
+                html += `Final operation: [${seqLen} × ${seqLen}] × [${seqLen} × ${headDim}] = [${seqLen} × ${headDim}]<br><br>`;
+                html += '<strong>🔍 What each token\'s output contains:</strong><br>';
+                for (let i = 0; i < seqLen; i++) {
+                    html += `<br><strong>"${tokens[i]}" output:</strong><br>`;
+                    let explanation = '';
+                    for (let j = 0; j < seqLen; j++) {
+                        if (attention[i][j] > 0.1) {
+                            explanation += `${(attention[i][j] * 100).toFixed(1)}% from "${tokens[j]}" + `;
+                        }
+                    }
+                    explanation = explanation.slice(0, -3); // Remove last " + "
+                    html += explanation + '<br>';
+                    html += `Result: [${output[i].slice(0, 4).map(x => x.toFixed(2)).join(', ')}...]`;
+                }
+                html += '</div>';
+                
+                html += '<div class="success">';
+                html += '<strong>🎉 Final Result:</strong> Each token now has a rich representation containing relevant information from the entire sequence, weighted by attention!';
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            document.getElementById('attentionResults').innerHTML = html;
+        }
+        
+        function explainSteps() {
+            let html = '<div class="step">';
+            html += '<h3>📚 Detailed Step Explanations</h3>';
+            
+            html += '<h4>🎯 Step 1: Create Q, K, V Matrices</h4>';
+            html += '<div class="example-box">';
+            html += '<strong>Q (Query):</strong> "What information is each token looking for?"<br>';
+            html += '• Each token asks a question about what it needs to know<br>';
+            html += '• Generated by: Input × W_Q<br><br>';
+            html += '<strong>K (Key):</strong> "What information does each token offer?"<br>';
+            html += '• Each token advertises what information it has<br>';
+            html += '• Generated by: Input × W_K<br><br>';
+            html += '<strong>V (Value):</strong> "What is the actual information content?"<br>';
+            html += '• The actual data that will be shared<br>';
+            html += '• Generated by: Input × W_V';
+            html += '</div>';
+            
+            html += '<h4>⚡ Step 2: Calculate Compatibility (Q × K^T)</h4>';
+            html += '<div class="example-box">';
+            html += '<strong>Purpose:</strong> Measure how well each query matches each key<br>';
+            html += '<strong>Math:</strong> Dot product between query and key vectors<br>';
+            html += '<strong>Result:</strong> Raw similarity scores (can be any value)<br>';
+            html += '<strong>Interpretation:</strong> Higher score = better match = more attention';
+            html += '</div>';
+            
+            html += '<h4>🎲 Step 3: Normalize with Softmax</h4>';
+            html += '<div class="example-box">';
+            html += '<strong>Purpose:</strong> Convert raw scores to valid probabilities<br>';
+            html += '<strong>Math:</strong> softmax(x_i) = exp(x_i) / Σ exp(x_j)<br>';
+            html += '<strong>Result:</strong> Each row sums to 1.0<br>';
+            html += '<strong>Benefit:</strong> Ensures attention weights are well-behaved';
+            html += '</div>';
+            
+            html += '<h4>🎯 Step 4: Apply to Values (Attention × V)</h4>';
+            html += '<div class="example-box">';
+            html += '<strong>Purpose:</strong> Use attention weights to mix value vectors<br>';
+            html += '<strong>Math:</strong> Weighted sum of all value vectors<br>';
+            html += '<strong>Result:</strong> Each token gets contextual information<br>';
+            html += '<strong>Magic:</strong> Tokens automatically focus on relevant information!';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('stepExplanations').innerHTML = html;
+        }
+        
+        function exploreMatrices() {
+            let html = '<div class="step">';
+            html += '<h3>🔬 Matrix Interaction Explorer</h3>';
+            
+            html += '<div class="warning">';
+            html += '<strong>🎯 Interactive Question:</strong> What happens if we change different matrices?';
+            html += '</div>';
+            
+            html += '<h4>🔄 Q Matrix Impact</h4>';
+            html += '<div class="example-box">';
+            html += '<strong>Q determines:</strong> "What each token is looking for"<br>';
+            html += '• Change Q → Different attention patterns<br>';
+            html += '• High Q values → Strong queries → More selective attention<br>';
+            html += '• Low Q values → Weak queries → More distributed attention<br><br>';
+            html += '<strong>Example:</strong> If "cat" has high Q values, it will be very picky about what it attends to';
+            html += '</div>';
+            
+            html += '<h4>🗝️ K Matrix Impact</h4>';
+            html += '<div class="example-box">';
+            html += '<strong>K determines:</strong> "How discoverable each token is"<br>';
+            html += '• Change K → Different attention targets<br>';
+            html += '• High K values → Easy to find → Receives more attention<br>';
+            html += '• Low K values → Hard to find → Receives less attention<br><br>';
+            html += '<strong>Example:</strong> If "sat" has high K values, many tokens will attend to it';
+            html += '</div>';
+            
+            html += '<h4>💎 V Matrix Impact</h4>';
+            html += '<div class="example-box">';
+            html += '<strong>V determines:</strong> "What information actually gets shared"<br>';
+            html += '• Change V → Different content in final output<br>';
+            html += '• Rich V values → More informative representations<br>';
+            html += '• Poor V values → Less useful final output<br><br>';
+            html += '<strong>Critical:</strong> V is the only matrix that affects the actual content!';
+            html += '</div>';
+            
+            html += '<div class="success">';
+            html += '<strong>🧠 Key Insight:</strong> Q and K determine WHO attends to WHOM, but V determines WHAT information gets shared. All three are crucial for effective attention!';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('matrixExplorer').innerHTML = html;
+        }
+        
+        // Helper functions
+        function generateMatrix(rows, cols, type) {
+            const matrix = [];
+            for (let i = 0; i < rows; i++) {
+                const row = [];
+                for (let j = 0; j < cols; j++) {
+                    // Generate reasonable values based on matrix type
+                    const base = type === 'Q' ? 0.5 : type === 'K' ? 0.3 : 0.7;
+                    row.push((Math.random() - 0.5) * 2 * base);
+                }
+                matrix.push(row);
+            }
+            return matrix;
+        }
+        
+        function transpose(matrix) {
+            const result = [];
+            for (let i = 0; i < matrix[0].length; i++) {
+                const row = [];
+                for (let j = 0; j < matrix.length; j++) {
+                    row.push(matrix[j][i]);
+                }
+                result.push(row);
+            }
+            return result;
+        }
+        
+        function matrixMultiply(A, B) {
+            const result = [];
+            for (let i = 0; i < A.length; i++) {
+                const row = [];
+                for (let j = 0; j < B[0].length; j++) {
+                    let sum = 0;
+                    for (let k = 0; k < A[0].length; k++) {
+                        sum += A[i][k] * B[k][j];
+                    }
+                    row.push(sum);
+                }
+                result.push(row);
+            }
+            return result;
+        }
+        
+        function applySoftmax(matrix) {
+            const result = [];
+            for (let i = 0; i < matrix.length; i++) {
+                const row = matrix[i];
+                const maxVal = Math.max(...row);
+                const exps = row.map(x => Math.exp(x - maxVal));
+                const sum = exps.reduce((a, b) => a + b, 0);
+                result.push(exps.map(x => x / sum));
+            }
+            return result;
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            demonstrateAttention();
+        });
+    </script>
+</body>
+</html>
