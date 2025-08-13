@@ -25,6 +25,38 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
         
+        .nav-bar {
+            background: #2d2d2d;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-home {
+            background: #ffffff;
+            color: #2d2d2d;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-home:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
         .step {
             background: #f8f9fa;
             border: 1px solid #e9ecef;
@@ -141,6 +173,11 @@
     </style>
 </head>
 <body>
+    <div class="nav-bar">
+        <div class="nav-title">🌀 RoPE: Rotary Position Embedding Tutorial</div>
+        <a href="index.html" class="nav-home">🏠 Home</a>
+    </div>
+
     <div class="container">
         <h1>🌀 RoPE: Rotary Position Embedding Tutorial</h1>
         <p>Learn how the same transformer model behaves differently with various context lengths!</p>
@@ -161,7 +198,86 @@
     </div>
 
     <div class="container">
-        <h2>🔧 Step 2: Interactive RoPE Calculator</h2>
+        <h2>📝 Step 1: Understanding Dimension Pairs</h2>
+        
+        <div class="step">
+            <h3>What are Dimension Pairs?</h3>
+            <p>RoPE doesn't rotate individual dimensions - it rotates <span class="highlight">pairs of adjacent dimensions</span> together as 2D coordinates (also called "2D chunks").</p>
+            
+            <div class="example-box">
+                <strong>🎯 Visual Example: 8D Embedding → 4 Dimension Pairs</strong><br><br>
+                
+                <strong>Original 8D embedding:</strong><br>
+                [x₀, x₁, x₂, x₃, x₄, x₅, x₆, x₇]<br><br>
+                
+                <strong>Grouped into dimension pairs:</strong><br>
+                • Pair 0: (x₀, x₁) ← dimensions 0 and 1<br>
+                • Pair 1: (x₂, x₃) ← dimensions 2 and 3<br>
+                • Pair 2: (x₄, x₅) ← dimensions 4 and 5<br>
+                • Pair 3: (x₆, x₇) ← dimensions 6 and 7<br><br>
+                
+                <strong>Each pair = 2D coordinates that get rotated!</strong>
+            </div>
+            
+            <div class="example-box">
+                <strong>🔄 Why Pairs?</strong><br>
+                RoPE applies 2D rotations - you need exactly 2 coordinates to rotate in a plane:<br><br>
+                
+                Think of each pair as coordinates on a 2D plane:<br>
+                • (x₀, x₁) = point on plane 0<br>
+                • (x₂, x₃) = point on plane 1<br>
+                • (x₄, x₅) = point on plane 2<br>
+                • etc.<br><br>
+                
+                Each plane gets rotated by a different amount based on position!
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📝 Step 2: Token Embeddings & RoPE Application</h2>
+        
+        <div class="step">
+            <h3>Complete RoPE Process</h3>
+            <p>RoPE works by <span class="highlight">rotating pairs of embedding dimensions</span> based on position. Let's see the complete transformation!</p>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>Sample Text:</label>
+                <select id="sampleText">
+                    <option value="The cat sat on the mat">The cat sat on the mat (6 tokens)</option>
+                    <option value="The quick brown fox jumps over the lazy dog">The quick brown fox jumps over the lazy dog (9 tokens)</option>
+                    <option value="Artificial intelligence models like transformers process sequences of tokens">AI models like transformers process sequences of tokens (9 tokens)</option>
+                    <option value="custom">Custom text...</option>
+                </select>
+            </div>
+            <div class="control-group" id="customTextGroup" style="display: none;">
+                <label>Custom Text:</label>
+                <input type="text" id="customText" placeholder="Enter your text...">
+            </div>
+            <div class="control-group">
+                <label>Embedding Dimension:</label>
+                <select id="embeddingDim">
+                    <option value="4">4 (toy)</option>
+                    <option value="8">8</option>
+                    <option value="16">16</option>
+                    <option value="32">32</option>
+                    <option value="64">64</option>
+                    <option value="128">128</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="demonstrateFullRoPE()">🔄 Show Complete RoPE Process</button>
+        <button onclick="visualizeDimensionPairs()" style="margin-left: 10px;">🎨 Visualize Dimension Pairs</button>
+        
+        <div id="dimensionPairsViz"></div>
+        <div id="fullRoPEDemo"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Step 3: Interactive RoPE Calculator</h2>
         
         <div class="controls">
             <div class="control-group">
@@ -170,11 +286,12 @@
                     <option value="4">4 (toy model)</option>
                     <option value="8">8</option>
                     <option value="16">16</option>
+                    <option value="32">32</option>
                 </select>
             </div>
             <div class="control-group">
                 <label>Sequence Length:</label>
-                <input type="number" id="seqLength" value="4" min="2" max="10">
+                <input type="number" id="seqLength" value="8" min="2" max="128">
             </div>
             <div class="control-group">
                 <label>Base (θ base):</label>
@@ -188,7 +305,7 @@
     </div>
 
     <div class="container">
-        <h2>🎯 Step 3: Context Length Impact</h2>
+        <h2>🎯 Step 4: Context Length Impact</h2>
         
         <div class="comparison">
             <div>
@@ -209,7 +326,7 @@
     </div>
 
     <div class="container">
-        <h2>🧮 Step 4: Attention Score Calculation</h2>
+        <h2>🧮 Step 5: Attention Score Calculation</h2>
         
         <div class="step">
             <h3>How RoPE Affects Attention</h3>
@@ -221,7 +338,35 @@
     </div>
 
     <div class="container">
-        <h2>📈 Step 5: Context Extension Challenges</h2>
+        <h2>📈 Step 6: Long Context Challenges (Up to 128 Tokens)</h2>
+        
+        <div class="step">
+            <h3>Testing RoPE at Scale</h3>
+            <p>Let's see how RoPE behaves with longer sequences and why context extension becomes challenging.</p>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>Context Length:</label>
+                <input type="range" id="contextSlider" min="4" max="128" value="16" step="4">
+                <span id="contextValue">16</span> tokens
+            </div>
+            <div class="control-group">
+                <label>Model Size:</label>
+                <select id="modelSize">
+                    <option value="64">64D (small)</option>
+                    <option value="256">256D (medium)</option>
+                    <option value="512">512D (large)</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="demonstrateLongContext()">📊 Analyze Long Context</button>
+        <div id="longContextDemo"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔬 Step 7: Context Extension Challenges</h2>
         
         <div class="step">
             <h3>The Problem with Longer Contexts</h3>
@@ -238,6 +383,378 @@
     </div>
 
     <script>
+        // Add new functions for visual explanations
+        
+        function visualizeDimensionPairs() {
+            const embeddingDim = parseInt(document.getElementById('embeddingDim').value);
+            const numPairs = embeddingDim / 2;
+            
+            let html = '<div class="step"><h3>🎨 Dimension Pairs Visualization</h3>';
+            
+            // Visual representation of dimension pairing
+            html += '<div class="example-box">';
+            html += `<strong>🔢 ${embeddingDim}D Embedding → ${numPairs} Dimension Pairs</strong><br><br>`;
+            
+            // Show the embedding as a row
+            html += '<strong>Original embedding vector:</strong><br>';
+            html += '<div style="display: flex; gap: 5px; margin: 10px 0; flex-wrap: wrap;">';
+            for (let i = 0; i < embeddingDim; i++) {
+                const pairIndex = Math.floor(i / 2);
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#fd79a8'];
+                const color = colors[pairIndex % colors.length];
+                html += `<div style="background: ${color}; color: white; padding: 8px; border-radius: 4px; min-width: 40px; text-align: center; font-weight: bold;">x${i}</div>`;
+            }
+            html += '</div>';
+            
+            // Show the pairing
+            html += '<strong>Grouped into dimension pairs:</strong><br>';
+            html += '<div style="margin: 15px 0;">';
+            for (let i = 0; i < numPairs; i++) {
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#fd79a8'];
+                const color = colors[i % colors.length];
+                html += `<div style="display: inline-block; margin: 5px; padding: 10px; border: 2px solid ${color}; border-radius: 8px; background: rgba(255,255,255,0.1);">`;
+                html += `<strong>Pair ${i}:</strong> (x${2*i}, x${2*i+1})<br>`;
+                html += `<small>2D coordinates on plane ${i}</small>`;
+                html += '</div>';
+            }
+            html += '</div>';
+            
+            // Show frequency assignment
+            html += '<strong>Each dimension pair gets its own rotation frequency:</strong><br>';
+            html += '<table style="width:100%; margin: 10px 0; font-size: 12px;">';
+            html += '<tr style="background: #f0f0f0;"><th>Dimension Pair</th><th>Dimensions</th><th>Frequency (θ)</th><th>Rotation Speed</th></tr>';
+            
+            const base = 10000;
+            for (let i = 0; i < Math.min(numPairs, 8); i++) {
+                const theta = Math.pow(base, -2 * i / embeddingDim);
+                const speed = i === 0 ? 'Fastest' : i === numPairs - 1 ? 'Slowest' : 'Medium';
+                html += `<tr><td><strong>${i}</strong></td><td>(${2*i}, ${2*i+1})</td><td>${theta.toFixed(6)}</td><td>${speed}</td></tr>`;
+            }
+            if (numPairs > 8) {
+                html += `<tr><td colspan="4">... and ${numPairs - 8} more pairs</td></tr>`;
+            }
+            html += '</table>';
+            html += '</div>';
+            
+            // Concrete rotation example
+            html += '<div class="example-box">';
+            html += '<strong>🔄 Concrete Rotation Example</strong><br><br>';
+            html += 'Let\'s say we have embedding [0.5, 0.8, -0.3, 0.6] at position 1:<br><br>';
+            
+            html += '<table style="width:100%; font-size: 12px;">';
+                            html += '<tr style="background: #2d2d2d; color: white;"><th>Pair</th><th>Original (x,y)</th><th>Angle</th><th>After Rotation</th></tr>';
+            
+            // Example with concrete numbers
+            const exampleEmbedding = [0.5, 0.8, -0.3, 0.6];
+            const position = 1;
+            
+            for (let i = 0; i < 2; i++) {
+                const theta = Math.pow(base, -2 * i / 4);
+                const angle = position * theta;
+                const cos_a = Math.cos(angle);
+                const sin_a = Math.sin(angle);
+                
+                const x = exampleEmbedding[2 * i];
+                const y = exampleEmbedding[2 * i + 1];
+                const x_new = x * cos_a - y * sin_a;
+                const y_new = x * sin_a + y * cos_a;
+                
+                html += `<tr>`;
+                html += `<td><strong>${i}</strong></td>`;
+                html += `<td>(${x}, ${y})</td>`;
+                html += `<td>${angle.toFixed(3)} rad</td>`;
+                html += `<td>(${x_new.toFixed(3)}, ${y_new.toFixed(3)})</td>`;
+                html += `</tr>`;
+            }
+            html += '</table><br>';
+            
+            html += '<strong>🎯 Key Point:</strong> Each dimension pair is rotated independently, creating a unique "rotational fingerprint" for each position!';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('dimensionPairsViz').innerHTML = html;
+        }
+        
+        function demonstrateFullRoPE() {
+            const textSelect = document.getElementById('sampleText');
+            const customText = document.getElementById('customText');
+            const embeddingDim = parseInt(document.getElementById('embeddingDim').value);
+            
+            let text;
+            if (textSelect.value === 'custom') {
+                text = customText.value || 'Hello world';
+            } else {
+                text = textSelect.value;
+            }
+            
+            const tokens = text.split(' ');
+            const seqLen = tokens.length;
+            
+            let html = '<div class="step"><h3>Complete RoPE Transformation</h3>';
+            
+            // Step 1: Show tokenization
+            html += '<div class="example-box">';
+            html += '<strong>Step 1: Tokenization</strong><br>';
+            html += `Input: "${text}"<br>`;
+            html += `Tokens: [${tokens.map((t, i) => `"${t}" (pos ${i})`).join(', ')}]<br>`;
+            html += `Sequence length: ${seqLen}`;
+            html += '</div>';
+            
+            // Step 2: Generate random embeddings (for demonstration)
+            const embeddings = [];
+            for (let i = 0; i < seqLen; i++) {
+                const embedding = [];
+                for (let j = 0; j < embeddingDim; j++) {
+                    embedding.push((Math.random() - 0.5) * 2); // Random values between -1 and 1
+                }
+                embeddings.push(embedding);
+            }
+            
+            html += '<div class="example-box">';
+            html += '<strong>Step 2: Initial Token Embeddings (Random for Demo)</strong><br>';
+            html += '<table style="width:100%; font-size: 12px; margin: 10px 0;">';
+            html += '<tr><th>Token</th><th>Position</th><th>Embedding Vector</th></tr>';
+            for (let i = 0; i < Math.min(seqLen, 6); i++) {
+                html += `<tr><td><strong>${tokens[i]}</strong></td><td>${i}</td><td>[${embeddings[i].map(x => x.toFixed(2)).join(', ')}]</td></tr>`;
+            }
+            if (seqLen > 6) {
+                html += `<tr><td colspan="3">... and ${seqLen - 6} more tokens</td></tr>`;
+            }
+            html += '</table></div>';
+            
+            // Step 3: Calculate rotation frequencies for dimension pairs
+            const base = 10000;
+            const thetas = [];
+            for (let i = 0; i < embeddingDim / 2; i++) {
+                thetas.push(Math.pow(base, -2 * i / embeddingDim));
+            }
+            
+            html += '<div class="example-box">';
+            html += '<strong>Step 3: Calculate Rotation Frequencies for Dimension Pairs</strong><br>';
+            html += `For ${embeddingDim}D embeddings, we get ${embeddingDim/2} dimension pairs, each with its own frequency:<br><br>`;
+            
+            html += '<table style="width:100%; font-size: 12px;">';
+            html += '<tr style="background: #2d2d2d; color: white;"><th>Pair Index</th><th>Dimensions</th><th>Frequency Formula</th><th>θ Value</th><th>Rotation Speed</th></tr>';
+            for (let i = 0; i < Math.min(thetas.length, 6); i++) {
+                const speed = i === 0 ? 'Fastest' : i === thetas.length - 1 ? 'Slowest' : 'Medium';
+                html += `<tr><td><strong>${i}</strong></td><td>(${2*i}, ${2*i+1})</td><td>${base}^(-${2*i}/${embeddingDim})</td><td>${thetas[i].toFixed(6)}</td><td>${speed}</td></tr>`;
+            }
+            if (thetas.length > 6) {
+                html += `<tr><td colspan="5">... and ${thetas.length - 6} more dimension pairs</td></tr>`;
+            }
+            html += '</table></div>';
+            
+            // Step 4: Apply RoPE transformations
+            const rotatedEmbeddings = embeddings.map((embedding, pos) => {
+                const rotated = [...embedding];
+                for (let i = 0; i < embeddingDim / 2; i++) {
+                    const angle = pos * thetas[i];
+                    const cos_angle = Math.cos(angle);
+                    const sin_angle = Math.sin(angle);
+                    
+                    const x = embedding[2 * i];
+                    const y = embedding[2 * i + 1];
+                    
+                    rotated[2 * i] = x * cos_angle - y * sin_angle;
+                    rotated[2 * i + 1] = x * sin_angle + y * cos_angle;
+                }
+                return rotated;
+            });
+            
+            html += '<div class="example-box">';
+            html += '<strong>Step 4: Apply RoPE Rotations to Dimension Pairs</strong><br>';
+            html += '<strong>🔬 The Complete RoPE Formula:</strong><br>';
+            html += 'For each dimension pair i and position m:<br>';
+            html += '<code style="background: #f0f0f0; padding: 5px; display: block; margin: 10px 0;">';
+            html += '1. angle = m × θᵢ<br>';
+            html += '2. x′₍₂ᵢ₎ = x₍₂ᵢ₎ × cos(angle) - x₍₂ᵢ₊₁₎ × sin(angle)<br>';
+            html += '3. x′₍₂ᵢ₊₁₎ = x₍₂ᵢ₎ × sin(angle) + x₍₂ᵢ₊₁₎ × cos(angle)';
+            html += '</code>';
+            html += '<br><strong>Applied to our tokens:</strong><br><br>';
+            
+            html += '<table style="width:100%; font-size: 10px;">';
+            html += '<tr><th style="background: #2d2d2d; color: white;">Token</th><th style="background: #2d2d2d; color: white;">Pos</th><th style="background: #2d2d2d; color: white;">Dimension Pair</th><th style="background: #2d2d2d; color: white;">Angle</th><th style="background: #2d2d2d; color: white;">cos(θ)</th><th style="background: #2d2d2d; color: white;">sin(θ)</th><th style="background: #2d2d2d; color: white;">Original (x,y)</th><th style="background: #2d2d2d; color: white;">Rotated (x′,y′)</th></tr>';
+            
+            // Show detailed transformation for first few tokens and dimension pairs
+            for (let i = 0; i < Math.min(seqLen, 3); i++) {
+                for (let pairIndex = 0; pairIndex < Math.min(embeddingDim / 2, 3); pairIndex++) {
+                    const angle = i * thetas[pairIndex];
+                    const cos_angle = Math.cos(angle);
+                    const sin_angle = Math.sin(angle);
+                    
+                    const x = embeddings[i][2 * pairIndex];
+                    const y = embeddings[i][2 * pairIndex + 1];
+                    const x_prime = rotatedEmbeddings[i][2 * pairIndex];
+                    const y_prime = rotatedEmbeddings[i][2 * pairIndex + 1];
+                    
+                    const rowspan = pairIndex === 0 ? ` rowspan="${Math.min(embeddingDim / 2, 3)}"` : '';
+                    
+                    html += '<tr>';
+                    if (pairIndex === 0) {
+                        html += `<td${rowspan}><strong>${tokens[i]}</strong></td>`;
+                        html += `<td${rowspan}>${i}</td>`;
+                    }
+                    html += `<td>${pairIndex} (dims ${2*pairIndex},${2*pairIndex+1})</td>`;
+                    html += `<td>${angle.toFixed(3)}</td>`;
+                    html += `<td>${cos_angle.toFixed(3)}</td>`;
+                    html += `<td>${sin_angle.toFixed(3)}</td>`;
+                    html += `<td>(${x.toFixed(2)}, ${y.toFixed(2)})</td>`;
+                    html += `<td>(${x_prime.toFixed(2)}, ${y_prime.toFixed(2)})</td>`;
+                    html += '</tr>';
+                }
+            }
+            if (embeddingDim > 6) {
+                html += `<tr><td colspan="8">... and ${embeddingDim/2 - 3} more dimension pairs</td></tr>`;
+            }
+            html += '</table><br>';
+            
+            html += '<strong>🎯 Mathematical Verification Example:</strong><br>';
+            if (seqLen > 0 && embeddingDim >= 2) {
+                const pos = 1; // Use position 1 for example
+                const pairIndex = 0; // Use first dimension pair
+                const angle = pos * thetas[pairIndex];
+                const cos_a = Math.cos(angle);
+                const sin_a = Math.sin(angle);
+                const orig_x = embeddings[pos][0];
+                const orig_y = embeddings[pos][1];
+                const new_x = rotatedEmbeddings[pos][0];
+                const new_y = rotatedEmbeddings[pos][1];
+                
+                html += `For token "${tokens[pos]}" (pos=${pos}), dimension pair 0 (dims 0,1):<br>`;
+                html += `• angle = ${pos} × ${thetas[pairIndex].toFixed(6)} = ${angle.toFixed(6)} radians<br>`;
+                html += `• cos(${angle.toFixed(3)}) = ${cos_a.toFixed(6)}<br>`;
+                html += `• sin(${angle.toFixed(3)}) = ${sin_a.toFixed(6)}<br>`;
+                html += `• Original pair: (${orig_x.toFixed(4)}, ${orig_y.toFixed(4)})<br>`;
+                html += `• x′ = ${orig_x.toFixed(4)} × ${cos_a.toFixed(3)} - ${orig_y.toFixed(4)} × ${sin_a.toFixed(3)} = ${new_x.toFixed(4)}<br>`;
+                html += `• y′ = ${orig_x.toFixed(4)} × ${sin_a.toFixed(3)} + ${orig_y.toFixed(4)} × ${cos_a.toFixed(3)} = ${new_y.toFixed(4)}`;
+            }
+            html += '</div>';
+            
+            // Step 5: Show geometric interpretation
+            html += '<div class="example-box">';
+            html += '<strong>Step 5: Geometric Interpretation of Dimension Pairs</strong><br>';
+            html += '🔄 <strong>RoPE as 2D Rotations:</strong><br>';
+            html += 'Each dimension pair (x₍₂ᵢ₎, x₍₂ᵢ₊₁₎) forms a 2D plane that gets rotated by angle m×θᵢ<br><br>';
+            
+            html += '<table style="width:100%; text-align: center; font-size: 12px;">';
+            html += '<tr><th style="background: #2d2d2d; color: white;">Position</th><th style="background: #2d2d2d; color: white;">Fast Pair (θ₀)</th><th style="background: #2d2d2d; color: white;">Medium Pair (θ₁)</th>';
+            if (embeddingDim > 4) html += '<th style="background: #2d2d2d; color: white;">Slow Pair (θ₂)</th>';
+            html += '</tr>';
+            
+            for (let pos = 0; pos < Math.min(seqLen, 6); pos++) {
+                html += `<tr><td><strong>${pos}</strong></td>`;
+                for (let i = 0; i < Math.min(thetas.length, 3); i++) {
+                    const angle = pos * thetas[i];
+                    const degrees = (angle * 180 / Math.PI) % 360;
+                    html += `<td>${angle.toFixed(3)} rad<br>(${degrees.toFixed(1)}°)</td>`;
+                }
+                html += '</tr>';
+            }
+            html += '</table><br>';
+            
+            html += '📐 <strong>Key Insights about Dimension Pairs:</strong><br>';
+            html += '• Each position gets a unique "rotational fingerprint" across all dimension pairs<br>';
+            html += '• Fast-rotating pairs (low θ) distinguish nearby positions<br>';
+            html += '• Slow-rotating pairs (high θ) capture long-range patterns<br>';
+            html += '• The combination creates unique position encoding across all ${embeddingDim/2} pairs';
+            html += '</div>';
+            
+            html += '<div class="warning">';
+            html += '<strong>🔑 Mathematical Summary:</strong><br>';
+            html += '1. <strong>Dimension Pairing:</strong> Group embedding into pairs of adjacent dimensions<br>';
+            html += '2. <strong>Angle Calculation:</strong> angle = position × θᵢ (unique frequency per pair)<br>';
+            html += '3. <strong>2D Rotation:</strong> Apply cos/sin transformation to each dimension pair<br>';
+            html += '4. <strong>Position Encoding:</strong> Each position gets unique rotational signature across all pairs<br>';
+            html += '5. <strong>Relative Awareness:</strong> Attention scores become position-dependent through dot products of rotated vectors';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('fullRoPEDemo').innerHTML = html;
+        }
+        
+        function demonstrateLongContext() {
+            const contextLength = parseInt(document.getElementById('contextSlider').value);
+            const modelDim = parseInt(document.getElementById('modelSize').value);
+            const base = 10000;
+            
+            let html = '<div class="step">';
+            html += `<h3>Analysis: ${contextLength} Tokens, ${modelDim}D Model</h3>`;
+            
+            // Calculate some key metrics
+            const numRotationPairs = modelDim / 2;
+            const maxAngle = (contextLength - 1) * Math.pow(base, 0); // Fastest rotating dimension
+            const minAngle = (contextLength - 1) * Math.pow(base, -2 * (numRotationPairs - 1) / modelDim);
+            
+            const attentionMatrixSize = contextLength * contextLength;
+            const memoryMB = attentionMatrixSize * 4 / (1024 * 1024);
+            
+            html += '<div class="example-box">';
+            html += '<strong>Model Configuration:</strong><br>';
+            html += `• Context Length: ${contextLength} tokens<br>`;
+            html += `• Model Dimension: ${modelDim}<br>`;
+            html += `• Rotation Pairs: ${numRotationPairs}<br>`;
+            html += `• Attention Matrix: ${contextLength} × ${contextLength} = ${attentionMatrixSize.toLocaleString()} elements<br>`;
+            html += `• Memory for Attention: ${memoryMB.toFixed(2)} MB`;
+            html += '</div>';
+            
+            html += '<div class="example-box">';
+            html += '<strong>Rotation Angle Ranges:</strong><br>';
+            html += `• Fastest dimension (θ₀): 0 to ${maxAngle.toFixed(3)} radians<br>`;
+            html += `• Slowest dimension (θ₍ₙ₋₁₎): 0 to ${minAngle.toFixed(6)} radians<br>`;
+            html += `• Total unique rotation patterns: ${contextLength}`;
+            html += '</div>';
+            
+            // Show sample positions and their rotation signatures
+            html += '<div class="example-box">';
+            html += '<strong>Sample Rotation Signatures:</strong><br>';
+            html += '<table style="width:100%; font-size: 11px; text-align: center;">';
+            html += '<tr><th>Position</th><th>Fast Rotation (θ₀)</th><th>Medium Rotation (θ₁)</th><th>Slow Rotation (θ₍ₙ₋₁₎)</th></tr>';
+            
+            const samplePositions = [0, Math.floor(contextLength/4), Math.floor(contextLength/2), Math.floor(3*contextLength/4), contextLength-1];
+            
+            for (let pos of samplePositions) {
+                if (pos < contextLength) {
+                    const fastAngle = pos * Math.pow(base, 0);
+                    const medAngle = pos * Math.pow(base, -2 / modelDim);
+                    const slowAngle = pos * Math.pow(base, -2 * (numRotationPairs - 1) / modelDim);
+                    html += `<tr><td><strong>${pos}</strong></td><td>${fastAngle.toFixed(3)}</td><td>${medAngle.toFixed(3)}</td><td>${slowAngle.toFixed(6)}</td></tr>`;
+                }
+            }
+            html += '</table></div>';
+            
+            // Context extension challenges
+            html += '<div class="example-box">';
+            html += '<strong>Context Extension Challenge:</strong><br>';
+            if (contextLength <= 32) {
+                html += '✅ <strong>Safe Range:</strong> Most models train on sequences this length<br>';
+            } else if (contextLength <= 64) {
+                html += '⚠️ <strong>Extension Range:</strong> May need position interpolation<br>';
+            } else {
+                html += '🔴 <strong>Long Context:</strong> Definitely needs RoPE scaling techniques<br>';
+                html += `• Extrapolating to ${((contextLength/32)*100).toFixed(0)}% beyond typical training<br>`;
+                html += '• Risk of degraded performance without scaling tricks';
+            }
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('longContextDemo').innerHTML = html;
+        }
+        
+        // Update context slider display
+        document.getElementById('contextSlider').addEventListener('input', function() {
+            document.getElementById('contextValue').textContent = this.value;
+        });
+        
+        // Handle custom text selection
+        document.getElementById('sampleText').addEventListener('change', function() {
+            const customGroup = document.getElementById('customTextGroup');
+            if (this.value === 'custom') {
+                customGroup.style.display = 'flex';
+            } else {
+                customGroup.style.display = 'none';
+            }
+        });
+        
         function calculateRoPE() {
             const d = parseInt(document.getElementById('modelDim').value);
             const seqLen = parseInt(document.getElementById('seqLength').value);
@@ -397,6 +914,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             calculateRoPE();
             compareContexts();
+            demonstrateFullRoPE();
+            visualizeDimensionPairs();
         });
     </script>
 </body>
