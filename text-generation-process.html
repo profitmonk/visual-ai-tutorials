@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Generation Process Tutorial</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background: #ffffff;
+            color: #2d2d2d;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-bar {
+            background: #2d2d2d;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-home {
+            background: #ffffff;
+            color: #2d2d2d;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-home:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border-left: 4px solid #2d2d2d;
+        }
+        
+        .example-box {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            border: 1px solid #4a4a4a;
+        }
+        
+        .highlight {
+            background: #f8f9fa;
+            color: #2d2d2d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        button {
+            background: #2d2d2d;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #2d2d2d;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #2d2d2d;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .matrix-visual {
+            background: #f8f9fa;
+            border: 2px solid #2d2d2d;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            margin: 10px;
+        }
+        
+        .matrix-label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2d2d2d;
+        }
+        
+        .matrix-data {
+            font-size: 12px;
+            background: #2d2d2d;
+            color: #e0e0e0;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .step-indicator {
+            background: #e9ecef;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 10px 5px;
+            font-weight: bold;
+        }
+        
+        .step-active {
+            background: #28a745;
+            color: white;
+        }
+        
+        .matrix-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .arrow {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin: 0 10px;
+        }
+        
+        .generation-step {
+            background: #e8f5e8;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .vocab-preview {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .probability-bar {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+        
+        .prob-token {
+            width: 80px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .prob-bar {
+            height: 20px;
+            background: #28a745;
+            margin: 0 10px;
+            border-radius: 4px;
+        }
+        
+        .prob-value {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .math-formula {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">🚀 Text Generation Process Tutorial</div>
+        <a href="index.html" class="nav-home">🏠 Home</a>
+    </div>
+
+    <div class="container">
+        <h1>🚀 Complete Text Generation Process</h1>
+        <p>Interactive step-by-step walkthrough of how transformers generate text, from attention through vocabulary prediction with exact matrix computations</p>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Model Configuration</h2>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Model Architecture:</strong></label>
+                <select id="modelPreset">
+                    <option value="gpt2">GPT-2 Small (117M)</option>
+                    <option value="gpt2-medium">GPT-2 Medium (345M)</option>
+                    <option value="gpt2-large">GPT-2 Large (762M)</option>
+                    <option value="llama7b" selected>LLaMA-7B</option>
+                    <option value="llama13b">LLaMA-13B</option>
+                    <option value="qwen7b">Qwen-7B</option>
+                    <option value="deepseek7b">DeepSeek-7B</option>
+                    <option value="custom">Custom Parameters</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Generation Step:</strong></label>
+                <select id="generationStep">
+                    <option value="0">Full Pipeline</option>
+                    <option value="1">1. Attention Output</option>
+                    <option value="2">2. Feed-Forward Network</option>
+                    <option value="3">3. Layer Norm & Residuals</option>
+                    <option value="4">4. Output Projection</option>
+                    <option value="5">5. Vocabulary Logits</option>
+                    <option value="6">6. Sampling Strategy</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Context Length:</strong></label>
+                <select id="contextLength">
+                    <option value="10">10 tokens</option>
+                    <option value="50" selected>50 tokens</option>
+                    <option value="100">100 tokens</option>
+                    <option value="512">512 tokens</option>
+                    <option value="2048">2048 tokens</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="customParams" style="display: none;">
+            <div class="controls">
+                <div class="control-group">
+                    <label><strong>d_model:</strong></label>
+                    <input type="number" id="d_model" value="4096">
+                </div>
+                <div class="control-group">
+                    <label><strong>n_heads:</strong></label>
+                    <input type="number" id="n_heads" value="32">
+                </div>
+                <div class="control-group">
+                    <label><strong>n_layers:</strong></label>
+                    <input type="number" id="n_layers" value="32">
+                </div>
+                <div class="control-group">
+                    <label><strong>vocab_size:</strong></label>
+                    <input type="number" id="vocab_size" value="32000">
+                </div>
+                <div class="control-group">
+                    <label><strong>d_ff:</strong></label>
+                    <input type="number" id="d_ff" value="11008">
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="runTextGeneration()">🚀 Run Text Generation Process</button>
+        
+        <div id="modelSpecs"></div>
+    </div>
+
+    <div class="container">
+        <h2>📊 Mathematical Flow: From Attention to Next Token</h2>
+        <div id="generationPipeline"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔢 Detailed Matrix Computations</h2>
+        
+        <div class="warning">
+            <strong>🎯 Key Focus:</strong> Exact matrix dimensions and computational requirements for each step
+        </div>
+        
+        <button onclick="showMatrixComputations()">🧮 Show Detailed Matrix Math</button>
+        <div id="matrixComputations"></div>
+    </div>
+
+    <div class="container">
+        <h2>⚡ Performance Analysis</h2>
+        
+        <div class="info">
+            <strong>📈 Computational Metrics:</strong> Memory usage, bandwidth requirements, and FLOPs per operation
+        </div>
+        
+        <button onclick="analyzePerformance()">📊 Analyze Performance Metrics</button>
+        <div id="performanceAnalysis"></div>
+    </div>
+
+    <div class="container">
+        <h2>🎲 Simulated Interactive Token Generation</h2>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Input Text:</strong></label>
+                <input type="text" id="inputText" value="The future of AI is" style="width: 200px;">
+            </div>
+            <div class="control-group">
+                <label><strong>Temperature:</strong></label>
+                <input type="range" id="temperature" min="0.1" max="2.0" step="0.1" value="1.0">
+                <span id="tempValue">1.0</span>
+            </div>
+            <div class="control-group">
+                <label><strong>Top-k:</strong></label>
+                <input type="range" id="topK" min="1" max="100" step="1" value="50">
+                <span id="topKValue">50</span>
+            </div>
+            <div class="control-group">
+                <label><strong>Top-p:</strong></label>
+                <input type="range" id="topP" min="0.1" max="1.0" step="0.05" value="0.9">
+                <span id="topPValue">0.9</span>
+            </div>
+        </div>
+        
+        <button onclick="generateNextToken()">🎯 Generate Next Token</button>
+        <div id="tokenGeneration"></div>
+    </div>
+
+    <script>
+        // Model configurations with exact specifications
+        const modelConfigs = {
+            'gpt2': {
+                name: 'GPT-2 Small',
+                d_model: 768,
+                n_heads: 12,
+                n_layers: 12,
+                vocab_size: 50257,
+                d_ff: 3072,
+                parameters: '117M',
+                context_window: 1024
+            },
+            'gpt2-medium': {
+                name: 'GPT-2 Medium',
+                d_model: 1024,
+                n_heads: 16,
+                n_layers: 24,
+                vocab_size: 50257,
+                d_ff: 4096,
+                parameters: '345M',
+                context_window: 1024
+            },
+            'gpt2-large': {
+                name: 'GPT-2 Large',
+                d_model: 1280,
+                n_heads: 20,
+                n_layers: 36,
+                vocab_size: 50257,
+                d_ff: 5120,
+                parameters: '762M',
+                context_window: 1024
+            },
+            'llama7b': {
+                name: 'LLaMA-7B',
+                d_model: 4096,
+                n_heads: 32,
+                n_layers: 32,
+                vocab_size: 32000,
+                d_ff: 11008,
+                parameters: '6.7B',
+                context_window: 2048
+            },
+            'llama13b': {
+                name: 'LLaMA-13B',
+                d_model: 5120,
+                n_heads: 40,
+                n_layers: 40,
+                vocab_size: 32000,
+                d_ff: 13824,
+                parameters: '13.0B',
+                context_window: 2048
+            },
+            'qwen7b': {
+                name: 'Qwen-7B',
+                d_model: 4096,
+                n_heads: 32,
+                n_layers: 32,
+                vocab_size: 151936,
+                d_ff: 22016,
+                parameters: '7.7B',
+                context_window: 8192
+            },
+            'deepseek7b': {
+                name: 'DeepSeek-7B',
+                d_model: 4096,
+                n_heads: 32,
+                n_layers: 30,
+                vocab_size: 100000,
+                d_ff: 11008,
+                parameters: '6.7B',
+                context_window: 4096
+            }
+        };
+
+        let currentConfig = modelConfigs['llama7b'];
+
+        // Event listeners
+        document.getElementById('modelPreset').addEventListener('change', function() {
+            const preset = this.value;
+            if (preset === 'custom') {
+                document.getElementById('customParams').style.display = 'block';
+                currentConfig = getCustomConfig();
+            } else {
+                document.getElementById('customParams').style.display = 'none';
+                currentConfig = modelConfigs[preset];
+            }
+            updateModelSpecs();
+        });
+
+        document.getElementById('temperature').addEventListener('input', function() {
+            document.getElementById('tempValue').textContent = this.value;
+        });
+
+        document.getElementById('topK').addEventListener('input', function() {
+            document.getElementById('topKValue').textContent = this.value;
+        });
+
+        document.getElementById('topP').addEventListener('input', function() {
+            document.getElementById('topPValue').textContent = this.value;
+        });
+
+        function getCustomConfig() {
+            return {
+                name: 'Custom Model',
+                d_model: parseInt(document.getElementById('d_model').value),
+                n_heads: parseInt(document.getElementById('n_heads').value),
+                n_layers: parseInt(document.getElementById('n_layers').value),
+                vocab_size: parseInt(document.getElementById('vocab_size').value),
+                d_ff: parseInt(document.getElementById('d_ff').value),
+                parameters: 'Custom',
+                context_window: 2048
+            };
+        }
+
+        function updateModelSpecs() {
+            const seqLen = parseInt(document.getElementById('contextLength').value);
+            const d_head = currentConfig.d_model / currentConfig.n_heads;
+            
+            let html = '<div class="step"><h3>📋 Model Specifications</h3>';
+            
+            html += '<div class="example-box">';
+            html += `<strong>Model:</strong> ${currentConfig.name} (${currentConfig.parameters} parameters)<br>`;
+            html += `<strong>d_model:</strong> ${currentConfig.d_model} (hidden dimension)<br>`;
+            html += `<strong>n_heads:</strong> ${currentConfig.n_heads} (attention heads)<br>`;
+            html += `<strong>d_head:</strong> ${d_head} (dimension per head)<br>`;
+            html += `<strong>n_layers:</strong> ${currentConfig.n_layers} (transformer layers)<br>`;
+            html += `<strong>vocab_size:</strong> ${currentConfig.vocab_size.toLocaleString()} (vocabulary tokens)<br>`;
+            html += `<strong>d_ff:</strong> ${currentConfig.d_ff.toLocaleString()} (feed-forward dimension)<br>`;
+            html += `<strong>seq_len:</strong> ${seqLen} (current sequence length)`;
+            html += '</div>';
+            
+            // Key mathematical relationships
+            html += '<div class="math-formula">';
+            html += '<strong>🔗 Key Relationships:</strong><br><br>';
+            html += `d_head = d_model / n_heads = ${currentConfig.d_model} / ${currentConfig.n_heads} = ${d_head}<br>`;
+            html += `d_ff typically ≈ 2.7 × d_model = ${(2.7 * currentConfig.d_model).toFixed(0)} (actual: ${currentConfig.d_ff})<br>`;
+            html += `Total attention params per layer ≈ 4 × d_model² = ${(4 * currentConfig.d_model * currentConfig.d_model / 1e6).toFixed(1)}M<br>`;
+            html += `FF params per layer = 2 × d_model × d_ff = ${(2 * currentConfig.d_model * currentConfig.d_ff / 1e6).toFixed(1)}M`;
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('modelSpecs').innerHTML = html;
+        }
+
+        function runTextGeneration() {
+            const stepToShow = parseInt(document.getElementById('generationStep').value);
+            const seqLen = parseInt(document.getElementById('contextLength').value);
+            
+            let html = '<div class="step"><h3>🚀 Text Generation Pipeline</h3>';
+            
+            // Step indicators
+            html += '<div style="text-align: center; margin: 20px 0;">';
+            for (let i = 1; i <= 6; i++) {
+                const isActive = (stepToShow === 0 || stepToShow === i) ? 'step-active' : '';
+                html += `<span class="step-indicator ${isActive}">Step ${i}</span>`;
+            }
+            html += '</div>';
+            
+            if (stepToShow === 0 || stepToShow === 1) {
+                html += generateAttentionStep(seqLen);
+            }
+            
+            if (stepToShow === 0 || stepToShow === 2) {
+                html += generateFeedForwardStep(seqLen);
+            }
+            
+            if (stepToShow === 0 || stepToShow === 3) {
+                html += generateLayerNormStep(seqLen);
+            }
+            
+            if (stepToShow === 0 || stepToShow === 4) {
+                html += generateOutputProjectionStep(seqLen);
+            }
+            
+            if (stepToShow === 0 || stepToShow === 5) {
+                html += generateVocabLogitsStep(seqLen);
+            }
+            
+            if (stepToShow === 0 || stepToShow === 6) {
+                html += generateSamplingStep(seqLen);
+            }
+            
+            html += '</div>';
+            document.getElementById('generationPipeline').innerHTML = html;
+        }
+
+        function generateAttentionStep(seqLen) {
+            const d_head = currentConfig.d_model / currentConfig.n_heads;
+            
+            let html = '<div class="generation-step">';
+            html += '<h4>🎯 Step 1: Multi-Head Attention Output</h4>';
+            
+            html += '<div class="matrix-flow">';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Attention Input</div>`;
+            html += `<div>[${seqLen} × ${currentConfig.d_model}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">→</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Q, K, V Projection</div>`;
+            html += `<div>3 × [${seqLen} × ${currentConfig.d_model}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">→</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Attention Output</div>`;
+            html += `<div>[${seqLen} × ${currentConfig.d_model}]</div>`;
+            html += `</div>`;
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Matrix Operations:</strong><br><br>';
+            html += `Q = Input @ W_Q: [${seqLen} × ${currentConfig.d_model}] @ [${currentConfig.d_model} × ${currentConfig.d_model}]<br>`;
+            html += `K = Input @ W_K: [${seqLen} × ${currentConfig.d_model}] @ [${currentConfig.d_model} × ${currentConfig.d_model}]<br>`;
+            html += `V = Input @ W_V: [${seqLen} × ${currentConfig.d_model}] @ [${currentConfig.d_model} × ${currentConfig.d_model}]<br><br>`;
+            html += `Attention Scores = Q @ K^T: [${seqLen} × ${currentConfig.d_model}] @ [${currentConfig.d_model} × ${seqLen}] = [${seqLen} × ${seqLen}]<br>`;
+            html += `Attention Output = Softmax(Scores) @ V: [${seqLen} × ${seqLen}] @ [${seqLen} × ${currentConfig.d_model}] = [${seqLen} × ${currentConfig.d_model}]`;
+            html += '</div>';
+            
+            html += '</div>';
+            return html;
+        }
+
+        function generateFeedForwardStep(seqLen) {
+            let html = '<div class="generation-step">';
+            html += '<h4>⚡ Step 2: Feed-Forward Network</h4>';
+            
+            html += '<div class="matrix-flow">';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Attention Output</div>`;
+            html += `<div>[${seqLen} × ${currentConfig.d_model}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">@</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">W₁</div>`;
+            html += `<div>[${currentConfig.d_model} × ${currentConfig.d_ff}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">=</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">After Linear 1</div>`;
+            html += `<div>[${seqLen} × ${currentConfig.d_ff}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">ReLU</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">After Activation</div>`;
+            html += `<div>[${seqLen} × ${currentConfig.d_ff}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">@</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">W₂</div>`;
+            html += `<div>[${currentConfig.d_ff} × ${currentConfig.d_model}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">=</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">FFN Output</div>`;
+            html += `<div>[${seqLen} × ${currentConfig.d_model}]</div>`;
+            html += `</div>`;
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Feed-Forward Computation:</strong><br><br>';
+            html += `FFN(x) = W₂ @ ReLU(W₁ @ x + b₁) + b₂<br><br>`;
+            html += `Intermediate = ReLU(x @ W₁ + b₁): [${seqLen} × ${currentConfig.d_model}] @ [${currentConfig.d_model} × ${currentConfig.d_ff}] = [${seqLen} × ${currentConfig.d_ff}]<br>`;
+            html += `Output = Intermediate @ W₂ + b₂: [${seqLen} × ${currentConfig.d_ff}] @ [${currentConfig.d_ff} × ${currentConfig.d_model}] = [${seqLen} × ${currentConfig.d_model}]<br><br>`;
+            html += `<strong>Parameters:</strong> W₁: ${(currentConfig.d_model * currentConfig.d_ff / 1e6).toFixed(1)}M, W₂: ${(currentConfig.d_ff * currentConfig.d_model / 1e6).toFixed(1)}M`;
+            html += '</div>';
+            
+            html += '</div>';
+            return html;
+        }
+
+        function generateLayerNormStep(seqLen) {
+            let html = '<div class="generation-step">';
+            html += '<h4>🔄 Step 3: Layer Normalization & Residual Connections</h4>';
+            
+            html += '<div class="matrix-flow">';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">FFN Output</div>`;
+            html += `<div>[${seqLen} × ${currentConfig.d_model}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">+</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Residual</div>`;
+            html += `<div>[${seqLen} × ${currentConfig.d_model}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">→</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Layer Output</div>`;
+            html += `<div>[${seqLen} × ${currentConfig.d_model}]</div>`;
+            html += `</div>`;
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Layer Normalization & Residuals:</strong><br><br>';
+            html += `Attention Block: x₁ = LayerNorm(x₀ + MultiHeadAttention(x₀))<br>`;
+            html += `FFN Block: x₂ = LayerNorm(x₁ + FFN(x₁))<br><br>`;
+            html += `LayerNorm(x) = γ ⊙ (x - μ) / σ + β<br>`;
+            html += `Where: μ = mean(x), σ = std(x)<br>`;
+            html += `Parameters: γ, β ∈ ℝ^${currentConfig.d_model} (learnable scale & shift)`;
+            html += '</div>';
+            
+            html += '</div>';
+            return html;
+        }
+
+        function generateOutputProjectionStep(seqLen) {
+            let html = '<div class="generation-step">';
+            html += '<h4>🎯 Step 4: Output Projection (Final Layer)</h4>';
+            
+            html += '<div class="matrix-flow">';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Layer ${currentConfig.n_layers} Output</div>`;
+            html += `<div>[${seqLen} × ${currentConfig.d_model}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">→</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Final LayerNorm</div>`;
+            html += `<div>[${seqLen} × ${currentConfig.d_model}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">→</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Ready for Vocab</div>`;
+            html += `<div>[${seqLen} × ${currentConfig.d_model}]</div>`;
+            html += `</div>`;
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Final Processing:</strong><br><br>';
+            html += `hidden_states = stack_of_${currentConfig.n_layers}_layers(input_embeddings)<br>`;
+            html += `normalized_hidden = LayerNorm(hidden_states): [${seqLen} × ${currentConfig.d_model}]<br><br>`;
+            html += `<strong>Key Point:</strong> We only need the LAST token's representation<br>`;
+            html += `last_token_hidden = normalized_hidden[-1, :]: [1 × ${currentConfig.d_model}]<br>`;
+            html += `This single vector contains all context information for next token prediction`;
+            html += '</div>';
+            
+            html += '</div>';
+            return html;
+        }
+
+        function generateVocabLogitsStep(seqLen) {
+            let html = '<div class="generation-step">';
+            html += '<h4>📚 Step 5: Vocabulary Logits</h4>';
+            
+            html += '<div class="matrix-flow">';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Last Token Hidden</div>`;
+            html += `<div>[1 × ${currentConfig.d_model}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">@</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">LM Head Weight</div>`;
+            html += `<div>[${currentConfig.d_model} × ${currentConfig.vocab_size.toLocaleString()}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">=</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Vocab Logits</div>`;
+            html += `<div>[1 × ${currentConfig.vocab_size.toLocaleString()}]</div>`;
+            html += `</div>`;
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Language Model Head:</strong><br><br>';
+            html += `logits = last_hidden @ W_lm_head<br>`;
+            html += `[1 × ${currentConfig.d_model}] @ [${currentConfig.d_model} × ${currentConfig.vocab_size.toLocaleString()}] = [1 × ${currentConfig.vocab_size.toLocaleString()}]<br><br>`;
+            html += `<strong>Result:</strong> One score for each vocabulary token<br>`;
+            html += `Higher logit = higher probability of being the next token<br>`;
+            html += `LM Head parameters: ${(currentConfig.d_model * currentConfig.vocab_size / 1e6).toFixed(1)}M (often the largest single matrix!)`;
+            html += '</div>';
+            
+            html += '</div>';
+            return html;
+        }
+
+        function generateSamplingStep(seqLen) {
+            let html = '<div class="generation-step">';
+            html += '<h4>🎲 Step 6: Sampling Strategy</h4>';
+            
+            html += '<div class="matrix-flow">';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Raw Logits</div>`;
+            html += `<div>[1 × ${currentConfig.vocab_size.toLocaleString()}]</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">→</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Temperature Scaling</div>`;
+            html += `<div>logits / T</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">→</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Probabilities</div>`;
+            html += `<div>softmax(scaled_logits)</div>`;
+            html += `</div>`;
+            html += '<div class="arrow">→</div>';
+            html += `<div class="matrix-visual">`;
+            html += `<div class="matrix-label">Next Token</div>`;
+            html += `<div>sample(probs)</div>`;
+            html += `</div>`;
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Sampling Mathematics:</strong><br><br>';
+            html += `1. Temperature Scaling: scaled_logits = logits / temperature<br>`;
+            html += `2. Softmax: P(token_i) = exp(scaled_logits[i]) / Σ exp(scaled_logits[j])<br>`;
+            html += `3. Top-k: Keep only k highest probability tokens<br>`;
+            html += `4. Top-p (nucleus): Keep smallest set with cumulative probability ≥ p<br>`;
+            html += `5. Sample: Choose token according to final probability distribution<br><br>`;
+            html += `<strong>Temperature effects:</strong><br>`;
+            html += `T < 1.0: More deterministic (sharp distribution)<br>`;
+            html += `T = 1.0: Unchanged probabilities<br>`;
+            html += `T > 1.0: More random (flat distribution)`;
+            html += '</div>';
+            
+            html += '</div>';
+            return html;
+        }
+
+        function showMatrixComputations() {
+            const seqLen = parseInt(document.getElementById('contextLength').value);
+            
+            let html = '<div class="step"><h3>🧮 Complete Matrix Computation Breakdown</h3>';
+            
+            // Per-layer computations
+            html += '<h4>📊 Per-Layer Matrix Operations</h4>';
+            html += '<table>';
+            html += '<tr><th>Operation</th><th>Matrix Multiplication</th><th>Output Shape</th><th>Parameters</th><th>FLOPs</th></tr>';
+            
+            // Attention operations
+            const qkv_flops = 3 * seqLen * currentConfig.d_model * currentConfig.d_model;
+            const attention_flops = seqLen * seqLen * currentConfig.d_model;
+            const output_proj_flops = seqLen * currentConfig.d_model * currentConfig.d_model;
+            
+            html += `<tr><td>Q, K, V Projections</td><td>3 × [${seqLen} × ${currentConfig.d_model}] @ [${currentConfig.d_model} × ${currentConfig.d_model}]</td><td>[${seqLen} × ${currentConfig.d_model}]</td><td>${(3 * currentConfig.d_model * currentConfig.d_model / 1e6).toFixed(1)}M</td><td>${(qkv_flops / 1e9).toFixed(2)}G</td></tr>`;
+            html += `<tr><td>Attention Scores</td><td>[${seqLen} × ${currentConfig.d_model}] @ [${currentConfig.d_model} × ${seqLen}]</td><td>[${seqLen} × ${seqLen}]</td><td>0M</td><td>${(attention_flops / 1e9).toFixed(2)}G</td></tr>`;
+            html += `<tr><td>Attention Output</td><td>[${seqLen} × ${seqLen}] @ [${seqLen} × ${currentConfig.d_model}]</td><td>[${seqLen} × ${currentConfig.d_model}]</td><td>0M</td><td>${(attention_flops / 1e9).toFixed(2)}G</td></tr>`;
+            html += `<tr><td>Output Projection</td><td>[${seqLen} × ${currentConfig.d_model}] @ [${currentConfig.d_model} × ${currentConfig.d_model}]</td><td>[${seqLen} × ${currentConfig.d_model}]</td><td>${(currentConfig.d_model * currentConfig.d_model / 1e6).toFixed(1)}M</td><td>${(output_proj_flops / 1e9).toFixed(2)}G</td></tr>`;
+            
+            // Feed-forward operations
+            const ffn1_flops = seqLen * currentConfig.d_model * currentConfig.d_ff;
+            const ffn2_flops = seqLen * currentConfig.d_ff * currentConfig.d_model;
+            
+            html += `<tr><td>FFN Layer 1</td><td>[${seqLen} × ${currentConfig.d_model}] @ [${currentConfig.d_model} × ${currentConfig.d_ff}]</td><td>[${seqLen} × ${currentConfig.d_ff}]</td><td>${(currentConfig.d_model * currentConfig.d_ff / 1e6).toFixed(1)}M</td><td>${(ffn1_flops / 1e9).toFixed(2)}G</td></tr>`;
+            html += `<tr><td>FFN Layer 2</td><td>[${seqLen} × ${currentConfig.d_ff}] @ [${currentConfig.d_ff} × ${currentConfig.d_model}]</td><td>[${seqLen} × ${currentConfig.d_model}]</td><td>${(currentConfig.d_ff * currentConfig.d_model / 1e6).toFixed(1)}M</td><td>${(ffn2_flops / 1e9).toFixed(2)}G</td></tr>`;
+            
+            html += '</table>';
+            
+            // Total per layer
+            const total_layer_flops = qkv_flops + 2 * attention_flops + output_proj_flops + ffn1_flops + ffn2_flops;
+            const total_layer_params = 4 * currentConfig.d_model * currentConfig.d_model + 2 * currentConfig.d_model * currentConfig.d_ff;
+            
+            html += '<div class="example-box">';
+            html += '<strong>Per-Layer Totals:</strong><br>';
+            html += `Total FLOPs per layer: ${(total_layer_flops / 1e9).toFixed(2)} GFLOPs<br>`;
+            html += `Total parameters per layer: ${(total_layer_params / 1e6).toFixed(1)}M<br>`;
+            html += `Memory per layer (fp16): ${(total_layer_params * 2 / 1024 / 1024).toFixed(1)} MB`;
+            html += '</div>';
+            
+            // Full model computation
+            html += '<h4>🏗️ Full Model Computation</h4>';
+            const lm_head_flops = currentConfig.d_model * currentConfig.vocab_size;
+            const total_model_flops = currentConfig.n_layers * total_layer_flops + lm_head_flops;
+            const total_model_params = currentConfig.n_layers * total_layer_params + currentConfig.d_model * currentConfig.vocab_size + currentConfig.vocab_size * currentConfig.d_model; // embeddings + lm_head
+            
+            html += '<div class="example-box">';
+            html += `<strong>Complete Forward Pass:</strong><br>`;
+            html += `Total layers: ${currentConfig.n_layers}<br>`;
+            html += `Layer computation: ${currentConfig.n_layers} × ${(total_layer_flops / 1e9).toFixed(2)} = ${(currentConfig.n_layers * total_layer_flops / 1e9).toFixed(1)} GFLOPs<br>`;
+            html += `LM head computation: [1 × ${currentConfig.d_model}] @ [${currentConfig.d_model} × ${currentConfig.vocab_size.toLocaleString()}] = ${(lm_head_flops / 1e9).toFixed(2)} GFLOPs<br>`;
+            html += `<strong>Total FLOPs: ${(total_model_flops / 1e9).toFixed(1)} GFLOPs</strong><br>`;
+            html += `<strong>Total parameters: ${(total_model_params / 1e9).toFixed(1)}B</strong><br>`;
+            html += `<strong>Model memory (fp16): ${(total_model_params * 2 / 1024 / 1024 / 1024).toFixed(1)} GB</strong>`;
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('matrixComputations').innerHTML = html;
+        }
+
+        function analyzePerformance() {
+            const seqLen = parseInt(document.getElementById('contextLength').value);
+            
+            let html = '<div class="step"><h3>📊 Performance Analysis</h3>';
+            
+            // Memory breakdown
+            html += '<h4>💾 Memory Requirements</h4>';
+            html += '<table>';
+            html += '<tr><th>Component</th><th>Shape</th><th>Elements</th><th>Memory (fp16)</th><th>Percentage</th></tr>';
+            
+            const embedding_elements = currentConfig.vocab_size * currentConfig.d_model;
+            const attention_params_per_layer = 4 * currentConfig.d_model * currentConfig.d_model;
+            const ffn_params_per_layer = 2 * currentConfig.d_model * currentConfig.d_ff;
+            const lm_head_elements = currentConfig.d_model * currentConfig.vocab_size;
+            const layer_norm_params = currentConfig.n_layers * 2 * currentConfig.d_model; // 2 layer norms per layer
+            
+            const total_params = embedding_elements + currentConfig.n_layers * (attention_params_per_layer + ffn_params_per_layer) + layer_norm_params + lm_head_elements;
+            
+            html += `<tr><td>Token Embeddings</td><td>[${currentConfig.vocab_size.toLocaleString()} × ${currentConfig.d_model}]</td><td>${(embedding_elements / 1e6).toFixed(1)}M</td><td>${(embedding_elements * 2 / 1024 / 1024).toFixed(1)} MB</td><td>${(embedding_elements / total_params * 100).toFixed(1)}%</td></tr>`;
+            html += `<tr><td>Attention (${currentConfig.n_layers} layers)</td><td>4 × [${currentConfig.d_model} × ${currentConfig.d_model}]</td><td>${(currentConfig.n_layers * attention_params_per_layer / 1e6).toFixed(1)}M</td><td>${(currentConfig.n_layers * attention_params_per_layer * 2 / 1024 / 1024).toFixed(1)} MB</td><td>${(currentConfig.n_layers * attention_params_per_layer / total_params * 100).toFixed(1)}%</td></tr>`;
+            html += `<tr><td>Feed-Forward (${currentConfig.n_layers} layers)</td><td>2 × [${currentConfig.d_model} × ${currentConfig.d_ff}]</td><td>${(currentConfig.n_layers * ffn_params_per_layer / 1e6).toFixed(1)}M</td><td>${(currentConfig.n_layers * ffn_params_per_layer * 2 / 1024 / 1024).toFixed(1)} MB</td><td>${(currentConfig.n_layers * ffn_params_per_layer / total_params * 100).toFixed(1)}%</td></tr>`;
+            html += `<tr><td>LM Head</td><td>[${currentConfig.d_model} × ${currentConfig.vocab_size.toLocaleString()}]</td><td>${(lm_head_elements / 1e6).toFixed(1)}M</td><td>${(lm_head_elements * 2 / 1024 / 1024).toFixed(1)} MB</td><td>${(lm_head_elements / total_params * 100).toFixed(1)}%</td></tr>`;
+            html += `<tr><td>Layer Norms</td><td>${currentConfig.n_layers * 2} × [${currentConfig.d_model}]</td><td>${(layer_norm_params / 1e6).toFixed(1)}M</td><td>${(layer_norm_params * 2 / 1024 / 1024).toFixed(1)} MB</td><td>${(layer_norm_params / total_params * 100).toFixed(1)}%</td></tr>`;
+            html += `<tr style="background: #f8f9fa; font-weight: bold;"><td>TOTAL</td><td>-</td><td>${(total_params / 1e9).toFixed(1)}B</td><td>${(total_params * 2 / 1024 / 1024 / 1024).toFixed(1)} GB</td><td>100%</td></tr>`;
+            
+            html += '</table>';
+            
+            // Computation analysis
+            html += '<h4>⚡ Computational Analysis</h4>';
+            
+            // Attention complexity
+            const attention_memory = seqLen * seqLen * 4; // bytes for attention matrix
+            const kv_cache_memory = currentConfig.n_layers * 2 * seqLen * currentConfig.d_model * 2; // K and V cache
+            
+            html += '<div class="example-box">';
+            html += '<strong>🔥 Attention Complexity:</strong><br>';
+            html += `Attention matrix: [${seqLen} × ${seqLen}] = ${(attention_memory / 1024 / 1024).toFixed(2)} MB<br>`;
+            html += `KV Cache: ${currentConfig.n_layers} layers × 2 × [${seqLen} × ${currentConfig.d_model}] = ${(kv_cache_memory / 1024 / 1024).toFixed(1)} MB<br>`;
+            html += `Time complexity: O(n²) where n = sequence length<br>`;
+            html += `Space complexity: O(n²) for attention + O(n) for KV cache`;
+            html += '</div>';
+            
+            // Bandwidth analysis
+            const model_size_bytes = total_params * 2; // fp16
+            const seq_processing_bytes = seqLen * currentConfig.d_model * 2; // activation memory
+            
+            html += '<div class="example-box">';
+            html += '<strong>🌐 Memory Bandwidth Requirements:</strong><br>';
+            html += `Model loading: ${(model_size_bytes / 1024 / 1024 / 1024).toFixed(1)} GB<br>`;
+            html += `Activation memory: ~${(seq_processing_bytes * currentConfig.n_layers / 1024 / 1024).toFixed(1)} MB<br>`;
+            html += `Peak memory: Model + Activations + KV Cache = ${(model_size_bytes / 1024 / 1024 / 1024 + seq_processing_bytes * currentConfig.n_layers / 1024 / 1024 / 1024 + kv_cache_memory / 1024 / 1024 / 1024).toFixed(1)} GB<br>`;
+            html += `Memory bandwidth utilization: Limited by weight loading from memory`;
+            html += '</div>';
+            
+            // Generation speed analysis
+            html += '<h4>🚀 Generation Speed Factors</h4>';
+            
+            html += '<div class="example-box">';
+            html += '<strong>⏱️ Speed Bottlenecks by Sequence Length:</strong><br><br>';
+            
+            const scenarios = [10, 100, 1000, 2048];
+            for (let len of scenarios) {
+                const att_flops = len * len * currentConfig.d_model;
+                const ffn_flops = len * currentConfig.d_model * currentConfig.d_ff;
+                const total_flops = currentConfig.n_layers * (att_flops + 2 * ffn_flops);
+                
+                html += `<strong>Sequence Length ${len}:</strong><br>`;
+                html += `• Attention FLOPs: ${(currentConfig.n_layers * att_flops / 1e9).toFixed(2)} GFLOPs<br>`;
+                html += `• FFN FLOPs: ${(currentConfig.n_layers * 2 * ffn_flops / 1e9).toFixed(2)} GFLOPs<br>`;
+                html += `• Memory: ${(len * len * 4 / 1024 / 1024).toFixed(2)} MB attention matrix<br>`;
+                html += `• Relative speed: ${len <= 100 ? 'Very Fast' : len <= 1000 ? 'Fast' : 'Slower'}<br><br>`;
+            }
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('performanceAnalysis').innerHTML = html;
+        }
+
+        function generateNextToken() {
+            const inputText = document.getElementById('inputText').value;
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const topK = parseInt(document.getElementById('topK').value);
+            const topP = parseFloat(document.getElementById('topP').value);
+            
+            let html = '<div class="step"><h3>🎯 Interactive Token Generation</h3>';
+            
+            const tokens = inputText.split(' ');
+            const seqLen = tokens.length;
+            
+            html += '<div class="example-box">';
+            html += `<strong>Input:</strong> "${inputText}"<br>`;
+            html += `<strong>Tokens:</strong> [${tokens.map((t, i) => `"${t}"(${i})`).join(', ')}]<br>`;
+            html += `<strong>Sequence Length:</strong> ${seqLen}<br>`;
+            html += `<strong>Settings:</strong> Temperature=${temperature}, Top-k=${topK}, Top-p=${topP}`;
+            html += '</div>';
+            
+            // Simulate vocabulary probabilities
+            const vocabSample = [
+                'amazing', 'bright', 'challenging', 'exciting', 'fascinating',
+                'incredible', 'promising', 'revolutionary', 'transformative', 'uncertain',
+                'very', 'quite', 'extremely', 'highly', 'somewhat',
+                'a', 'the', 'an', 'and', 'or'
+            ];
+            
+            // Generate fake logits
+            const logits = vocabSample.map(() => (Math.random() - 0.5) * 10);
+            
+            // Apply temperature scaling
+            const scaledLogits = logits.map(logit => logit / temperature);
+            
+            // Convert to probabilities
+            const maxLogit = Math.max(...scaledLogits);
+            const expLogits = scaledLogits.map(logit => Math.exp(logit - maxLogit));
+            const sumExp = expLogits.reduce((a, b) => a + b, 0);
+            const probs = expLogits.map(exp => exp / sumExp);
+            
+            // Apply top-k filtering
+            const topKIndices = probs
+                .map((prob, idx) => ({ prob, idx }))
+                .sort((a, b) => b.prob - a.prob)
+                .slice(0, topK);
+            
+            // Apply top-p filtering
+            let cumulativeProb = 0;
+            const topPIndices = [];
+            for (let item of topKIndices) {
+                cumulativeProb += item.prob;
+                topPIndices.push(item);
+                if (cumulativeProb >= topP) break;
+            }
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Step-by-Step Calculation:</strong><br><br>';
+            html += `1. Raw logits → Temperature scaling (÷ ${temperature})<br>`;
+            html += `2. Softmax normalization → Probabilities<br>`;
+            html += `3. Top-k filtering → Keep ${topK} highest<br>`;
+            html += `4. Top-p filtering → Keep cumulative prob ≥ ${topP}<br>`;
+            html += `5. Sample from final distribution`;
+            html += '</div>';
+            
+            html += '<h4>🎲 Final Probability Distribution</h4>';
+            html += '<div class="vocab-preview">';
+            
+            // Renormalize for final sampling
+            const finalProbSum = topPIndices.reduce((sum, item) => sum + item.prob, 0);
+            const finalProbs = topPIndices.map(item => ({
+                token: vocabSample[item.idx],
+                prob: item.prob / finalProbSum
+            }));
+            
+            for (let item of finalProbs.slice(0, 10)) {
+                html += '<div class="probability-bar">';
+                html += `<div class="prob-token">"${item.token}"</div>`;
+                html += `<div class="prob-bar" style="width: ${item.prob * 200}px;"></div>`;
+                html += `<div class="prob-value">${(item.prob * 100).toFixed(1)}%</div>`;
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            
+            // Sample final token
+            const selectedToken = finalProbs[0].token; // Just pick highest for demo
+            
+            html += '<div class="success">';
+            html += `<strong>🎯 Selected Next Token: "${selectedToken}"</strong><br>`;
+            html += `New sequence: "${inputText} ${selectedToken}"<br>`;
+            html += `This token will be fed back as input for the next generation step!`;
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('tokenGeneration').innerHTML = html;
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateModelSpecs();
+            runTextGeneration();
+        });
+    </script>
+</body>
+</html>
