@@ -28,8 +28,9 @@
         .tutorial-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 30px;
             margin: 30px 0;
+            align-items: stretch;
         }
         
         .tutorial-card {
@@ -39,6 +40,9 @@
             padding: 25px;
             transition: all 0.3s ease;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
         
         .tutorial-card:hover {
@@ -58,6 +62,7 @@
             color: #555;
             margin-bottom: 15px;
             font-size: 14px;
+            flex-grow: 1;
         }
         
         .tutorial-concepts {
@@ -67,6 +72,7 @@
             border-radius: 8px;
             font-size: 12px;
             font-family: 'Courier New', monospace;
+            margin-top: auto;
         }
         
         .tutorial-link {
@@ -214,9 +220,21 @@
                 </div>
             </a>
             
+            <a href="attention-evolution.html" class="tutorial-link">
+                <div class="tutorial-card">
+                    <div class="tutorial-title">🔄 Attention Mechanisms Evolution: MHA → GQA → MLA <span class="new-badge">New</span></div>
+                    <div class="tutorial-description">
+                        Complete evolution of attention mechanisms from Multi-Head Attention through Grouped Query Attention to Multi-Head Latent Attention, with deep dive into KV caching, memory optimization, and compression techniques.
+                    </div>
+                    <div class="tutorial-concepts">
+                        KV caching • Memory optimization • Grouped attention • Compression techniques • Evolution timeline
+                    </div>
+                </div>
+            </a>
+            
             <a href="text-generation-process.html" class="tutorial-link">
                 <div class="tutorial-card">
-                    <div class="tutorial-title">🚀 Text Generation Process <span class="new-badge">New</span></div>
+                    <div class="tutorial-title">🚀 Text Generation Process</div>
                     <div class="tutorial-description">
                         Complete mathematical walkthrough from attention output to next token prediction, including feed-forward networks, layer normalization, vocabulary projection, and sampling strategies with exact matrix computations.
                     </div>
@@ -288,6 +306,7 @@
             <li><strong>🎯 Q, K, V Matrix Dimensions</strong> - Understand the basic building blocks</li>
             <li><strong>🌀 RoPE: Rotary Position Embedding</strong> - Learn how position is encoded</li>
             <li><strong>⚡ Complete Attention Mechanism</strong> - See how Q, K, V work together</li>
+            <li><strong>🔄 Attention Mechanisms Evolution</strong> - Learn memory optimization and scaling techniques</li>
             <li><strong>🚀 Text Generation Process</strong> - Complete pipeline from attention to tokens</li>
             <li><strong>📊 Context Length Impact</strong> - Advanced concepts about training vs inference</li>
         </ol>
