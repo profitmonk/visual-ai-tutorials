@@ -63,7 +63,22 @@ Interactive step-by-step walkthrough of how Q, K, V matrices work together in tr
 
 ---
 
-### 🚀 Text Generation Process **[NEW]**
+### 🔄 Attention Mechanisms Evolution: MHA → GQA → MLA **[NEW]**
+**File:** `attention-evolution.html`
+
+Complete evolution of attention mechanisms from Multi-Head Attention through Grouped Query Attention to Multi-Head Latent Attention:
+- **KV caching foundation** - universal optimization across all attention mechanisms
+- **Memory scaling analysis** with exact calculations for different architectures
+- **Evolution timeline** from MHA (2017) → MQA (2019) → GQA (2023) → MLA (2024)
+- **Interactive comparisons** showing memory savings and trade-offs
+- **Deep dive into MLA** with compression/decompression mathematics
+- **Real model configurations** (GPT, LLaMA, Qwen, DeepSeek) with memory analysis
+
+**Key Concepts:** KV caching, memory optimization, grouped attention, compression techniques, evolution timeline
+
+---
+
+### 🚀 Text Generation Process
 **File:** `text-generation-process.html`
 
 Complete mathematical walkthrough from attention output to next token prediction:
@@ -85,7 +100,8 @@ visual-ai-tutorials/
 ├── qkv-matrices.html                  # Q,K,V matrix tutorial  
 ├── context-length-impact.html         # Context length impact tutorial
 ├── complete-attention-mechanism.html  # Complete attention mechanism
-├── text-generation-process.html       # Text generation process [NEW]
+├── attention-evolution.html           # Attention mechanisms evolution [NEW]
+├── text-generation-process.html       # Text generation process
 └── README.md                          # This file
 ```
 
@@ -148,6 +164,8 @@ After completing these tutorials, you'll understand:
 - How RoPE encodes position through rotation mathematics
 - Why attention matrices scale quadratically with sequence length  
 - How model dimensions affect memory and computation requirements
+- The evolution of attention mechanisms and memory optimization techniques
+- How KV caching works universally across all attention variants
 - The complete flow from attention output to next token prediction
 - How feed-forward networks transform representations
 - Why models trained on long contexts work better on short contexts
@@ -161,8 +179,9 @@ After completing these tutorials, you'll understand:
 1. **🎯 Q, K, V Matrix Dimensions** - Understand the basic building blocks
 2. **🌀 RoPE: Rotary Position Embedding** - Learn how position is encoded  
 3. **⚡ Complete Attention Mechanism** - See how Q, K, V work together
-4. **🚀 Text Generation Process** - Complete pipeline from attention to tokens
-5. **📊 Context Length Impact** - Advanced concepts about training vs inference
+4. **🔄 Attention Mechanisms Evolution** - Learn memory optimization and scaling techniques
+5. **🚀 Text Generation Process** - Complete pipeline from attention to tokens
+6. **📊 Context Length Impact** - Advanced concepts about training vs inference
 
 ## 🤝 Contributing
 
