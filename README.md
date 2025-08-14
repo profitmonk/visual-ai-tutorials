@@ -47,15 +47,46 @@ Mathematical analysis of why models trained on long contexts excel at shorter se
 
 **Key Concepts:** Context extension, performance analysis, RoPE frequencies, training vs inference
 
+---
+
+### ⚡ Complete Attention Mechanism
+**File:** `complete-attention-mechanism.html`
+
+Interactive step-by-step walkthrough of how Q, K, V matrices work together in transformer attention:
+- **Matrix creation process** with real token examples
+- **Q × K^T computation** showing compatibility scores
+- **Softmax normalization** converting scores to probabilities
+- **Attention × V application** demonstrating information flow
+- **Interactive matrix explorer** showing individual component impacts
+
+**Key Concepts:** Q×K^T computation, softmax normalization, attention×V, matrix interactions
+
+---
+
+### 🚀 Text Generation Process **[NEW]**
+**File:** `text-generation-process.html`
+
+Complete mathematical walkthrough from attention output to next token prediction:
+- **Feed-forward network computation** with exact matrix dimensions
+- **Layer normalization & residual connections** mathematical analysis
+- **Output projection to vocabulary** showing the largest matrix operation
+- **Sampling strategies** (temperature, top-k, top-p) with live probability visualization
+- **Performance analysis** including memory, bandwidth, and FLOPs per operation
+- **Real model presets** (GPT-2, LLaMA, Qwen, DeepSeek) with exact specifications
+
+**Key Concepts:** FFN computation, matrix flows, vocabulary logits, sampling strategies, performance analysis
+
 ## 🏗️ Repository Structure
 
 ```
 visual-ai-tutorials/
-├── index.html                    # Landing page with tutorial links
-├── rope-tutorial.html            # RoPE tutorial
-├── qkv-matrices.html            # Q,K,V matrix tutorial  
-├── context-length-impact.html   # Context length impact tutorial
-└── README.md                    # This file
+├── index.html                         # Landing page with tutorial links
+├── rope-tutorial.html                 # RoPE tutorial
+├── qkv-matrices.html                  # Q,K,V matrix tutorial  
+├── context-length-impact.html         # Context length impact tutorial
+├── complete-attention-mechanism.html  # Complete attention mechanism
+├── text-generation-process.html       # Text generation process [NEW]
+└── README.md                          # This file
 ```
 
 ## 🎯 Target Audience
@@ -104,11 +135,12 @@ Simply visit the [live demo](https://profitmonk.github.io/visual-ai-tutorials/) 
 
 ### 🔥 What Makes These Tutorials Special
 
-- **Real Architecture Data**: Actual specs from GPT-4, Claude Sonnet 4, Gemini 2.5 Pro
+- **Real Architecture Data**: Actual specs from GPT-4, Claude Sonnet 4, Gemini 2.5 Pro, LLaMA, Qwen, DeepSeek
 - **Interactive Math**: See formulas in action with adjustable parameters
 - **Visual Learning**: Color-coded matrices, dimension pairing, rotation visualizations
-- **Concrete Examples**: Real token sequences, actual memory calculations
+- **Concrete Examples**: Real token sequences, actual memory calculations, exact FLOP counts
 - **Progressive Complexity**: Build understanding step-by-step
+- **Performance Analysis**: Memory usage, bandwidth requirements, computational bottlenecks
 
 ### 🎓 Learning Outcomes
 
@@ -116,8 +148,21 @@ After completing these tutorials, you'll understand:
 - How RoPE encodes position through rotation mathematics
 - Why attention matrices scale quadratically with sequence length  
 - How model dimensions affect memory and computation requirements
+- The complete flow from attention output to next token prediction
+- How feed-forward networks transform representations
 - Why models trained on long contexts work better on short contexts
 - The relationship between training and inference in transformer models
+- Exact computational requirements for real transformer models
+
+## 🎓 Recommended Learning Path
+
+**For maximum understanding, follow this order:**
+
+1. **🎯 Q, K, V Matrix Dimensions** - Understand the basic building blocks
+2. **🌀 RoPE: Rotary Position Embedding** - Learn how position is encoded  
+3. **⚡ Complete Attention Mechanism** - See how Q, K, V work together
+4. **🚀 Text Generation Process** - Complete pipeline from attention to tokens
+5. **📊 Context Length Impact** - Advanced concepts about training vs inference
 
 ## 🤝 Contributing
 
