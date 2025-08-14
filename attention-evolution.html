@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attention Mechanisms Evolution Tutorial</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background: #ffffff;
+            color: #2d2d2d;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-bar {
+            background: #2d2d2d;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-home {
+            background: #ffffff;
+            color: #2d2d2d;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-home:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border-left: 4px solid #2d2d2d;
+        }
+        
+        .example-box {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            border: 1px solid #4a4a4a;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        button {
+            background: #2d2d2d;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #2d2d2d;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .danger {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #2d2d2d;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .evolution-timeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .timeline-step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+        
+        .timeline-step:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #2d2d2d;
+            font-weight: bold;
+        }
+        
+        .timeline-year {
+            background: #2d2d2d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .timeline-name {
+            font-weight: bold;
+            color: #2d2d2d;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-desc {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .memory-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .memory-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .memory-card:hover {
+            border-color: #2d2d2d;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .memory-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2d2d2d;
+        }
+        
+        .memory-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #dc3545;
+            margin: 10px 0;
+        }
+        
+        .memory-savings {
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .math-formula {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .progressive-improvement {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">🔄 Attention Mechanisms Evolution: MHA → GQA → MLA</div>
+        <a href="index.html" class="nav-home">🏠 Home</a>
+    </div>
+
+    <div class="container">
+        <h1>🔄 Evolution of Attention Mechanisms</h1>
+        <p>Step-by-step mathematical journey from Multi-Head Attention through Grouped Query Attention to Multi-Head Latent Attention, with deep dive into KV caching and memory optimization</p>
+    </div>
+
+    <div class="container">
+        <h2>📈 The Evolution Timeline</h2>
+        
+        <div class="evolution-timeline">
+            <div class="timeline-step">
+                <div class="timeline-year">2017</div>
+                <div class="timeline-name">Multi-Head Attention (MHA)</div>
+                <div class="timeline-desc">Original "Attention is All You Need"</div>
+            </div>
+            <div class="timeline-step">
+                <div class="timeline-year">2019</div>
+                <div class="timeline-name">Multi-Query Attention (MQA)</div>
+                <div class="timeline-desc">Single K,V shared across heads</div>
+            </div>
+            <div class="timeline-step">
+                <div class="timeline-year">2023</div>
+                <div class="timeline-name">Grouped Query Attention (GQA)</div>
+                <div class="timeline-desc">Balance between MHA and MQA</div>
+            </div>
+            <div class="timeline-step">
+                <div class="timeline-year">2024</div>
+                <div class="timeline-name">Multi-Head Latent Attention (MLA)</div>
+                <div class="timeline-desc">DeepSeek's compression innovation</div>
+            </div>
+        </div>
+        
+        <div class="warning">
+            <strong>🎯 Core Problem:</strong> As models scale and context lengths grow, the KV cache becomes the primary memory bottleneck during inference
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🏗️ Foundation: Understanding KV Caching</h2>
+        
+        <div class="success">
+            <strong>🔑 CRITICAL UNDERSTANDING:</strong> KV caching is a <strong>universal optimization</strong> that applies to ALL attention mechanisms - MHA, MQA, GQA, and MLA. The difference between mechanisms is <strong>WHAT gets cached</strong>, not WHETHER caching is used.
+        </div>
+        
+        <div class="info">
+            <strong>❓ Why KV Caching?</strong> In autoregressive generation, we recompute the same K,V values for previous tokens at every step. Caching eliminates this redundancy through a <strong>memory-for-compute trade-off</strong>.
+        </div>
+        
+        <div class="step">
+            <h3>🔍 Step 1: The Autoregressive Problem</h3>
+            
+            <div class="example-box">
+                <strong>Without KV Cache (Inefficient):</strong><br>
+                Step 1: "The" → Compute Q,K,V for position 0<br>
+                Step 2: "The cat" → Recompute Q,K,V for positions 0,1<br>
+                Step 3: "The cat sat" → Recompute Q,K,V for positions 0,1,2<br>
+                ...<br>
+                <strong>Problem:</strong> Massive redundant computation!
+            </div>
+            
+            <div class="example-box">
+                <strong>With KV Cache (Efficient):</strong><br>
+                Step 1: "The" → Compute Q₀,K₀,V₀, cache K₀,V₀<br>
+                Step 2: "cat" → Compute Q₁,K₁,V₁, cache K₁,V₁, reuse K₀,V₀<br>
+                Step 3: "sat" → Compute Q₂,K₂,V₂, cache K₂,V₂, reuse K₀,V₀,K₁,V₁<br>
+                ...<br>
+                <strong>Trade-off:</strong> Use MORE memory to avoid redundant computation!
+            </div>
+            
+            <div class="warning">
+                <strong>🔑 Key Insight:</strong> KV caching is a <strong>memory-for-compute trade-off</strong>:
+                <br>• ❌ <strong>Increases memory usage</strong> (store all previous K,V)
+                <br>• ✅ <strong>Reduces computation</strong> (avoid recomputing previous tokens)
+                <br>• ⚡ <strong>Dramatically speeds up inference</strong> (especially for long sequences)
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>📐 Step 2: Mathematical Foundation of KV Cache</h3>
+            
+            <div class="math-formula">
+                <strong>Standard Attention Formula:</strong><br>
+                Attention(Q, K, V) = softmax(Q × K^T / √d_k) × V<br><br>
+                
+                <strong>With KV Cache:</strong><br>
+                K_cache = [K₀, K₁, K₂, ..., K_{t-1}]  # Previous tokens<br>
+                V_cache = [V₀, V₁, V₂, ..., V_{t-1}]  # Previous tokens<br>
+                K_new = [K_cache, K_t]  # Append current token<br>
+                V_new = [V_cache, V_t]  # Append current token<br>
+                Output = Attention(Q_t, K_new, V_new)
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label><strong>Sequence Length:</strong></label>
+                    <select id="kvSeqLen">
+                        <option value="10">10 tokens</option>
+                        <option value="100" selected>100 tokens</option>
+                        <option value="1000">1K tokens</option>
+                        <option value="4096">4K tokens</option>
+                        <option value="32768">32K tokens</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>Model Size:</strong></label>
+                    <select id="kvModelSize">
+                        <option value="small">Small (d_model=768)</option>
+                        <option value="base" selected>Base (d_model=4096)</option>
+                        <option value="large">Large (d_model=8192)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="demonstrateKVCache()">📊 Analyze KV Cache Memory Growth</button>
+            <div id="kvCacheDemo"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔷 Multi-Head Attention (MHA) - The Foundation</h2>
+        
+        <div class="step">
+            <h3>📐 Mathematical Definition</h3>
+            
+            <div class="math-formula">
+                <strong>MHA with h heads:</strong><br>
+                Q_i = Input × W^Q_i ∈ ℝ^(seq_len × d_head)  # for i = 1..h<br>
+                K_i = Input × W^K_i ∈ ℝ^(seq_len × d_head)  # for i = 1..h<br>
+                V_i = Input × W^V_i ∈ ℝ^(seq_len × d_head)  # for i = 1..h<br><br>
+                
+                Head_i = Attention(Q_i, K_i, V_i)<br>
+                Output = Concat(Head_1, ..., Head_h) × W^O
+            </div>
+            
+            <div class="example-box">
+                <strong>🔑 Key Insight:</strong><br>
+                Each head has its own unique K_i and V_i matrices<br>
+                Total KV Cache = 2 × seq_len × h × d_head × sizeof(float16)<br>
+                = 2 × seq_len × d_model × 2 bytes
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>MHA Model:</strong></label>
+                <select id="mhaModel">
+                    <option value="gpt2">GPT-2 (12 heads, 768d)</option>
+                    <option value="gpt3" selected>GPT-3 (32 heads, 4096d)</option>
+                    <option value="large">Large Model (64 heads, 8192d)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Context Length:</strong></label>
+                <select id="mhaContext">
+                    <option value="2048">2K tokens</option>
+                    <option value="8192" selected>8K tokens</option>
+                    <option value="32768">32K tokens</option>
+                    <option value="131072">128K tokens</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="analyzeMHA()">🔍 Analyze MHA Memory Requirements</button>
+        <div id="mhaAnalysis"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔶 Multi-Query Attention (MQA) - First Optimization</h2>
+        
+        <div class="danger">
+            <strong>🚨 Radical Idea:</strong> What if all heads shared the same K and V?
+        </div>
+        
+        <div class="step">
+            <h3>📐 Mathematical Definition</h3>
+            
+            <div class="math-formula">
+                <strong>MQA with h heads:</strong><br>
+                Q_i = Input × W^Q_i ∈ ℝ^(seq_len × d_head)  # for i = 1..h (unique)<br>
+                K = Input × W^K ∈ ℝ^(seq_len × d_head)      # SINGLE shared K<br>
+                V = Input × W^V ∈ ℝ^(seq_len × d_head)      # SINGLE shared V<br><br>
+                
+                Head_i = Attention(Q_i, K, V)  # Same K,V for all heads<br>
+                Output = Concat(Head_1, ..., Head_h) × W^O
+            </div>
+        </div>
+        
+        <button onclick="compareMQA()">⚖️ Compare MHA vs MQA Memory</button>
+        <div id="mqaComparison"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔵 Grouped Query Attention (GQA) - The Balanced Approach</h2>
+        
+        <div class="success">
+            <strong>💡 Insight:</strong> MQA reduces memory but hurts quality. Can we find a middle ground?
+        </div>
+        
+        <div class="step">
+            <h3>📐 Mathematical Definition</h3>
+            
+            <div class="math-formula">
+                <strong>GQA with h heads, g groups:</strong><br>
+                Group size = h / g<br>
+                Q_i = Input × W^Q_i ∈ ℝ^(seq_len × d_head)  # for i = 1..h (unique)<br>
+                K_j = Input × W^K_j ∈ ℝ^(seq_len × d_head)  # for j = 1..g (g groups)<br>
+                V_j = Input × W^V_j ∈ ℝ^(seq_len × d_head)  # for j = 1..g (g groups)<br><br>
+                
+                Head_i uses K_{⌊i/group_size⌋}, V_{⌊i/group_size⌋}<br>
+                Output = Concat(Head_1, ..., Head_h) × W^O
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>GQA Configuration:</strong></label>
+                <select id="gqaConfig">
+                    <option value="llama3">LLaMA-3 (32 heads, 8 groups)</option>
+                    <option value="qwen25" selected>Qwen2.5 (40 heads, 8 groups)</option>
+                    <option value="gemma">Gemma-2 (16 heads, 4 groups)</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="analyzeGQA()">🔍 Analyze GQA Memory Savings</button>
+        <div id="gqaAnalysis"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔶 Multi-Head Latent Attention (MLA) - DeepSeek's Innovation</h2>
+        
+        <div class="danger">
+            <strong>🚀 Revolutionary Idea:</strong> Instead of reducing heads, compress the K,V representations themselves!
+        </div>
+        
+        <div class="step">
+            <h3>🏗️ Complete MLA Architecture</h3>
+            
+            <div class="math-formula">
+                <strong>MLA Step-by-Step Process:</strong><br><br>
+                
+                <strong>1. Joint Compression (NEW):</strong><br>
+                C^KV = Input @ W_compress ∈ ℝ^(seq_len × d_compress)<br>
+                where d_compress ≪ n_heads × d_head<br><br>
+                
+                <strong>2. Cache Compressed Form:</strong><br>
+                KV_cache = [C^KV] (much smaller!)<br><br>
+                
+                <strong>3. Query Processing (same as MHA):</strong><br>
+                Q = Input @ W_Q, reshape to heads<br><br>
+                
+                <strong>4. Decompression (NEW):</strong><br>
+                K = C^KV @ W_K_decomp ∈ ℝ^(seq_len × d_model)<br>
+                V = C^KV @ W_V_decomp ∈ ℝ^(seq_len × d_model)<br><br>
+                
+                <strong>5. Standard Attention:</strong><br>
+                Attention(Q, K, V) as usual
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Model Configuration:</strong></label>
+                <select id="mlaConfig">
+                    <option value="deepseek_7b">DeepSeek-V2-7B</option>
+                    <option value="deepseek_67b" selected>DeepSeek-V2-67B</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Sequence Length:</strong></label>
+                <select id="mlaSeqLen">
+                    <option value="4096">4K tokens</option>
+                    <option value="32768" selected>32K tokens</option>
+                    <option value="131072">128K tokens</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="analyzeMLA()">🔬 Deep Dive MLA Analysis</button>
+        <div id="mlaAnalysis"></div>
+    </div>
+
+    <div class="container">
+        <h2>⚖️ Complete Comparison: MHA vs GQA vs MLA</h2>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Comparison Scenario:</strong></label>
+                <select id="compScenario">
+                    <option value="7b_model">7B Model (typical use case)</option>
+                    <option value="70b_model" selected>70B Model (large scale)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Context Length:</strong></label>
+                <select id="compContext">
+                    <option value="8192">8K tokens</option>
+                    <option value="32768" selected>32K tokens</option>
+                    <option value="131072">128K tokens</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="compareAllMechanisms()">📊 Compare All Attention Mechanisms</button>
+        <div id="completeComparison"></div>
+    </div>
+	<div class="step">
+		<h3>⚡ Inference: How It Works in Practice</h3>
+		
+		<div class="example-box">
+			<strong>🔄 Step-by-Step Example: Generating "The cat sat"</strong><br><br>
+			
+			<strong>Setup:</strong> d_model=8, n_heads=4, d_compress=3<br>
+			<strong>Memory Comparison:</strong> MHA would cache 4×2=8 matrices per token, MLA caches 1 compressed vector<br><br>
+			
+			<strong>Token 1: "The"</strong><br>
+			Input₁ = [0.2, 0.5, -0.1, 0.8, 0.3, -0.4, 0.7, 0.1]<br>
+			C¹ᴷⱽ = Input₁ × W_compress = [0.42, 0.38, 0.31]  ← Cache this (3 numbers)<br>
+			<em>vs MHA: Would cache 16 numbers for 4 heads × 2 (K,V) × 2 dimensions</em><br><br>
+			
+			<strong>Token 2: "cat"</strong><br>
+			Input₂ = [0.1, 0.7, 0.2, -0.3, 0.6, 0.4, -0.2, 0.5]<br>
+			C²ᴷⱽ = Input₂ × W_compress = [0.35, 0.47, 0.28]  ← Cache this<br>
+			Cache = [C¹ᴷⱽ, C²ᴷⱽ] = 6 numbers total<br>
+			<em>vs MHA: Would cache 32 numbers for 2 tokens</em><br><br>
+			
+			<strong>When Attention is Needed:</strong><br>
+			K₁ = C¹ᴷⱽ × W_K_decomp = [reconstructed K for "The"]<br>
+			K₂ = C²ᴷⱽ × W_K_decomp = [reconstructed K for "cat"]<br>
+			V₁ = C¹ᴷⱽ × W_V_decomp = [reconstructed V for "The"]<br>
+			V₂ = C²ᴷⱽ × W_V_decomp = [reconstructed V for "cat"]<br>
+			Then: Normal attention with reconstructed K, V matrices
+		</div>
+		
+		<div class="progressive-improvement">
+			<strong>🎯 The Magic:</strong> 6 numbers (MLA) vs 32 numbers (MHA) for same sequence - 5.3× memory reduction with learned optimal compression!
+		</div>
+    </div>
+    <script>
+        // Model configurations
+        const attentionConfigs = {
+            // MHA models
+            gpt2: { name: 'GPT-2', d_model: 768, n_heads: 12, type: 'mha' },
+            gpt3: { name: 'GPT-3', d_model: 4096, n_heads: 32, type: 'mha' },
+            large: { name: 'Large Model', d_model: 8192, n_heads: 64, type: 'mha' },
+            
+            // GQA models
+            llama3: { name: 'LLaMA-3-8B', d_model: 4096, n_heads: 32, n_kv_groups: 8, type: 'gqa' },
+            qwen25: { name: 'Qwen2.5-32B', d_model: 5120, n_heads: 40, n_kv_groups: 8, type: 'gqa' },
+            gemma: { name: 'Gemma-2-27B', d_model: 4608, n_heads: 36, n_kv_groups: 16, type: 'gqa' },
+            
+            // MLA models  
+            deepseek_7b: { name: 'DeepSeek-V2-7B', d_model: 4096, n_heads: 32, d_compress: 1024, type: 'mla' },
+            deepseek_67b: { name: 'DeepSeek-V2-67B', d_model: 8192, n_heads: 64, d_compress: 2048, type: 'mla' }
+        };
+
+        function demonstrateKVCache() {
+            const seqLen = parseInt(document.getElementById('kvSeqLen').value);
+            const modelSize = document.getElementById('kvModelSize').value;
+            
+            const modelSpecs = {
+                small: { d_model: 768, n_heads: 12 },
+                base: { d_model: 4096, n_heads: 32 },
+                large: { d_model: 8192, n_heads: 64 }
+            };
+            
+            const config = modelSpecs[modelSize];
+            const d_head = config.d_model / config.n_heads;
+            
+            let html = '<div class="step"><h3>📊 KV Cache Memory Analysis</h3>';
+            
+            html += '<div class="example-box">';
+            html += '<strong>Model Configuration:</strong><br>';
+            html += 'd_model: ' + config.d_model + ', n_heads: ' + config.n_heads + ', d_head: ' + d_head + '<br>';
+            html += 'Sequence Length: ' + seqLen.toLocaleString() + ' tokens';
+            html += '</div>';
+            
+            const kv_cache_size = 2 * seqLen * config.n_heads * d_head * 2;
+            const total_attention_matrix = seqLen * seqLen * config.n_heads * 4;
+            
+            html += '<div class="math-formula">';
+            html += '<strong>KV Cache Memory:</strong><br>';
+            html += '2 (K+V) × ' + seqLen.toLocaleString() + ' × ' + config.n_heads + ' × ' + d_head + ' × 2 bytes<br>';
+            html += '= ' + (kv_cache_size / 1024 / 1024).toFixed(1) + ' MB<br><br>';
+            html += '<strong>Attention Matrix Memory:</strong><br>';
+            html += seqLen.toLocaleString() + ' × ' + seqLen.toLocaleString() + ' × ' + config.n_heads + ' × 4 bytes<br>';
+            html += '= ' + (total_attention_matrix / 1024 / 1024).toFixed(1) + ' MB';
+            html += '</div>';
+            
+            html += '<table>';
+            html += '<tr><th>Sequence Length</th><th>KV Cache (MB)</th><th>Attention Matrix (MB)</th><th>Total (MB)</th></tr>';
+            
+            const lengths = [1000, 4000, 16000, 64000];
+            for (let len of lengths) {
+                const kv = 2 * len * config.n_heads * d_head * 2 / 1024 / 1024;
+                const attn = len * len * config.n_heads * 4 / 1024 / 1024;
+                const total = kv + attn;
+                
+                html += '<tr>';
+                html += '<td>' + len.toLocaleString() + '</td>';
+                html += '<td>' + kv.toFixed(1) + '</td>';
+                html += '<td>' + attn.toFixed(1) + '</td>';
+                html += '<td><strong>' + total.toFixed(1) + '</strong></td>';
+                html += '</tr>';
+            }
+            html += '</table>';
+            
+            html += '<div class="warning">';
+            html += '<strong>🎯 The Memory Problem:</strong> As we scale to longer contexts (32K, 128K tokens), KV cache memory becomes the primary bottleneck.';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('kvCacheDemo').innerHTML = html;
+        }
+
+        function analyzeMHA() {
+            const modelKey = document.getElementById('mhaModel').value;
+            const context = parseInt(document.getElementById('mhaContext').value);
+            const config = attentionConfigs[modelKey];
+            
+            let html = '<div class="step"><h3>🔷 MHA Memory Analysis</h3>';
+            
+            const d_head = config.d_model / config.n_heads;
+            const kv_cache = 2 * context * config.n_heads * d_head * 2;
+            
+            html += '<div class="example-box">';
+            html += '<strong>Model:</strong> ' + config.name + '<br>';
+            html += '<strong>Architecture:</strong> ' + config.n_heads + ' heads × ' + d_head + ' dimensions<br>';
+            html += '<strong>Context:</strong> ' + context.toLocaleString() + ' tokens';
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>KV Cache Calculation:</strong><br>';
+            html += '2 (K+V) × ' + context.toLocaleString() + ' × ' + config.n_heads + ' × ' + d_head + ' × 2 bytes<br>';
+            html += '= ' + (kv_cache / 1024 / 1024).toFixed(1) + ' MB';
+            html += '</div>';
+            
+            html += '<div class="memory-comparison">';
+            html += '<div class="memory-card">';
+            html += '<div class="memory-title">Per-Head Memory</div>';
+            html += '<div class="memory-value">' + (kv_cache / config.n_heads / 1024 / 1024).toFixed(1) + ' MB</div>';
+            html += '<div>Each head stores its own K,V</div>';
+            html += '</div>';
+            html += '<div class="memory-card">';
+            html += '<div class="memory-title">Total KV Cache</div>';
+            html += '<div class="memory-value">' + (kv_cache / 1024 / 1024).toFixed(1) + ' MB</div>';
+            html += '<div>All heads combined</div>';
+            html += '</div>';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('mhaAnalysis').innerHTML = html;
+        }
+
+        function compareMQA() {
+            let html = '<div class="step"><h3>⚖️ MHA vs MQA Comparison</h3>';
+            
+            const config = { d_model: 4096, n_heads: 32 };
+            const d_head = config.d_model / config.n_heads;
+            const context = 8192;
+            
+            const mha_cache = 2 * context * config.n_heads * d_head * 2;
+            const mqa_cache = 2 * context * 1 * d_head * 2;
+            const reduction = mha_cache / mqa_cache;
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Memory Comparison (8K context, 32 heads):</strong><br><br>';
+            html += 'MHA KV Cache: 2 × ' + context + ' × ' + config.n_heads + ' × ' + d_head + ' × 2 = ' + (mha_cache / 1024 / 1024).toFixed(1) + ' MB<br>';
+            html += 'MQA KV Cache: 2 × ' + context + ' × 1 × ' + d_head + ' × 2 = ' + (mqa_cache / 1024 / 1024).toFixed(1) + ' MB<br><br>';
+            html += '<strong>Reduction Factor: ' + reduction.toFixed(0) + '×</strong>';
+            html += '</div>';
+            
+            html += '<div class="memory-comparison">';
+            html += '<div class="memory-card">';
+            html += '<div class="memory-title">🔷 MHA</div>';
+            html += '<div class="memory-value">' + (mha_cache / 1024 / 1024).toFixed(1) + ' MB</div>';
+            html += '<div>✅ Best Quality<br>❌ High Memory</div>';
+            html += '</div>';
+            html += '<div class="memory-card">';
+            html += '<div class="memory-title">🔸 MQA</div>';
+            html += '<div class="memory-value">' + (mqa_cache / 1024 / 1024).toFixed(1) + ' MB</div>';
+            html += '<div>✅ Low Memory<br>❌ Quality Loss</div>';
+            html += '</div>';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('mqaComparison').innerHTML = html;
+        }
+
+        function analyzeGQA() {
+            const configKey = document.getElementById('gqaConfig').value;
+            const config = attentionConfigs[configKey];
+            
+            let html = '<div class="step"><h3>🔵 GQA Memory Analysis</h3>';
+            
+            const d_head = config.d_model / config.n_heads;
+            const group_size = config.n_heads / config.n_kv_groups;
+            const context = 8192;
+            
+            const mha_cache = 2 * context * config.n_heads * d_head * 2;
+            const gqa_cache = 2 * context * config.n_kv_groups * d_head * 2;
+            const reduction = mha_cache / gqa_cache;
+            
+            html += '<div class="example-box">';
+            html += '<strong>Model:</strong> ' + config.name + '<br>';
+            html += '<strong>Heads:</strong> ' + config.n_heads + ' query heads<br>';
+            html += '<strong>KV Groups:</strong> ' + config.n_kv_groups + ' groups<br>';
+            html += '<strong>Group Size:</strong> ' + group_size + ' queries per KV group<br>';
+            html += '<strong>Reduction Factor:</strong> ' + reduction.toFixed(1) + '×';
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Memory Calculation:</strong><br>';
+            html += 'MHA: 2 × ' + context + ' × ' + config.n_heads + ' × ' + d_head + ' × 2 = ' + (mha_cache / 1024 / 1024).toFixed(1) + ' MB<br>';
+            html += 'GQA: 2 × ' + context + ' × ' + config.n_kv_groups + ' × ' + d_head + ' × 2 = ' + (gqa_cache / 1024 / 1024).toFixed(1) + ' MB<br>';
+            html += '<strong>Savings: ' + ((1 - gqa_cache/mha_cache) * 100).toFixed(1) + '%</strong>';
+            html += '</div>';
+            
+            html += '<div class="success">';
+            html += '<strong>🎯 GQA Sweet Spot:</strong><br>';
+            html += '✅ ' + reduction.toFixed(1) + '× memory reduction vs MHA<br>';
+            html += '✅ Minimal quality loss vs MHA<br>';
+            html += '✅ Simple implementation<br>';
+            html += '✅ Widely adopted in production';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('gqaAnalysis').innerHTML = html;
+        }
+
+        function analyzeMLA() {
+            const configKey = document.getElementById('mlaConfig').value;
+            const seqLen = parseInt(document.getElementById('mlaSeqLen').value);
+            const config = attentionConfigs[configKey];
+            
+            let html = '<div class="step"><h3>🔶 MLA Deep Dive Analysis</h3>';
+            
+            const d_head = config.d_model / config.n_heads;
+            const mha_cache = 2 * seqLen * config.n_heads * d_head * 2;
+            const mla_cache = seqLen * config.d_compress * 2;
+            
+            html += '<div class="example-box">';
+            html += '<strong>Model:</strong> ' + config.name + '<br>';
+            html += '<strong>d_model:</strong> ' + config.d_model + '<br>';
+            html += '<strong>n_heads:</strong> ' + config.n_heads + '<br>';
+            html += '<strong>d_compress:</strong> ' + config.d_compress + '<br>';
+            html += '<strong>Compression Ratio:</strong> ' + (config.n_heads * d_head / config.d_compress).toFixed(1) + ':1<br>';
+            html += '<strong>Sequence Length:</strong> ' + seqLen.toLocaleString() + ' tokens';
+            html += '</div>';
+            
+            const reduction = mla_cache / mha_cache;
+            const savings = (1 - reduction) * 100;
+            
+            html += '<div class="memory-comparison">';
+            html += '<div class="memory-card">';
+            html += '<div class="memory-title">🔷 Standard MHA</div>';
+            html += '<div class="memory-value">' + (mha_cache / 1024 / 1024).toFixed(1) + ' MB</div>';
+            html += '</div>';
+            html += '<div class="memory-card">';
+            html += '<div class="memory-title">🔶 MLA Compressed</div>';
+            html += '<div class="memory-value">' + (mla_cache / 1024 / 1024).toFixed(1) + ' MB</div>';
+            html += '<div class="memory-savings">' + savings.toFixed(1) + '% Reduction</div>';
+            html += '</div>';
+            html += '</div>';
+            
+            html += '<div class="progressive-improvement">';
+            html += '🚀 MLA represents a fundamental breakthrough: ' + savings.toFixed(1) + '% memory reduction with better quality than simpler approaches.';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('mlaAnalysis').innerHTML = html;
+        }
+
+        function compareAllMechanisms() {
+            const scenario = document.getElementById('compScenario').value;
+            const context = parseInt(document.getElementById('compContext').value);
+            
+            const scenarios = {
+                '7b_model': { d_model: 4096, n_heads: 32, d_compress: 1024 },
+                '70b_model': { d_model: 8192, n_heads: 64, d_compress: 2048 }
+            };
+            
+            const config = scenarios[scenario];
+            const d_head = config.d_model / config.n_heads;
+            
+            let html = '<div class="step"><h3>📊 Complete Architecture Comparison</h3>';
+            
+            html += '<div class="example-box">';
+            html += '<strong>Comparison Setup:</strong><br>';
+            html += 'Model Size: d_model=' + config.d_model + ', n_heads=' + config.n_heads + '<br>';
+            html += 'Context Length: ' + context.toLocaleString() + ' tokens<br>';
+            html += 'Precision: FP16 (2 bytes per parameter)';
+            html += '</div>';
+            
+            const mha_cache = 2 * context * config.n_heads * d_head * 2;
+            const gqa_cache = 2 * context * 8 * d_head * 2;
+            const mla_cache = context * config.d_compress * 2;
+            const mqa_cache = 2 * context * 1 * d_head * 2;
+            
+            html += '<table>';
+            html += '<tr><th>Mechanism</th><th>KV Cache (MB)</th><th>Reduction vs MHA</th><th>Quality</th><th>Implementation</th></tr>';
+            
+            const mechanisms = [
+                { name: 'MHA (Baseline)', cache: mha_cache, quality: '100%', impl: 'Simple' },
+                { name: 'GQA (8 groups)', cache: gqa_cache, quality: '~95%', impl: 'Simple' },
+                { name: 'MLA (Compressed)', cache: mla_cache, quality: '~98%', impl: 'Complex' },
+                { name: 'MQA (Reference)', cache: mqa_cache, quality: '~85%', impl: 'Simple' }
+            ];
+            
+            for (let mech of mechanisms) {
+                const reduction = mha_cache / mech.cache;
+                const savings = (1 - mech.cache / mha_cache) * 100;
+                
+                html += '<tr>';
+                html += '<td><strong>' + mech.name + '</strong></td>';
+                html += '<td>' + (mech.cache / 1024 / 1024).toFixed(1) + '</td>';
+                html += '<td>' + reduction.toFixed(1) + '× (' + savings.toFixed(1) + '%)</td>';
+                html += '<td>' + mech.quality + '</td>';
+                html += '<td>' + mech.impl + '</td>';
+                html += '</tr>';
+            }
+            html += '</table>';
+            
+            html += '<div class="memory-comparison">';
+            for (let mech of mechanisms) {
+                const isBaseline = mech.name.includes('MHA');
+                const color = isBaseline ? '#dc3545' : '#28a745';
+                html += '<div class="memory-card">';
+                html += '<div class="memory-title">' + mech.name + '</div>';
+                html += '<div class="memory-value" style="color: ' + color + ';">' + (mech.cache / 1024 / 1024).toFixed(1) + ' MB</div>';
+                if (!isBaseline) {
+                    html += '<div class="memory-savings">' + ((1 - mech.cache / mha_cache) * 100).toFixed(1) + '% Savings</div>';
+                }
+                html += '</div>';
+            }
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('completeComparison').innerHTML = html;
+        }
+
+        // Initialize with default demonstrations
+        document.addEventListener('DOMContentLoaded', function() {
+            demonstrateKVCache();
+        });
+    </script>
+</body>
+</html>
