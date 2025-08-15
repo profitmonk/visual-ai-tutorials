@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mixture of Experts Tutorial</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background: #ffffff;
+            color: #2d2d2d;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-bar {
+            background: #2d2d2d;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-home {
+            background: #ffffff;
+            color: #2d2d2d;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-home:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border-left: 4px solid #2d2d2d;
+        }
+        
+        .example-box {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            border: 1px solid #4a4a4a;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        button {
+            background: #2d2d2d;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #2d2d2d;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .danger {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #2d2d2d;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .math-formula {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .expert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .expert-box {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .expert-active {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .expert-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2d2d2d;
+        }
+        
+        .expert-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #dc3545;
+            margin: 8px 0;
+        }
+        
+        .routing-visualization {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .router-box {
+            background: #2d2d2d;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .arrow {
+            font-size: 24px;
+            color: #2d2d2d;
+            font-weight: bold;
+        }
+        
+        .token-flow {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px;
+            text-align: center;
+        }
+        
+        .efficiency-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .efficiency-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .efficiency-card.moe {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .efficiency-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2d2d2d;
+        }
+        
+        .efficiency-metric {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .sparsity-bar {
+            height: 20px;
+            background: #28a745;
+            border-radius: 10px;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        .sparsity-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">🎯 Mixture of Experts: Scaling Transformers Efficiently</div>
+        <a href="index.html" class="nav-home">🏠 Home</a>
+    </div>
+
+    <div class="container">
+        <h1>🎯 Mixture of Experts (MoE)</h1>
+        <p>Interactive exploration of how MoE scales transformer models efficiently through sparsity, routing, and selective expert activation</p>
+    </div>
+
+    <div class="container">
+        <h2>🧠 The Core Problem: Dense vs Sparse Computation</h2>
+        
+        <div class="danger">
+            <strong>🚨 The Scaling Challenge:</strong> Traditional transformers use ALL parameters for EVERY token. As models grow, computation becomes prohibitively expensive.
+        </div>
+        
+        <div class="step">
+            <h3>🔍 Traditional Dense FFN Problem</h3>
+            
+            <div class="example-box">
+                <strong>❌ Dense Approach (Traditional):</strong><br>
+                Every token → Uses entire FFN → All 11B parameters activated<br>
+                Token "The" → 11B parameters<br>
+                Token "cat" → 11B parameters (same ones!)<br>
+                Token "sat" → 11B parameters (same ones!)<br><br>
+                <strong>Problem:</strong> Massive computational waste for simple tokens!
+            </div>
+            
+            <div class="example-box">
+                <strong>✅ Sparse Approach (MoE):</strong><br>
+                Every token → Routed to specialized experts → Only 2-3 experts activated<br>
+                Token "The" → Grammar Expert (1.4B params)<br>
+                Token "cat" → Noun Expert (1.4B params)<br>
+                Token "complex_math" → Math Expert (1.4B params)<br><br>
+                <strong>Insight:</strong> 8× parameter increase, same computation cost!
+            </div>
+        </div>
+        
+        <div class="success">
+            <strong>🎯 MoE Key Insight:</strong> Different tokens need different types of processing. Instead of using one giant FFN, use many specialized smaller FFNs and route tokens to the right experts!
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🏗️ MoE Architecture: From Dense to Sparse</h2>
+        
+        <div class="step">
+            <h3>📐 Mathematical Transformation</h3>
+            
+            <div class="math-formula">
+                <strong>Dense FFN (Traditional):</strong><br>
+                FFN(x) = W₂ × ReLU(W₁ × x + b₁) + b₂<br>
+                Where: W₁ ∈ ℝ^(d_model × d_ff), W₂ ∈ ℝ^(d_ff × d_model)<br><br>
+                
+                <strong>MoE FFN (Sparse):</strong><br>
+                Router(x) = softmax(x × W_gate) → Select top-k experts<br>
+                MoE(x) = Σᵢ gᵢ(x) × Expertᵢ(x) for selected experts<br>
+                Where: gᵢ(x) = router weight for expert i
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label><strong>Base Model:</strong></label>
+                    <select id="modelSize">
+                        <option value="llama7b">LLaMA-7B</option>
+                        <option value="llama70b" selected>LLaMA-70B</option>
+                        <option value="qwen7b">Qwen-7B</option>
+                        <option value="qwen72b">Qwen-72B</option>
+                        <option value="deepseek7b">DeepSeek-7B</option>
+                        <option value="deepseek67b">DeepSeek-67B</option>
+                        <option value="mixtral7b">Mixtral-7B (for comparison)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>Number of Experts:</strong></label>
+                    <select id="numExperts">
+                        <option value="8">8 Experts</option>
+                        <option value="16" selected>16 Experts</option>
+                        <option value="32">32 Experts</option>
+                        <option value="64">64 Experts</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>Top-k Selection:</strong></label>
+                    <select id="topK">
+                        <option value="1">Top-1</option>
+                        <option value="2" selected>Top-2</option>
+                        <option value="4">Top-4</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="analyzeMoEArchitecture()">🔍 Analyze MoE Architecture</button>
+            <div id="moeArchitectureAnalysis"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧭 The Router: Smart Token Assignment</h2>
+        
+        <div class="step">
+            <h3>🎯 How Routing Works</h3>
+            
+            <div class="info">
+                <strong>🔑 Router's Job:</strong> For each token, decide which expert(s) should process it based on the token's learned representation.
+            </div>
+            
+            <div class="math-formula">
+                <strong>Router Mathematics:</strong><br><br>
+                
+                <strong>1. Compute expert affinities:</strong><br>
+                logits = token_embedding × W_router<br>
+                [seq_len × d_model] × [d_model × n_experts] = [seq_len × n_experts]<br><br>
+                
+                <strong>2. Softmax normalization:</strong><br>
+                probabilities = softmax(logits)<br>
+                Σᵢ probabilities[i] = 1.0<br><br>
+                
+                <strong>3. Top-k selection:</strong><br>
+                selected_experts = top_k(probabilities)<br>
+                routing_weights = renormalize(selected_probabilities)
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label><strong>Example Token:</strong></label>
+                    <select id="exampleToken">
+                        <option value="article">"the" (article)</option>
+                        <option value="noun" selected>"cat" (noun)</option>
+                        <option value="verb">"running" (verb)</option>
+                        <option value="math">"∫x²dx" (math)</option>
+                        <option value="code">"function()" (code)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>Router Temperature:</strong></label>
+                    <input type="range" id="routerTemp" min="0.1" max="2.0" step="0.1" value="1.0">
+                    <span id="tempValue">1.0</span>
+                </div>
+            </div>
+            
+            <button onclick="simulateRouting()">🧭 Simulate Token Routing</button>
+            <div id="routingSimulation"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>👥 Expert Specialization: What Each Expert Learns</h2>
+        
+        <div class="step">
+            <h3>🎓 Emergent Expert Behaviors</h3>
+            
+            <div class="example-box">
+                <strong>🔬 Research Findings on Expert Specialization:</strong><br><br>
+                
+                <strong>Expert 0:</strong> Articles, determiners ("the", "a", "an")<br>
+                <strong>Expert 1:</strong> Common nouns ("cat", "house", "car")<br>
+                <strong>Expert 2:</strong> Verbs and actions ("run", "jump", "think")<br>
+                <strong>Expert 3:</strong> Numbers and mathematics ("42", "∑", "∫")<br>
+                <strong>Expert 4:</strong> Proper nouns ("Paris", "OpenAI", "Tesla")<br>
+                <strong>Expert 5:</strong> Technical/code tokens ("function", "class", "{}")<br>
+                <strong>Expert 6:</strong> Emotional/descriptive words ("beautiful", "sad")<br>
+                <strong>Expert 7:</strong> Complex reasoning and logic tokens<br><br>
+                
+                <strong>🧠 Key Insight:</strong> Specialization emerges automatically during training!
+            </div>
+            
+            <div class="expert-grid" id="expertGrid">
+                <div class="expert-box">
+                    <div class="expert-title">Grammar Expert</div>
+                    <div class="expert-value">15%</div>
+                    <div>Articles, Prepositions</div>
+                </div>
+                <div class="expert-box">
+                    <div class="expert-title">Noun Expert</div>
+                    <div class="expert-value">12%</div>
+                    <div>Objects, Entities</div>
+                </div>
+                <div class="expert-box">
+                    <div class="expert-title">Verb Expert</div>
+                    <div class="expert-value">10%</div>
+                    <div>Actions, States</div>
+                </div>
+                <div class="expert-box">
+                    <div class="expert-title">Math Expert</div>
+                    <div class="expert-value">8%</div>
+                    <div>Numbers, Equations</div>
+                </div>
+            </div>
+            
+            <button onclick="analyzeExpertSpecialization()">🔬 Analyze Expert Usage Patterns</button>
+            <div id="expertAnalysis"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>⚡ Performance & Efficiency Analysis</h2>
+        
+        <div class="step">
+            <h3>📊 Dense vs MoE Comparison</h3>
+            
+            <div class="info">
+                <strong>📋 Model Selection:</strong> Choose a real model architecture to see exact performance comparisons with realistic MoE scaling.
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label><strong>Base Model Architecture:</strong></label>
+                    <select id="efficiencyModel">
+                        <option value="llama7b">LLaMA-7B (32 layers)</option>
+                        <option value="llama70b" selected>LLaMA-70B (80 layers)</option>
+                        <option value="qwen7b">Qwen-7B (32 layers)</option>
+                        <option value="qwen72b">Qwen-72B (80 layers)</option>
+                        <option value="deepseek7b">DeepSeek-7B (30 layers)</option>
+                        <option value="deepseek67b">DeepSeek-67B (95 layers)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>Comparison Scenario:</strong></label>
+                    <select id="comparisonScenario">
+                        <option value="inference">Inference Speed</option>
+                        <option value="training" selected>Training Efficiency</option>
+                        <option value="scaling">Parameter Scaling</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>Sequence Length:</strong></label>
+                    <select id="sequenceLength">
+                        <option value="512">512 tokens</option>
+                        <option value="2048" selected>2048 tokens</option>
+                        <option value="8192">8192 tokens</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="compareEfficiency()">📈 Compare Dense vs MoE Efficiency</button>
+            <div id="efficiencyComparison"></div>
+        </div>
+        
+        <div class="step">
+            <h3>💰 Cost-Benefit Analysis</h3>
+            
+            <div class="warning">
+                <strong>🎯 The MoE Trade-off:</strong> More parameters, same compute cost, but higher memory requirements and routing overhead.
+            </div>
+            
+            <button onclick="analyzeCostBenefit()">💰 Analyze Cost-Benefit Trade-offs</button>
+            <div id="costBenefitAnalysis"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎲 Interactive MoE Token Processing</h2>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Input Text:</strong></label>
+                <input type="text" id="inputText" value="The cat solved the mathematical equation" style="width: 300px;">
+            </div>
+            <div class="control-group">
+                <label><strong>Load Balancing:</strong></label>
+                <select id="loadBalancing">
+                    <option value="none">No Balancing</option>
+                    <option value="auxiliary" selected>Auxiliary Loss</option>
+                    <option value="switch">Switch Transformer</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="processWithMoE()">🚀 Process Text with MoE</button>
+        <div id="moeProcessing"></div>
+    </div>
+
+    <div class="container">
+        <h2>📈 Real-World MoE Models</h2>
+        
+        <div class="step">
+            <h3>🏭 Production MoE Architectures</h3>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label><strong>MoE Model:</strong></label>
+                    <select id="realMoeModel">
+                        <option value="switch">Switch Transformer</option>
+                        <option value="glam" selected>GLaM</option>
+                        <option value="palm">PaLM-2</option>
+                        <option value="gpt4">GPT-4 (rumored)</option>
+                        <option value="mixtral">Mixtral 8x7B</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="analyzeRealMoEModel()">🔍 Analyze Real MoE Model</button>
+            <div id="realModelAnalysis"></div>
+        </div>
+    </div>
+
+    <script>
+        // Event listeners for dynamic updates
+        document.getElementById('routerTemp').addEventListener('input', function() {
+            document.getElementById('tempValue').textContent = this.value;
+        });
+
+        // Model configurations for real MoE systems
+        const moeConfigs = {
+            'switch': {
+                name: 'Switch Transformer',
+                total_params: '1.6T',
+                experts: 2048,
+                top_k: 1,
+                expert_size: '780M',
+                sparsity: 99.95,
+                efficiency_gain: '4x'
+            },
+            'glam': {
+                name: 'GLaM',
+                total_params: '1.2T',
+                experts: 64,
+                top_k: 2,
+                expert_size: '8.7B',
+                sparsity: 96.9,
+                efficiency_gain: '3x'
+            },
+            'palm': {
+                name: 'PaLM-2',
+                total_params: '340B',
+                experts: 16,
+                top_k: 2,
+                expert_size: '13B',
+                sparsity: 87.5,
+                efficiency_gain: '2.5x'
+            },
+            'gpt4': {
+                name: 'GPT-4 (Rumored)',
+                total_params: '1.8T',
+                experts: 8,
+                top_k: 2,
+                expert_size: '111B',
+                sparsity: 75.0,
+                efficiency_gain: '2x'
+            },
+            'mixtral': {
+                name: 'Mixtral 8x7B',
+                total_params: '45B',
+                experts: 8,
+                top_k: 2,
+                expert_size: '7B',
+                sparsity: 75.0,
+                efficiency_gain: '1.8x'
+            }
+        };
+
+        function analyzeMoEArchitecture() {
+            const modelSize = document.getElementById('modelSize').value;
+            const numExperts = parseInt(document.getElementById('numExperts').value);
+            const topK = parseInt(document.getElementById('topK').value);
+            
+            const modelSpecs = realModelSpecs[modelKey];
+            const expertSize = modelSpecs.d_ff / 4; // Assuming each expert is 1/4 of original FFN
+            const config = modelSpecs;
+            const totalMoEParams = numExperts * expertSize * config.d_model * 2; // W1 + W2
+            const activeParams = topK * expertSize * config.d_model * 2;
+            const sparsity = (1 - activeParams / totalMoEParams) * 100;
+            
+            let html = '<div class="step"><h3>🏗️ MoE Architecture Analysis</h3>';
+            
+            html += '<div class="example-box">';
+            html += '<strong>Model Configuration:</strong><br>';
+            html += 'Base Model: ' + config.dense_params + ' parameters<br>';
+            html += 'Number of Experts: ' + numExperts + '<br>';
+            html += 'Top-k Selection: ' + topK + '<br>';
+            html += 'd_model: ' + config.d_model + ', d_ff: ' + config.d_ff + '<br>';
+            html += 'Expert Size: ' + (expertSize / 1e3).toFixed(1) + 'K parameters each';
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Parameter Calculation:</strong><br><br>';
+            html += 'Dense FFN params per layer: 2 × ' + config.d_model + ' × ' + config.d_ff + ' = ' + (2 * config.d_model * config.d_ff / 1e9).toFixed(1) + 'B<br>';
+            html += 'MoE FFN params per layer: ' + numExperts + ' × 2 × ' + config.d_model + ' × ' + expertSize + ' = ' + (totalMoEParams / 1e9).toFixed(1) + 'B<br>';
+            html += 'Active params per forward pass: ' + topK + ' × 2 × ' + config.d_model + ' × ' + expertSize + ' = ' + (activeParams / 1e9).toFixed(1) + 'B<br>';
+            html += '<strong>Sparsity: ' + sparsity.toFixed(1) + '%</strong>';
+            html += '</div>';
+            
+            html += '<div class="efficiency-comparison">';
+            html += '<div class="efficiency-card">';
+            html += '<div class="efficiency-title">Dense Model</div>';
+            html += '<div class="efficiency-metric" style="color: #dc3545;">' + config.dense_params + '</div>';
+            html += '<div>Total Parameters</div>';
+            html += '<div class="efficiency-metric" style="color: #dc3545;">100%</div>';
+            html += '<div>Parameters Used</div>';
+            html += '</div>';
+            html += '<div class="efficiency-card moe">';
+            html += '<div class="efficiency-title">MoE Model</div>';
+            html += '<div class="efficiency-metric" style="color: #28a745;">' + (totalMoEParams * config.layers / 1e9).toFixed(0) + 'B</div>';
+            html += '<div>Total Parameters</div>';
+            html += '<div class="efficiency-metric" style="color: #28a745;">' + (100 - sparsity).toFixed(1) + '%</div>';
+            html += '<div>Parameters Used</div>';
+            html += '</div>';
+            html += '</div>';
+            
+            html += '<div class="success">';
+            html += '<strong>🎯 MoE Advantage:</strong> ' + (totalMoEParams * config.layers / (2 * config.d_model * config.d_ff * config.layers)).toFixed(1) + 'x more parameters, but only ' + (activeParams / (2 * config.d_model * config.d_ff)).toFixed(1) + 'x computation cost!';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('moeArchitectureAnalysis').innerHTML = html;
+        }
+
+        function simulateRouting() {
+            const token = document.getElementById('exampleToken').value;
+            const temperature = parseFloat(document.getElementById('routerTemp').value);
+            
+            // Simulate expert affinities based on token type
+            const expertAffinities = {
+                'article': [0.8, 0.1, 0.05, 0.02, 0.01, 0.01, 0.005, 0.005],
+                'noun': [0.1, 0.7, 0.1, 0.03, 0.03, 0.02, 0.01, 0.01],
+                'verb': [0.05, 0.1, 0.75, 0.03, 0.02, 0.02, 0.02, 0.01],
+                'math': [0.01, 0.02, 0.02, 0.9, 0.01, 0.02, 0.01, 0.01],
+                'code': [0.02, 0.03, 0.05, 0.1, 0.05, 0.7, 0.03, 0.02]
+            };
+            
+            const expertNames = [
+                'Grammar Expert', 'Noun Expert', 'Verb Expert', 'Math Expert',
+                'Proper Noun Expert', 'Code Expert', 'Sentiment Expert', 'Logic Expert'
+            ];
+            
+            let affinities = expertAffinities[token] || expertAffinities['noun'];
+            
+            // Apply temperature scaling
+            const scaledLogits = affinities.map(a => Math.log(a) / temperature);
+            const maxLogit = Math.max(...scaledLogits);
+            const expLogits = scaledLogits.map(l => Math.exp(l - maxLogit));
+            const sumExp = expLogits.reduce((a, b) => a + b, 0);
+            const probabilities = expLogits.map(e => e / sumExp);
+            
+            // Get top-2 experts
+            const topExperts = probabilities
+                .map((prob, idx) => ({ prob, idx, name: expertNames[idx] }))
+                .sort((a, b) => b.prob - a.prob)
+                .slice(0, 2);
+            
+            let html = '<div class="step"><h3>🧭 Token Routing Simulation</h3>';
+            
+            html += '<div class="routing-visualization">';
+            html += '<div class="token-flow">';
+            html += '<strong>Token: "' + document.getElementById('exampleToken').options[document.getElementById('exampleToken').selectedIndex].text + '"</strong>';
+            html += '</div>';
+            html += '<div class="arrow">→</div>';
+            html += '<div class="router-box">Router<br>Network</div>';
+            html += '<div class="arrow">→</div>';
+            html += '<div class="token-flow">';
+            html += '<strong>Selected Experts</strong><br>';
+            html += topExperts[0].name + ': ' + (topExperts[0].prob * 100).toFixed(1) + '%<br>';
+            html += topExperts[1].name + ': ' + (topExperts[1].prob * 100).toFixed(1) + '%';
+            html += '</div>';
+            html += '</div>';
+            
+            html += '<table>';
+            html += '<tr><th>Expert</th><th>Affinity Score</th><th>Final Probability</th><th>Selected</th></tr>';
+            
+            for (let i = 0; i < expertNames.length; i++) {
+                const isSelected = i === topExperts[0].idx || i === topExperts[1].idx;
+                const rowClass = isSelected ? 'style="background: #d4edda;"' : '';
+                html += '<tr ' + rowClass + '>';
+                html += '<td>' + expertNames[i] + '</td>';
+                html += '<td>' + affinities[i].toFixed(3) + '</td>';
+                html += '<td>' + (probabilities[i] * 100).toFixed(1) + '%</td>';
+                html += '<td>' + (isSelected ? '✅' : '❌') + '</td>';
+                html += '</tr>';
+            }
+            html += '</table>';
+            
+            html += '<div class="info">';
+            html += '<strong>🔄 Temperature Effect:</strong><br>';
+            html += '• Low temperature (' + (temperature < 0.5 ? 'current' : 'try 0.3') + '): Sharp, focused routing<br>';
+            html += '• High temperature (' + (temperature > 1.5 ? 'current' : 'try 2.0') + '): Smooth, distributed routing<br>';
+            html += '• Current: ' + (temperature < 0.7 ? 'Focused' : temperature > 1.3 ? 'Distributed' : 'Balanced') + ' routing pattern';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('routingSimulation').innerHTML = html;
+        }
+
+        function analyzeExpertSpecialization() {
+            let html = '<div class="step"><h3>🔬 Expert Specialization Analysis</h3>';
+            
+            html += '<div class="example-box">';
+            html += '<strong>📊 Token Distribution Across Experts (Simulated):</strong><br><br>';
+            
+            const experts = [
+                { name: 'Grammar Expert', tokens: ['the', 'a', 'an', 'in', 'on', 'at'], usage: 15.2 },
+                { name: 'Noun Expert', tokens: ['cat', 'house', 'car', 'book', 'tree'], usage: 12.8 },
+                { name: 'Verb Expert', tokens: ['run', 'jump', 'think', 'write', 'read'], usage: 11.5 },
+                { name: 'Math Expert', tokens: ['42', '∫', '∑', 'equation', 'calculate'], usage: 8.3 },
+                { name: 'Proper Noun Expert', tokens: ['Paris', 'OpenAI', 'Tesla', 'Einstein'], usage: 9.7 },
+                { name: 'Code Expert', tokens: ['function', 'class', '{}', 'import', 'def'], usage: 7.4 },
+                { name: 'Sentiment Expert', tokens: ['beautiful', 'sad', 'amazing', 'terrible'], usage: 6.1 },
+                { name: 'Logic Expert', tokens: ['therefore', 'because', 'however', 'although'], usage: 5.8 }
+            ];
+            
+            for (let expert of experts) {
+                html += '<strong>' + expert.name + '</strong> (' + expert.usage + '% of tokens)<br>';
+                html += 'Specializes in: ' + expert.tokens.join(', ') + '<br><br>';
+            }
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Load Balancing Mathematics:</strong><br><br>';
+            html += 'Ideal uniform distribution: 100% / 8 experts = 12.5% each<br>';
+            html += 'Actual distribution: Varies from 5.8% to 15.2%<br>';
+            html += 'Load imbalance factor: max_usage / min_usage = 15.2% / 5.8% = 2.6x<br><br>';
+            html += '<strong>Auxiliary Loss:</strong> L_aux = α × Σᵢ (usage_rate[i] - 1/N)²<br>';
+            html += 'Encourages balanced expert utilization during training';
+            html += '</div>';
+            
+            html += '<div class="warning">';
+            html += '<strong>⚖️ Load Balancing Challenge:</strong> Some experts become overused while others are underutilized. This creates computational bottlenecks and reduces the benefits of sparsity.';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('expertAnalysis').innerHTML = html;
+        }
+
+        // Real model configurations with exact specifications
+        const realModelSpecs = {
+            'llama7b': { 
+                name: 'LLaMA-7B', d_model: 4096, d_ff: 11008, layers: 32, 
+                total_params: 6.7, vocab_size: 32000 
+            },
+            'llama70b': { 
+                name: 'LLaMA-70B', d_model: 8192, d_ff: 22016, layers: 80, 
+                total_params: 65.2, vocab_size: 32000 
+            },
+            'qwen7b': { 
+                name: 'Qwen-7B', d_model: 4096, d_ff: 22016, layers: 32, 
+                total_params: 7.7, vocab_size: 151936 
+            },
+            'qwen72b': { 
+                name: 'Qwen-72B', d_model: 8192, d_ff: 24576, layers: 80, 
+                total_params: 72.7, vocab_size: 151936 
+            },
+            'deepseek7b': { 
+                name: 'DeepSeek-7B', d_model: 4096, d_ff: 11008, layers: 30, 
+                total_params: 6.7, vocab_size: 100000 
+            },
+            'deepseek67b': { 
+                name: 'DeepSeek-67B', d_model: 8192, d_ff: 22016, layers: 95, 
+                total_params: 67.0, vocab_size: 100000 
+            },
+            'mixtral7b': { 
+                name: 'Mixtral-7B', d_model: 4096, d_ff: 14336, layers: 32, 
+                total_params: 7.2, vocab_size: 32000 
+            }
+        };
+
+        function analyzeMoEArchitecture() {
+            const modelKey = document.getElementById('modelSize').value;
+            const numExperts = parseInt(document.getElementById('numExperts').value);
+            const topK = parseInt(document.getElementById('topK').value);
+            
+            const config = realModelSpecs[modelKey];
+            const expertSize = config.d_ff / 4; // Assuming each expert is 1/4 of original FFN
+            const totalMoEParams = numExperts * expertSize * config.d_model * 2; // W1 + W2
+            const activeParams = topK * expertSize * config.d_model * 2;
+            const sparsity = (1 - activeParams / totalMoEParams) * 100;
+            
+            let html = '<div class="step"><h3>🏗️ MoE Architecture Analysis</h3>';
+            
+            html += '<div class="example-box">';
+            html += '<strong>Base Model:</strong> ' + config.name + ' (' + config.total_params + 'B parameters)<br>';
+            html += '<strong>Architecture:</strong> ' + config.layers + ' layers, d_model=' + config.d_model + ', d_ff=' + config.d_ff + '<br>';
+            html += '<strong>MoE Configuration:</strong> ' + numExperts + ' experts, top-' + topK + ' routing<br>';
+            html += '<strong>Expert Size:</strong> ' + (expertSize / 1e3).toFixed(1) + 'K parameters each<br>';
+            html += '<strong>Vocabulary:</strong> ' + config.vocab_size.toLocaleString() + ' tokens';
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Parameter Calculation for ' + config.name + ':</strong><br><br>';
+            html += 'Original FFN params per layer: 2 × ' + config.d_model + ' × ' + config.d_ff + ' = ' + (2 * config.d_model * config.d_ff / 1e9).toFixed(2) + 'B<br>';
+            html += 'Original total FFN params: ' + config.layers + ' × ' + (2 * config.d_model * config.d_ff / 1e9).toFixed(2) + 'B = ' + (config.layers * 2 * config.d_model * config.d_ff / 1e9).toFixed(1) + 'B<br><br>';
+            html += 'MoE FFN params per layer: ' + numExperts + ' × 2 × ' + config.d_model + ' × ' + expertSize + ' = ' + (totalMoEParams / 1e9).toFixed(2) + 'B<br>';
+            html += 'MoE total FFN params: ' + config.layers + ' × ' + (totalMoEParams / 1e9).toFixed(2) + 'B = ' + (config.layers * totalMoEParams / 1e9).toFixed(1) + 'B<br>';
+            html += 'Active params per token: ' + topK + ' × 2 × ' + config.d_model + ' × ' + expertSize + ' = ' + (activeParams / 1e9).toFixed(2) + 'B<br>';
+            html += '<strong>Sparsity: ' + sparsity.toFixed(1) + '%</strong>';
+            html += '</div>';
+            
+            html += '<div class="efficiency-comparison">';
+            html += '<div class="efficiency-card">';
+            html += '<div class="efficiency-title">' + config.name + ' Dense</div>';
+            html += '<div class="efficiency-metric" style="color: #dc3545;">' + config.total_params + 'B</div>';
+            html += '<div>Total Parameters</div>';
+            html += '<div class="efficiency-metric" style="color: #dc3545;">100%</div>';
+            html += '<div>Parameters Used</div>';
+            html += '</div>';
+            html += '<div class="efficiency-card moe">';
+            html += '<div class="efficiency-title">' + config.name + ' MoE</div>';
+            html += '<div class="efficiency-metric" style="color: #28a745;">' + (config.total_params + config.layers * totalMoEParams / 1e9 - config.layers * 2 * config.d_model * config.d_ff / 1e9).toFixed(0) + 'B</div>';
+            html += '<div>Total Parameters</div>';
+            html += '<div class="efficiency-metric" style="color: #28a745;">' + (100 - sparsity).toFixed(1) + '%</div>';
+            html += '<div>Parameters Used</div>';
+            html += '</div>';
+            html += '</div>';
+            
+            const parameterIncrease = (config.layers * totalMoEParams / 1e9) / (config.layers * 2 * config.d_model * config.d_ff / 1e9);
+            const computeReduction = (config.layers * 2 * config.d_model * config.d_ff / 1e9) / (config.layers * activeParams / 1e9);
+            
+            html += '<div class="success">';
+            html += '<strong>🎯 ' + config.name + ' MoE Advantage:</strong> ' + parameterIncrease.toFixed(1) + 'x more parameters in FFN layers, but ' + computeReduction.toFixed(1) + 'x reduction in active computation per token!';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('moeArchitectureAnalysis').innerHTML = html;
+        }
+
+        function compareEfficiency() {
+            const scenario = document.getElementById('comparisonScenario').value;
+            const modelKey = document.getElementById('efficiencyModel').value;
+            const seqLen = parseInt(document.getElementById('sequenceLength').value);
+            
+            const config = realModelSpecs[modelKey];
+            const numExperts = 16;
+            const topK = 2;
+            
+            let html = '<div class="step"><h3>📊 ' + config.name + ' Efficiency Analysis</h3>';
+            
+            html += '<div class="example-box">';
+            html += '<strong>Base Model:</strong> ' + config.name + '<br>';
+            html += '<strong>Parameters:</strong> ' + config.total_params + 'B total<br>';
+            html += '<strong>Architecture:</strong> ' + config.layers + ' layers × [d_model=' + config.d_model + ', d_ff=' + config.d_ff + ']<br>';
+            html += '<strong>Sequence Length:</strong> ' + seqLen.toLocaleString() + ' tokens<br>';
+            html += '<strong>MoE Setup:</strong> ' + numExperts + ' experts, top-' + topK + ' routing';
+            html += '</div>';
+            
+            const denseFfnParams = config.layers * 2 * config.d_model * config.d_ff / 1e9;
+            const moeFfnParams = config.layers * numExperts * 2 * config.d_model * (config.d_ff / 4) / 1e9;
+            const activeFfnParams = config.layers * topK * 2 * config.d_model * (config.d_ff / 4) / 1e9;
+            
+            if (scenario === 'inference') {
+                const denseFLOPs = seqLen * 2 * config.d_model * config.d_ff * config.layers / 1e9;
+                const moeFLOPs = seqLen * 2 * config.d_model * (config.d_ff / 4) * topK * config.layers / 1e9;
+                const routingFLOPs = seqLen * config.d_model * numExperts * config.layers / 1e9;
+                const totalMoEFLOPs = moeFLOPs + routingFLOPs;
+                
+                html += '<div class="efficiency-comparison">';
+                html += '<div class="efficiency-card">';
+                html += '<div class="efficiency-title">' + config.name + ' Dense</div>';
+                html += '<div class="efficiency-metric" style="color: #dc3545;">' + denseFLOPs.toFixed(1) + 'G</div>';
+                html += '<div>FLOPs</div>';
+                html += '<div class="efficiency-metric" style="color: #dc3545;">' + denseFfnParams.toFixed(1) + 'B</div>';
+                html += '<div>FFN Parameters</div>';
+                html += '</div>';
+                html += '<div class="efficiency-card moe">';
+                html += '<div class="efficiency-title">' + config.name + ' MoE</div>';
+                html += '<div class="efficiency-metric" style="color: #28a745;">' + totalMoEFLOPs.toFixed(1) + 'G</div>';
+                html += '<div>FLOPs</div>';
+                html += '<div class="efficiency-metric" style="color: #ffc107;">' + moeFfnParams.toFixed(1) + 'B</div>';
+                html += '<div>Total FFN Parameters</div>';
+                html += '</div>';
+                html += '</div>';
+                
+                html += '<div class="math-formula">';
+                html += '<strong>Detailed FLOP Calculation:</strong><br><br>';
+                html += 'Dense FFN FLOPs: ' + seqLen + ' × 2 × ' + config.d_model + ' × ' + config.d_ff + ' × ' + config.layers + ' = ' + denseFLOPs.toFixed(1) + 'G<br>';
+                html += 'MoE Expert FLOPs: ' + seqLen + ' × 2 × ' + config.d_model + ' × ' + (config.d_ff / 4) + ' × ' + topK + ' × ' + config.layers + ' = ' + moeFLOPs.toFixed(1) + 'G<br>';
+                html += 'Routing FLOPs: ' + seqLen + ' × ' + config.d_model + ' × ' + numExperts + ' × ' + config.layers + ' = ' + routingFLOPs.toFixed(1) + 'G<br>';
+                html += 'Total MoE FLOPs: ' + moeFLOPs.toFixed(1) + 'G + ' + routingFLOPs.toFixed(1) + 'G = ' + totalMoEFLOPs.toFixed(1) + 'G';
+                html += '</div>';
+                
+                html += '<div class="success">';
+                html += '<strong>⚡ ' + config.name + ' Inference Speedup:</strong> ' + (denseFLOPs / totalMoEFLOPs).toFixed(1) + 'x fewer FLOPs with ' + (moeFfnParams / denseFfnParams).toFixed(1) + 'x more FFN parameters!';
+                html += '</div>';
+                
+            } else if (scenario === 'training') {
+                const memoryDense = seqLen * config.d_model * config.layers * 4 / 1024 / 1024; // Activations in MB
+                const memoryMoE = seqLen * config.d_model * config.layers * 4 / 1024 / 1024 + moeFfnParams * 1000 * 2 / 1024; // Activations + expert params
+                
+                html += '<div class="efficiency-comparison">';
+                html += '<div class="efficiency-card">';
+                html += '<div class="efficiency-title">' + config.name + ' Dense Training</div>';
+                html += '<div class="efficiency-metric" style="color: #dc3545;">' + (memoryDense / 1024).toFixed(1) + 'GB</div>';
+                html += '<div>Activation Memory</div>';
+                html += '<div class="efficiency-metric" style="color: #dc3545;">100%</div>';
+                html += '<div>Expert Utilization</div>';
+                html += '</div>';
+                html += '<div class="efficiency-card moe">';
+                html += '<div class="efficiency-title">' + config.name + ' MoE Training</div>';
+                html += '<div class="efficiency-metric" style="color: #ffc107;">' + (memoryMoE / 1024).toFixed(1) + 'GB</div>';
+                html += '<div>Total Memory</div>';
+                html += '<div class="efficiency-metric" style="color: #28a745;">' + (topK / numExperts * 100).toFixed(1) + '%</div>';
+                html += '<div>Expert Utilization</div>';
+                html += '</div>';
+                html += '</div>';
+                
+                html += '<div class="warning">';
+                html += '<strong>🧠 ' + config.name + ' Training Challenge:</strong> MoE requires ' + (memoryMoE / memoryDense).toFixed(1) + 'x more memory but achieves better sample efficiency through ' + (moeFfnParams / denseFfnParams).toFixed(1) + 'x increased model capacity.';
+                html += '</div>';
+                
+            } else if (scenario === 'scaling') {
+                html += '<div class="math-formula">';
+                html += '<strong>' + config.name + ' Parameter Scaling Analysis:</strong><br><br>';
+                html += 'Dense model FFN parameters: ' + denseFfnParams.toFixed(1) + 'B<br>';
+                html += 'MoE model FFN parameters: ' + moeFfnParams.toFixed(1) + 'B (' + (moeFfnParams / denseFfnParams).toFixed(1) + 'x increase)<br>';
+                html += 'Active parameters per token: ' + activeFfnParams.toFixed(1) + 'B (' + (activeFfnParams / denseFfnParams).toFixed(1) + 'x of dense)<br><br>';
+                html += 'Memory scaling factor: ' + (moeFfnParams / denseFfnParams).toFixed(1) + 'x<br>';
+                html += 'Compute scaling factor: ' + (activeFfnParams / denseFfnParams).toFixed(1) + 'x<br>';
+                html += 'Sparsity achieved: ' + ((1 - activeFfnParams / moeFfnParams) * 100).toFixed(1) + '%';
+                html += '</div>';
+                
+                html += '<div class="success">';
+                html += '<strong>🎯 ' + config.name + ' Scaling Sweet Spot:</strong> ' + (moeFfnParams / denseFfnParams).toFixed(1) + 'x parameter increase enables much better model quality while keeping compute cost at ' + (activeFfnParams / denseFfnParams).toFixed(1) + 'x of the dense baseline.';
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            document.getElementById('efficiencyComparison').innerHTML = html;
+        }
+
+        function analyzeCostBenefit() {
+            let html = '<div class="step"><h3>💰 Cost-Benefit Analysis</h3>';
+            
+            html += '<table>';
+            html += '<tr><th>Aspect</th><th>Dense Model</th><th>MoE Model</th><th>Trade-off</th></tr>';
+            html += '<tr><td><strong>Parameters</strong></td><td>70B</td><td>560B (8x)</td><td>🔴 More storage needed</td></tr>';
+            html += '<tr><td><strong>Computation</strong></td><td>100%</td><td>25% (sparse)</td><td>🟢 4x faster inference</td></tr>';
+            html += '<tr><td><strong>Memory (Inference)</strong></td><td>140GB</td><td>1120GB</td><td>🔴 8x more memory</td></tr>';
+            html += '<tr><td><strong>Quality</strong></td><td>Baseline</td><td>+15-25% better</td><td>🟢 Better performance</td></tr>';
+            html += '<tr><td><strong>Training Cost</strong></td><td>$1M</td><td>$1.2M</td><td>🟡 20% increase</td></tr>';
+            html += '<tr><td><strong>Inference Cost</strong></td><td>$0.10/1K tokens</td><td>$0.04/1K tokens</td><td>🟢 60% savings</td></tr>';
+            html += '</table>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Economic Break-even Analysis:</strong><br><br>';
+            html += 'Additional training cost: +$200,000<br>';
+            html += 'Inference savings per 1M tokens: $60<br>';
+            html += 'Break-even point: $200,000 / $60 = 3.33M tokens<br>';
+            html += 'For high-volume applications (>3.33M tokens), MoE is economically superior';
+            html += '</div>';
+            
+            html += '<div class="success">';
+            html += '<strong>🎯 Sweet Spot:</strong> MoE excels for high-throughput inference scenarios where the upfront memory and complexity costs are amortized over millions of requests.';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('costBenefitAnalysis').innerHTML = html;
+        }
+
+        function processWithMoE() {
+            const inputText = document.getElementById('inputText').value;
+            const loadBalancing = document.getElementById('loadBalancing').value;
+            
+            const tokens = inputText.toLowerCase().split(' ');
+            
+            // Simulate expert assignment for each token
+            const expertAssignments = tokens.map(token => {
+                if (['the', 'a', 'an', 'in', 'on', 'at'].includes(token)) {
+                    return { token, primary: 'Grammar', secondary: 'Syntax', confidence: 0.92 };
+                } else if (['cat', 'dog', 'house', 'car', 'book'].includes(token)) {
+                    return { token, primary: 'Noun', secondary: 'Grammar', confidence: 0.88 };
+                } else if (['solved', 'running', 'think', 'write'].includes(token)) {
+                    return { token, primary: 'Verb', secondary: 'Action', confidence: 0.85 };
+                } else if (['mathematical', 'equation', 'calculate', '42'].includes(token)) {
+                    return { token, primary: 'Math', secondary: 'Logic', confidence: 0.94 };
+                } else {
+                    return { token, primary: 'General', secondary: 'Context', confidence: 0.75 };
+                }
+            });
+            
+            let html = '<div class="step"><h3>🚀 MoE Token Processing</h3>';
+            
+            html += '<div class="example-box">';
+            html += '<strong>Input:</strong> "' + inputText + '"<br>';
+            html += '<strong>Tokens:</strong> ' + tokens.length + '<br>';
+            html += '<strong>Load Balancing:</strong> ' + loadBalancing.charAt(0).toUpperCase() + loadBalancing.slice(1);
+            html += '</div>';
+            
+            html += '<table>';
+            html += '<tr><th>Token</th><th>Primary Expert</th><th>Secondary Expert</th><th>Confidence</th><th>Processing</th></tr>';
+            
+            for (let assignment of expertAssignments) {
+                const processingTime = (assignment.confidence * 2.5 + Math.random() * 0.5).toFixed(1);
+                html += '<tr>';
+                html += '<td><strong>"' + assignment.token + '"</strong></td>';
+                html += '<td>' + assignment.primary + ' Expert</td>';
+                html += '<td>' + assignment.secondary + ' Expert</td>';
+                html += '<td>' + (assignment.confidence * 100).toFixed(1) + '%</td>';
+                html += '<td>' + processingTime + 'ms</td>';
+                html += '</tr>';
+            }
+            html += '</table>';
+            
+            // Calculate expert utilization
+            const expertCounts = {};
+            expertAssignments.forEach(a => {
+                expertCounts[a.primary] = (expertCounts[a.primary] || 0) + 1;
+            });
+            
+            html += '<div class="expert-grid">';
+            Object.entries(expertCounts).forEach(([expert, count]) => {
+                const utilization = (count / tokens.length * 100).toFixed(1);
+                html += '<div class="expert-box expert-active">';
+                html += '<div class="expert-title">' + expert + ' Expert</div>';
+                html += '<div class="expert-value">' + count + '</div>';
+                html += '<div>' + utilization + '% utilization</div>';
+                html += '</div>';
+            });
+            html += '</div>';
+            
+            const avgConfidence = expertAssignments.reduce((sum, a) => sum + a.confidence, 0) / expertAssignments.length;
+            const totalProcessingTime = expertAssignments.reduce((sum, a) => sum + parseFloat((a.confidence * 2.5).toFixed(1)), 0);
+            
+            html += '<div class="success">';
+            html += '<strong>🎯 Processing Summary:</strong><br>';
+            html += '• Average routing confidence: ' + (avgConfidence * 100).toFixed(1) + '%<br>';
+            html += '• Total processing time: ' + totalProcessingTime.toFixed(1) + 'ms<br>';
+            html += '• Experts activated: ' + Object.keys(expertCounts).length + ' out of 8<br>';
+            html += '• Sparsity achieved: ' + (100 - Object.keys(expertCounts).length / 8 * 100).toFixed(1) + '%';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('moeProcessing').innerHTML = html;
+        }
+
+        function analyzeRealMoEModel() {
+            const modelKey = document.getElementById('realMoeModel').value;
+            const config = moeConfigs[modelKey];
+            
+            let html = '<div class="step"><h3>🏭 Real MoE Model Analysis</h3>';
+            
+            html += '<div class="example-box">';
+            html += '<strong>Model:</strong> ' + config.name + '<br>';
+            html += '<strong>Total Parameters:</strong> ' + config.total_params + '<br>';
+            html += '<strong>Number of Experts:</strong> ' + config.experts + '<br>';
+            html += '<strong>Top-k Selection:</strong> ' + config.top_k + '<br>';
+            html += '<strong>Expert Size:</strong> ' + config.expert_size + ' each<br>';
+            html += '<strong>Sparsity:</strong> ' + config.sparsity + '%<br>';
+            html += '<strong>Efficiency Gain:</strong> ' + config.efficiency_gain;
+            html += '</div>';
+            
+            html += '<div class="sparsity-bar" style="width: 100%; background: #e9ecef;">';
+            html += '<div class="sparsity-bar" style="width: ' + (100 - config.sparsity) + '%; background: #28a745;">';
+            html += '<div class="sparsity-label">' + (100 - config.sparsity).toFixed(1) + '% Active</div>';
+            html += '</div>';
+            html += '</div>';
+            
+            html += '<div class="math-formula">';
+            html += '<strong>Model Mathematics:</strong><br><br>';
+            
+            if (modelKey === 'switch') {
+                html += 'Switch Transformer uses top-1 routing for maximum sparsity<br>';
+                html += 'Only 1 expert active per token → 99.95% parameters idle<br>';
+                html += 'Massive scale: 2048 experts, each 780M parameters<br>';
+                html += 'Challenge: Extreme load imbalance between experts';
+            } else if (modelKey === 'mixtral') {
+                html += 'Mixtral uses 8 experts with top-2 routing<br>';
+                html += 'Each expert is a complete 7B parameter model<br>';
+                html += 'Total: 45B parameters, but only 12B active per token<br>';
+                html += 'Excellent balance of scale and efficiency';
+            } else if (modelKey === 'glam') {
+                html += 'GLaM pioneered large-scale MoE with 64 experts<br>';
+                html += 'Top-2 routing with sophisticated load balancing<br>';
+                html += '1.2T total parameters, 97B active per forward pass<br>';
+                html += 'Achieved GPT-3 performance with 3x less computation';
+            }
+            
+            html += '</div>';
+            
+            html += '<div class="info">';
+            html += '<strong>🎯 Key Innovation:</strong> ' + config.name + ' demonstrates that MoE can achieve massive parameter scaling (' + config.total_params + ') while maintaining computational efficiency through ' + config.sparsity + '% sparsity.';
+            html += '</div>';
+            
+            html += '</div>';
+            document.getElementById('realModelAnalysis').innerHTML = html;
+        }
+
+        // Initialize with default analysis
+        document.addEventListener('DOMContentLoaded', function() {
+            analyzeMoEArchitecture();
+            simulateRouting();
+        });
+    </script>
+</body>
+</html>
