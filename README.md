@@ -91,6 +91,23 @@ Complete mathematical walkthrough from attention output to next token prediction
 
 **Key Concepts:** FFN computation, matrix flows, vocabulary logits, sampling strategies, performance analysis
 
+---
+
+### 🎯 Mixture of Experts: Scaling Transformers Efficiently **[NEW]**
+**File:** `mixture-of-experts.html`
+
+Interactive exploration of how MoE scales transformer models through sparsity and selective expert activation:
+- **Dense vs sparse computation** analysis with exact parameter calculations
+- **Router mechanics** - how intelligent token assignment works mathematically
+- **Expert specialization** - what each expert learns and emergent behaviors
+- **Load balancing challenges** and solutions (auxiliary loss, Switch Transformer)
+- **Performance analysis** with real model architectures (LLaMA, Qwen, DeepSeek)
+- **Cost-benefit analysis** - economic implications of MoE scaling
+- **Real-world MoE models** - Switch Transformer, GLaM, Mixtral, GPT-4 analysis
+- **Interactive simulations** - route tokens through expert networks
+
+**Key Concepts:** Sparse computation, expert routing, load balancing, parameter scaling, sparsity benefits
+
 ## 🏗️ Repository Structure
 
 ```
@@ -100,8 +117,9 @@ visual-ai-tutorials/
 ├── qkv-matrices.html                  # Q,K,V matrix tutorial  
 ├── context-length-impact.html         # Context length impact tutorial
 ├── complete-attention-mechanism.html  # Complete attention mechanism
-├── attention-evolution.html           # Attention mechanisms evolution [NEW]
+├── attention-evolution.html           # Attention mechanisms evolution
 ├── text-generation-process.html       # Text generation process
+├── mixture-of-experts.html            # Mixture of Experts [NEW]
 └── README.md                          # This file
 ```
 
@@ -166,6 +184,9 @@ After completing these tutorials, you'll understand:
 - How model dimensions affect memory and computation requirements
 - The evolution of attention mechanisms and memory optimization techniques
 - How KV caching works universally across all attention variants
+- How MoE enables massive parameter scaling through sparse computation
+- The mathematics of expert routing and load balancing
+- Trade-offs between memory, computation, and model quality in MoE systems
 - The complete flow from attention output to next token prediction
 - How feed-forward networks transform representations
 - Why models trained on long contexts work better on short contexts
@@ -181,7 +202,8 @@ After completing these tutorials, you'll understand:
 3. **⚡ Complete Attention Mechanism** - See how Q, K, V work together
 4. **🔄 Attention Mechanisms Evolution** - Learn memory optimization and scaling techniques
 5. **🚀 Text Generation Process** - Complete pipeline from attention to tokens
-6. **📊 Context Length Impact** - Advanced concepts about training vs inference
+6. **🎯 Mixture of Experts** - Advanced scaling through sparse computation
+7. **📊 Context Length Impact** - Advanced concepts about training vs inference
 
 ## 🤝 Contributing
 
