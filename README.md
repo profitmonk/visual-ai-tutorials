@@ -8,17 +8,33 @@ Learn transformer architecture concepts through hands-on visualizations and step
 
 ## 📚 Available Tutorials
 
-### 🌀 RoPE: Rotary Position Embedding
-**File:** `rope-tutorial.html`
+### 🏗️ Transformer Basics: The Foundation **[NEW]**
+**File:** `transformer-basics.html`
 
-Comprehensive guide to understanding how transformers encode position information through rotation:
-- **Visual dimension pairing** with color-coded examples
-- **Complete mathematical walkthrough** with cos/sin transformations  
-- **Interactive examples** with up to 128D embeddings and 128 token contexts
-- **Context extension challenges** and scaling analysis
-- **Step-by-step RoPE application** with real token examples
+Essential foundation for understanding modern AI - from the revolutionary breakthrough to why transformers work so well:
+- **The problem with RNNs and CNNs** - why sequential processing was a bottleneck
+- **The attention breakthrough** - "Attention is All You Need" explained simply
+- **Core architecture components** - interactive exploration of transformer building blocks
+- **Three paradigms** - Encoder-only (BERT), Decoder-only (GPT), Encoder-Decoder (T5)
+- **Evolution timeline** - from 2017 research to ChatGPT revolution
+- **Interactive comparisons** - see why transformers won over previous architectures
 
-**Key Concepts:** Position encoding, dimension pairs, rotation mathematics, context scaling
+**Key Concepts:** Attention mechanism, parallel processing, architectural paradigms, AI evolution
+
+---
+
+### 📊 Architecture Comparison: Modern LLM Designs **[NEW]**
+**File:** `architecture-comparison.html`
+
+Comprehensive comparison of modern LLM architectures across the industry:
+- **Real model analysis** - GPT-4, Claude, Gemini, LLaMA, Qwen, DeepSeek architectures
+- **Design decisions breakdown** - why different companies made different choices
+- **Performance vs efficiency trade-offs** - computational costs and capabilities
+- **Architecture evolution** - from academic research to production systems
+- **Interactive model explorer** - compare specifications side-by-side
+- **Future trends analysis** - where LLM architectures are heading
+
+**Key Concepts:** Model comparison, design trade-offs, production considerations, architectural evolution
 
 ---
 
@@ -35,17 +51,17 @@ Interactive exploration of attention mechanism matrix sizes and their relationsh
 
 ---
 
-### 📊 Context Length Impact: Training vs Inference
-**File:** `context-length-impact.html`
+### 🌀 RoPE: Rotary Position Embedding
+**File:** `rope-tutorial.html`
 
-Mathematical analysis of why models trained on long contexts excel at shorter sequences:
-- **Fixed vs dynamic components** in transformer models
-- **RoPE frequency analysis** - what changes and what doesn't
-- **Performance metrics** with concrete speed/memory calculations
-- **Step-by-step mathematical proofs** with real examples
-- **Interactive comparisons** across different context lengths
+Comprehensive guide to understanding how transformers encode position information through rotation:
+- **Visual dimension pairing** with color-coded examples
+- **Complete mathematical walkthrough** with cos/sin transformations  
+- **Interactive examples** with up to 128D embeddings and 128 token contexts
+- **Context extension challenges** and scaling analysis
+- **Step-by-step RoPE application** with real token examples
 
-**Key Concepts:** Context extension, performance analysis, RoPE frequencies, training vs inference
+**Key Concepts:** Position encoding, dimension pairs, rotation mathematics, context scaling
 
 ---
 
@@ -63,7 +79,7 @@ Interactive step-by-step walkthrough of how Q, K, V matrices work together in tr
 
 ---
 
-### 🔄 Attention Mechanisms Evolution: MHA → GQA → MLA **[NEW]**
+### 🔄 Attention Mechanisms Evolution: MHA → GQA → MLA
 **File:** `attention-evolution.html`
 
 Complete evolution of attention mechanisms from Multi-Head Attention through Grouped Query Attention to Multi-Head Latent Attention:
@@ -93,7 +109,7 @@ Complete mathematical walkthrough from attention output to next token prediction
 
 ---
 
-### 🎯 Mixture of Experts: Scaling Transformers Efficiently **[NEW]**
+### 🎯 Mixture of Experts: Scaling Transformers Efficiently
 **File:** `mixture-of-experts.html`
 
 Interactive exploration of how MoE scales transformer models through sparsity and selective expert activation:
@@ -108,18 +124,34 @@ Interactive exploration of how MoE scales transformer models through sparsity an
 
 **Key Concepts:** Sparse computation, expert routing, load balancing, parameter scaling, sparsity benefits
 
+---
+
+### 📊 Context Length Impact: Training vs Inference
+**File:** `context-length-impact.html`
+
+Mathematical analysis of why models trained on long contexts excel at shorter sequences:
+- **Fixed vs dynamic components** in transformer models
+- **RoPE frequency analysis** - what changes and what doesn't
+- **Performance metrics** with concrete speed/memory calculations
+- **Step-by-step mathematical proofs** with real examples
+- **Interactive comparisons** across different context lengths
+
+**Key Concepts:** Context extension, performance analysis, RoPE frequencies, training vs inference
+
 ## 🏗️ Repository Structure
 
 ```
 visual-ai-tutorials/
 ├── index.html                         # Landing page with tutorial links
-├── rope-tutorial.html                 # RoPE tutorial
+├── transformer-basics.html            # Transformer basics tutorial [NEW]
+├── architecture-comparison.html       # Architecture comparison tutorial [NEW]
 ├── qkv-matrices.html                  # Q,K,V matrix tutorial  
-├── context-length-impact.html         # Context length impact tutorial
+├── rope-tutorial.html                 # RoPE tutorial
 ├── complete-attention-mechanism.html  # Complete attention mechanism
 ├── attention-evolution.html           # Attention mechanisms evolution
 ├── text-generation-process.html       # Text generation process
-├── mixture-of-experts.html            # Mixture of Experts [NEW]
+├── mixture-of-experts.html            # Mixture of Experts
+├── context-length-impact.html         # Context length impact tutorial
 └── README.md                          # This file
 ```
 
@@ -179,6 +211,8 @@ Simply visit the [live demo](https://profitmonk.github.io/visual-ai-tutorials/) 
 ### 🎓 Learning Outcomes
 
 After completing these tutorials, you'll understand:
+- **Foundation**: Why transformers revolutionized AI and how they work fundamentally
+- **Architecture Design**: How different companies approach LLM architecture and trade-offs
 - How RoPE encodes position through rotation mathematics
 - Why attention matrices scale quadratically with sequence length  
 - How model dimensions affect memory and computation requirements
@@ -197,13 +231,15 @@ After completing these tutorials, you'll understand:
 
 **For maximum understanding, follow this order:**
 
-1. **🎯 Q, K, V Matrix Dimensions** - Understand the basic building blocks
-2. **🌀 RoPE: Rotary Position Embedding** - Learn how position is encoded  
-3. **⚡ Complete Attention Mechanism** - See how Q, K, V work together
-4. **🔄 Attention Mechanisms Evolution** - Learn memory optimization and scaling techniques
-5. **🚀 Text Generation Process** - Complete pipeline from attention to tokens
-6. **🎯 Mixture of Experts** - Advanced scaling through sparse computation
-7. **📊 Context Length Impact** - Advanced concepts about training vs inference
+1. **🏗️ Transformer Basics** - Understand the revolutionary breakthrough and foundation
+2. **📊 Architecture Comparison** - Learn how modern LLMs differ and why
+3. **🎯 Q, K, V Matrix Dimensions** - Understand the basic building blocks
+4. **🌀 RoPE: Rotary Position Embedding** - Learn how position is encoded  
+5. **⚡ Complete Attention Mechanism** - See how Q, K, V work together
+6. **🔄 Attention Mechanisms Evolution** - Learn memory optimization and scaling techniques
+7. **🚀 Text Generation Process** - Complete pipeline from attention to tokens
+8. **🎯 Mixture of Experts** - Advanced scaling through sparse computation
+9. **📊 Context Length Impact** - Advanced concepts about training vs inference
 
 ## 🤝 Contributing
 
