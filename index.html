@@ -151,6 +151,17 @@
             text-transform: uppercase;
             margin-left: 10px;
         }
+        
+        .foundation-badge {
+            background: #dc3545;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -172,14 +183,26 @@
         <h2>🚀 Available Tutorials</h2>
         
         <div class="tutorial-grid">
-            <a href="rope-tutorial.html" class="tutorial-link">
+            <a href="transformer-basics.html" class="tutorial-link">
                 <div class="tutorial-card">
-                    <div class="tutorial-title">🌀 RoPE: Rotary Position Embedding</div>
+                    <div class="tutorial-title">🏗️ Transformer Basics: The Foundation <span class="foundation-badge">Start Here</span></div>
                     <div class="tutorial-description">
-                        Comprehensive guide to understanding how transformers encode position information through rotation with visual dimension pairing, complete mathematical walkthrough, and interactive examples with up to 128D embeddings.
+                        Essential foundation for understanding modern AI - from the revolutionary breakthrough to why transformers work so well. Covers the core architecture, three paradigms (BERT/GPT/T5), and interactive comparisons with older architectures.
                     </div>
                     <div class="tutorial-concepts">
-                        Position encoding • Dimension pairs • Rotation mathematics • Context scaling
+                        Attention mechanism • Parallel processing • Architectural paradigms • AI evolution
+                    </div>
+                </div>
+            </a>
+            
+            <a href="architecture-comparison.html" class="tutorial-link">
+                <div class="tutorial-card">
+                    <div class="tutorial-title">📊 Architecture Comparison: Modern LLM Designs <span class="new-badge">New</span></div>
+                    <div class="tutorial-description">
+                        Comprehensive comparison of modern LLM architectures across the industry. Real model analysis of GPT-4, Claude, Gemini, LLaMA, and more with design decisions breakdown and performance trade-offs.
+                    </div>
+                    <div class="tutorial-concepts">
+                        Model comparison • Design trade-offs • Production considerations • Architectural evolution
                     </div>
                 </div>
             </a>
@@ -196,14 +219,14 @@
                 </div>
             </a>
             
-            <a href="context-length-impact.html" class="tutorial-link">
+            <a href="rope-tutorial.html" class="tutorial-link">
                 <div class="tutorial-card">
-                    <div class="tutorial-title">📊 Context Length Impact: Training vs Inference</div>
+                    <div class="tutorial-title">🌀 RoPE: Rotary Position Embedding</div>
                     <div class="tutorial-description">
-                        Mathematical analysis of why models trained on long contexts excel at shorter sequences with fixed vs dynamic components, RoPE frequency analysis, and performance metrics.
+                        Comprehensive guide to understanding how transformers encode position information through rotation with visual dimension pairing, complete mathematical walkthrough, and interactive examples with up to 128D embeddings.
                     </div>
                     <div class="tutorial-concepts">
-                        Context extension • Performance analysis • RoPE frequencies • Training vs inference
+                        Position encoding • Dimension pairs • Rotation mathematics • Context scaling
                     </div>
                 </div>
             </a>
@@ -222,7 +245,7 @@
             
             <a href="attention-evolution.html" class="tutorial-link">
                 <div class="tutorial-card">
-                    <div class="tutorial-title">🔄 Attention Mechanisms Evolution: MHA → GQA → MLA <span class="new-badge">New</span></div>
+                    <div class="tutorial-title">🔄 Attention Mechanisms Evolution: MHA → GQA → MLA</div>
                     <div class="tutorial-description">
                         Complete evolution of attention mechanisms from Multi-Head Attention through Grouped Query Attention to Multi-Head Latent Attention, with deep dive into KV caching, memory optimization, and compression techniques.
                     </div>
@@ -246,12 +269,24 @@
             
             <a href="mixture-of-experts.html" class="tutorial-link">
                 <div class="tutorial-card">
-                    <div class="tutorial-title">🎯 Mixture of Experts: Scaling Transformers Efficiently <span class="new-badge">New</span></div>
+                    <div class="tutorial-title">🎯 Mixture of Experts: Scaling Transformers Efficiently</div>
                     <div class="tutorial-description">
                         Interactive exploration of how MoE scales transformer models through sparsity, routing, and selective expert activation. Covers dense vs sparse computation, router mechanics, expert specialization, and real-world MoE architectures.
                     </div>
                     <div class="tutorial-concepts">
                         Sparse computation • Expert routing • Load balancing • Parameter scaling • Real MoE models
+                    </div>
+                </div>
+            </a>
+            
+            <a href="context-length-impact.html" class="tutorial-link">
+                <div class="tutorial-card">
+                    <div class="tutorial-title">📊 Context Length Impact: Training vs Inference</div>
+                    <div class="tutorial-description">
+                        Mathematical analysis of why models trained on long contexts excel at shorter sequences with fixed vs dynamic components, RoPE frequency analysis, and performance metrics.
+                    </div>
+                    <div class="tutorial-concepts">
+                        Context extension • Performance analysis • RoPE frequencies • Training vs inference
                     </div>
                 </div>
             </a>
@@ -315,6 +350,8 @@
         <h2>🎓 Learning Path</h2>
         <p><strong>Recommended order for maximum understanding:</strong></p>
         <ol>
+            <li><strong>🏗️ Transformer Basics</strong> - Understand the revolutionary breakthrough and foundation</li>
+            <li><strong>📊 Architecture Comparison</strong> - Learn how modern LLMs differ and why</li>
             <li><strong>🎯 Q, K, V Matrix Dimensions</strong> - Understand the basic building blocks</li>
             <li><strong>🌀 RoPE: Rotary Position Embedding</strong> - Learn how position is encoded</li>
             <li><strong>⚡ Complete Attention Mechanism</strong> - See how Q, K, V work together</li>
