@@ -2097,7 +2097,7 @@ function buildArchitecture() {
     const useCaseSpec = useCaseRequirements[useCase];
     
     // Calculate real metrics
-    const metrics = calculateArchitectureMetrics(size, attentionSpec, normSpec, ffnSpec);
+    const metrics = calculateArchitectureMetrics(size, attentionSpec, normSpec, ffnSpec, ffn);
     const compatibility = analyzeUseCaseCompatibility(useCaseSpec, attentionSpec, normSpec, ffnSpec);
     const improvements = suggestImprovements(useCase, attention, norm, ffn, size);
     
@@ -2174,7 +2174,7 @@ function buildArchitecture() {
     }
 }
 
-function calculateArchitectureMetrics(size, attentionSpec, normSpec, ffnSpec) {
+function calculateArchitectureMetrics(size, attentionSpec, normSpec, ffnSpec, ffnType) {
     // Base memory calculation (more realistic)
     const baseMemory = size * 2; // 2GB per billion parameters (FP16)
     const kvCacheMemory = (size / 10) * attentionSpec.memoryMultiplier * 8; // 8K context assumption
@@ -2201,7 +2201,7 @@ function calculateArchitectureMetrics(size, attentionSpec, normSpec, ffnSpec) {
     const inferenceSpeed = 10 - (attentionSpec.memoryMultiplier * 5 + implementationDifficulty * 0.5);
     
     // Active parameters (for MoE)
-    const activeParams = ffn === 'moe' ? size * 0.125 : ffn === 'alternating' ? size * 0.6 : size;
+    const activeParams = ffnType === 'moe' ? size * 0.125 : ffnType === 'alternating' ? size * 0.6 : size;
     
     return {
         memoryGB: totalMemory,
