@@ -357,7 +357,7 @@
         <p>Comprehensive analysis of production LLM architectures from industry leaders - understanding design decisions, trade-offs, and innovations that shape 2025's AI landscape</p>
         
         <div class="info">
-            <strong>🎯 Based on Sebastian Raschka's research:</strong> This tutorial analyzes real production architectures from DeepSeek, Meta, Google, Mistral, Alibaba, and more - focusing on the architectural innovations that make modern LLMs work.
+             This tutorial analyzes real production architectures from DeepSeek, Meta, Google, Mistral, Alibaba, and more - focusing on the architectural innovations that make modern LLMs work.
         </div>
     </div>
 
@@ -1278,290 +1278,75 @@
 
     <script>
         // Model specifications database
-        const modelSpecs = {
-            'deepseek-v3': {
-                name: 'DeepSeek V3',
-                totalParams: '671B',
-                activeParams: '37B',
-                attention: 'Multi-Head Latent Attention (MLA)',
-                moe: 'Dense MoE (256 experts, 9 active)',
-                innovations: ['MLA compression', 'Shared expert', 'KV cache optimization'],
-                released: 'December 2024',
-                company: 'DeepSeek',
-                keyFeature: 'Memory-efficient MLA with massive MoE'
-            },
-            'llama-4': {
-                name: 'Llama 4 Maverick',
-                totalParams: '400B',
-                activeParams: '17B',
-                attention: 'Grouped Query Attention (GQA)',
-                moe: 'Alternating MoE (2 active experts)',
-                innovations: ['Alternating dense/MoE', 'Large expert size', 'Simplified routing'],
-                released: 'March 2025',
-                company: 'Meta',
-                keyFeature: 'Balanced MoE with proven GQA'
-            },
-            'gemma-3': {
-                name: 'Gemma 3',
-                totalParams: '27B',
-                activeParams: '27B (dense)',
-                attention: 'Sliding Window GQA',
-                moe: 'No MoE (dense model)',
-                innovations: ['5:1 sliding window', 'Pre+Post norm', 'QK normalization'],
-                released: 'February 2025',
-                company: 'Google',
-                keyFeature: 'Sliding window attention efficiency'
-            },
-            'qwen3-235b': {
-                name: 'Qwen3 235B-A22B',
-                totalParams: '235B',
-                activeParams: '22B',
-                attention: 'Grouped Query Attention (GQA)',
-                moe: 'Standard MoE (8 active experts)',
-                innovations: ['No shared expert', 'Optimized routing', 'Multi-size variants'],
-                released: 'April 2025',
-                company: 'Alibaba',
-                keyFeature: 'Efficient MoE without shared expert'
-            },
-            'olmo-2': {
-                name: 'OLMo 2',
-                totalParams: '13B',
-                activeParams: '13B (dense)',
-                attention: 'Multi-Head Attention (MHA)',
-                moe: 'No MoE (dense model)',
-                innovations: ['Post-norm placement', 'QK normalization', 'Training transparency'],
-                released: 'January 2025',
-                company: 'Allen Institute',
-                keyFeature: 'Transparent training with norm innovations'
-            },
-            'kimi-k2': {
-                name: 'Kimi K2',
-                totalParams: '1T',
-                activeParams: '~100B',
-                attention: 'Multi-Head Latent Attention (MLA)',
-                moe: 'Massive MoE (like DeepSeek V3)',
-                innovations: ['Trillion parameters', 'Muon optimizer', 'Scaled MLA'],
-                released: 'May 2025',
-                company: 'Moonshot AI',
-                keyFeature: 'Largest open-weight model with MLA'
-            }
-        };
-
-        function showEvolution(model) {
-            let html = '<div class="step"><h3>📈 ' + model.toUpperCase() + ' Innovation Spotlight</h3>';
-            
-            switch(model) {
-                case 'deepseek':
-                    html += '<div class="example-box">';
-                    html += '<strong>DeepSeek V3 Revolution (December 2024):</strong><br>';
-                    html += '• Introduced Multi-Head Latent Attention (MLA) to production<br>';
-                    html += '• Massive 671B parameters with only 37B active<br>';
-                    html += '• 50% KV cache memory savings vs standard GQA<br>';
-                    html += '• Shared expert design for better specialization<br>';
-                    html += '• Outperformed GPT-4 while being more efficient';
-                    html += '</div>';
-                    break;
-                    
-                case 'olmo':
-                    html += '<div class="example-box">';
-                    html += '<strong>OLMo 2 Transparency (January 2025):</strong><br>';
-                    html += '• Returned to Post-Norm for better training stability<br>';
-                    html += '• Added QK-Norm inside attention mechanism<br>';
-                    html += '• Full training transparency - code, data, logs<br>';
-                    html += '• Achieved Pareto frontier on compute/performance<br>';
-                    html += '• Educational blueprint for LLM development';
-                    html += '</div>';
-                    break;
-                    
-                case 'gemma':
-                    html += '<div class="example-box">';
-                    html += '<strong>Gemma 3 Efficiency (February 2025):</strong><br>';
-                    html += '• Revolutionary 5:1 sliding window ratio<br>';
-                    html += '• Reduced window size from 4K to 1K tokens<br>';
-                    html += '• Massive KV cache memory savings<br>';
-                    html += '• Pre+Post normalization for stability<br>';
-                    html += '• Sweet spot 27B parameter size';
-                    html += '</div>';
-                    break;
-                    
-                case 'llama':
-                    html += '<div class="example-box">';
-                    html += '<strong>Llama 4 Balance (March 2025):</strong><br>';
-                    html += '• Alternating MoE/dense layer strategy<br>';
-                    html += '• Proven GQA over experimental MLA<br>';
-                    html += '• Larger experts (8K) with fewer active (2)<br>';
-                    html += '• 400B total with 17B active parameters<br>';
-                    html += '• Production-ready architecture focus';
-                    html += '</div>';
-                    break;
-                    
-                case 'kimi':
-                    html += '<div class="example-box">';
-                    html += '<strong>Kimi K2 Scale (May 2025):</strong><br>';
-                    html += '• First 1 trillion parameter open-weight model<br>';
-                    html += '• Uses DeepSeek V3 architecture at massive scale<br>';
-                    html += '• Muon optimizer over traditional AdamW<br>';
-                    html += '• Smooth training loss curves<br>';
-                    html += '• Matches proprietary model performance';
-                    html += '</div>';
-                    break;
-            }
-            
-            html += '</div>';
-            document.getElementById('evolutionDetails').innerHTML = html;
-        }
-
-        function compareArchitectures() {
-            const primary = document.getElementById('primaryModel').value;
-            const comparison = document.getElementById('comparisonModel').value;
-            const focus = document.getElementById('focusArea').value;
-            
-            const primarySpec = modelSpecs[primary];
-            const comparisonSpec = modelSpecs[comparison];
-            
-            let html = '<div class="step"><h3>🔍 ' + primarySpec.name + ' vs ' + comparisonSpec.name + '</h3>';
-            
-            // Architecture comparison table
-            html += '<div class="comparison-matrix">';
-            html += '<table>';
-            html += '<tr><th>Aspect</th><th>' + primarySpec.name + '</th><th>' + comparisonSpec.name + '</th><th>Analysis</th></tr>';
-            html += '<tr><td><strong>Total Parameters</strong></td><td>' + primarySpec.totalParams + '</td><td>' + comparisonSpec.totalParams + '</td><td>Capacity difference</td></tr>';
-            html += '<tr><td><strong>Active Parameters</strong></td><td>' + primarySpec.activeParams + '</td><td>' + comparisonSpec.activeParams + '</td><td>Inference efficiency</td></tr>';
-            html += '<tr><td><strong>Attention</strong></td><td>' + primarySpec.attention + '</td><td>' + comparisonSpec.attention + '</td><td>Memory/compute trade-off</td></tr>';
-            html += '<tr><td><strong>MoE Strategy</strong></td><td>' + primarySpec.moe + '</td><td>' + comparisonSpec.moe + '</td><td>Scaling approach</td></tr>';
-            html += '<tr><td><strong>Key Innovation</strong></td><td>' + primarySpec.keyFeature + '</td><td>' + comparisonSpec.keyFeature + '</td><td>Design philosophy</td></tr>';
-            html += '</table>';
-            html += '</div>';
-            
-            if (focus === 'attention') {
-                html += '<div class="info">';
-                html += '<strong>🎯 Attention Focus:</strong> ' + primarySpec.name + ' uses ' + primarySpec.attention + 
-                        ' while ' + comparisonSpec.name + ' uses ' + comparisonSpec.attention + '. ';
-                        
-                if (primarySpec.attention.includes('MLA')) {
-                    html += 'MLA provides superior memory efficiency through KV compression but requires more complex implementation.';
-                } else if (primarySpec.attention.includes('Sliding')) {
-                    html += 'Sliding window attention reduces memory quadratically while maintaining most performance.';
-                } else {
-                    html += 'Standard GQA provides proven efficiency with simpler implementation.';
-                }
-                html += '</div>';
-            }
-            
-            html += '</div>';
-            document.getElementById('architectureComparison').innerHTML = html;
-        }
-
-        function showDetailedMoEComparison() {
-            let html = '<div class="step"><h3>🔬 MoE Implementation Deep Dive</h3>';
-            
-            html += '<div class="feature-comparison">';
-            html += '<div class="feature-card">';
-            html += '<div class="feature-title">🧠 DeepSeek V3 MoE Design</div>';
-            html += '<div class="math-formula">';
-            html += '<strong>Expert Configuration:</strong><br>';
-            html += '• 256 total experts per layer<br>';
-            html += '• 9 active: 8 routed + 1 shared<br>';
-            html += '• Expert size: 2,048 hidden units<br>';
-            html += '• Every layer has MoE (except first 3)<br>';
-            html += '• Shared expert always active<br><br>';
-            html += '<strong>Routing Math:</strong><br>';
-            html += 'token → router → top-8 experts + shared<br>';
-            html += 'output = Σ(weight_i × expert_i(token)) + shared(token)';
-            html += '</div>';
-            html += '</div>';
-            
-            html += '<div class="feature-card">';
-            html += '<div class="feature-title">🚀 Llama 4 MoE Design</div>';
-            html += '<div class="math-formula">';
-            html += '<strong>Expert Configuration:</strong><br>';
-            html += '• Fewer total experts per layer<br>';
-            html += '• 2 active experts per token<br>';
-            html += '• Expert size: 8,192 hidden units<br>';
-            html += '• Alternates: Layer N=MoE, N+1=Dense<br>';
-            html += '• No shared expert<br><br>';
-            html += '<strong>Routing Math:</strong><br>';
-            html += 'token → router → top-2 experts<br>';
-            html += 'output = weight_1 × expert_1(token) + weight_2 × expert_2(token)';
-            html += '</div>';
-            html += '</div>';
-            html += '</div>';
-            
-            html += '<div class="warning">';
-            html += '<strong>🎯 Trade-off Analysis:</strong><br>';
-            html += '• <strong>DeepSeek:</strong> More experts = better specialization, higher routing overhead<br>';
-            html += '• <strong>Llama 4:</strong> Fewer experts = simpler routing, larger expert capacity<br>';
-            html += '• <strong>Shared Expert:</strong> Handles common patterns, reduces expert load imbalance<br>';
-            html += '• <strong>Alternating:</strong> Balances dense computation with sparse scaling';
-            html += '</div>';
-            
-            html += '</div>';
-            document.getElementById('moeDetails').innerHTML = html;
-        }
-
-        function selectUseCase(useCase) {
-            // Remove selection from all cards
-            document.querySelectorAll('.arch-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            // Add selection to clicked card
-            event.target.classList.add('selected');
-            
-            let html = '<div class="step"><h3>🎯 ' + useCase.toUpperCase() + ' Use Case Recommendations</h3>';
-            
-            switch(useCase) {
-                case 'research':
-                    html += '<div class="info">';
-                    html += '<strong>🔬 Research & Experimentation:</strong><br>';
-                    html += '• <strong>OLMo 2:</strong> Complete transparency, training logs, clean architecture<br>';
-                    html += '• <strong>SmolLM3:</strong> Small scale for quick experiments, NoPE innovation<br>';
-                    html += '• <strong>Benefits:</strong> Reproducible results, educational value, modification-friendly<br>';
-                    html += '• <strong>Trade-offs:</strong> Not state-of-the-art performance, smaller scale';
-                    html += '</div>';
-                    break;
-                    
-                case 'production':
-                    html += '<div class="success">';
-                    html += '<strong>🏭 Production Deployment:</strong><br>';
-                    html += '• <strong>Llama 4:</strong> Battle-tested, extensive ecosystem, balanced architecture<br>';
-                    html += '• <strong>Gemma 3:</strong> Efficient, well-optimized, good documentation<br>';
-                    html += '• <strong>Benefits:</strong> Proven reliability, optimization support, community resources<br>';
-                    html += '• <strong>Trade-offs:</strong> Less cutting-edge, potentially higher inference costs';
-                    html += '</div>';
-                    break;
-                    
-                case 'efficiency':
-                    html += '<div class="warning">';
-                    html += '<strong>⚡ Maximum Efficiency:</strong><br>';
-                    html += '• <strong>DeepSeek V3:</strong> MLA compression, optimal MoE design, memory efficient<br>';
-                    html += '• <strong>Qwen3:</strong> Multiple variants, optimized routing, good performance/cost<br>';
-                    html += '• <strong>Benefits:</strong> Lowest inference cost, cutting-edge optimizations<br>';
-                    html += '• <strong>Trade-offs:</strong> Implementation complexity, newer/less tested';
-                    html += '</div>';
-                    break;
-                    
-                case 'local':
-                    html += '<div class="info">';
-                    html += '<strong>💻 Local Deployment:</strong><br>';
-                    html += '• <strong>Gemma 3:</strong> Sliding window reduces memory, multiple sizes<br>';
-                    html += '• <strong>Qwen3 Small:</strong> Excellent small models, efficient architecture<br>';
-                    html += '• <strong>Benefits:</strong> Consumer hardware friendly, privacy control<br>';
-                    html += '• <strong>Trade-offs:</strong> Limited by local compute, smaller model capabilities';
-                    html += '</div>';
-                    break;
-            }
-            
-            html += '</div>';
-            document.getElementById('useCaseDetails').innerHTML = html;
-        }
-
-        // Initialize with first comparison
-        document.addEventListener('DOMContentLoaded', function() {
-            compareArchitectures();
-            showEvolution('deepseek');
-        });
-        // Additional data objects and functions to add to your existing <script> section
+    // Model specifications database
+const modelSpecs = {
+    'deepseek-v3': {
+        name: 'DeepSeek V3',
+        totalParams: '671B',
+        activeParams: '37B',
+        attention: 'Multi-Head Latent Attention (MLA)',
+        moe: 'Dense MoE (256 experts, 9 active)',
+        innovations: ['MLA compression', 'Shared expert', 'KV cache optimization'],
+        released: 'December 2024',
+        company: 'DeepSeek',
+        keyFeature: 'Memory-efficient MLA with massive MoE'
+    },
+    'llama-4': {
+        name: 'Llama 4 Maverick',
+        totalParams: '400B',
+        activeParams: '17B',
+        attention: 'Grouped Query Attention (GQA)',
+        moe: 'Alternating MoE (2 active experts)',
+        innovations: ['Alternating dense/MoE', 'Large expert size', 'Simplified routing'],
+        released: 'March 2025',
+        company: 'Meta',
+        keyFeature: 'Balanced MoE with proven GQA'
+    },
+    'gemma-3': {
+        name: 'Gemma 3',
+        totalParams: '27B',
+        activeParams: '27B (dense)',
+        attention: 'Sliding Window GQA',
+        moe: 'No MoE (dense model)',
+        innovations: ['5:1 sliding window', 'Pre+Post norm', 'QK normalization'],
+        released: 'February 2025',
+        company: 'Google',
+        keyFeature: 'Sliding window attention efficiency'
+    },
+    'qwen3-235b': {
+        name: 'Qwen3 235B-A22B',
+        totalParams: '235B',
+        activeParams: '22B',
+        attention: 'Grouped Query Attention (GQA)',
+        moe: 'Standard MoE (8 active experts)',
+        innovations: ['No shared expert', 'Optimized routing', 'Multi-size variants'],
+        released: 'April 2025',
+        company: 'Alibaba',
+        keyFeature: 'Efficient MoE without shared expert'
+    },
+    'olmo-2': {
+        name: 'OLMo 2',
+        totalParams: '13B',
+        activeParams: '13B (dense)',
+        attention: 'Multi-Head Attention (MHA)',
+        moe: 'No MoE (dense model)',
+        innovations: ['Post-norm placement', 'QK normalization', 'Training transparency'],
+        released: 'January 2025',
+        company: 'Allen Institute',
+        keyFeature: 'Transparent training with norm innovations'
+    },
+    'kimi-k2': {
+        name: 'Kimi K2',
+        totalParams: '1T',
+        activeParams: '~100B',
+        attention: 'Multi-Head Latent Attention (MLA)',
+        moe: 'Massive MoE (like DeepSeek V3)',
+        innovations: ['Trillion parameters', 'Muon optimizer', 'Scaled MLA'],
+        released: 'May 2025',
+        company: 'Moonshot AI',
+        keyFeature: 'Largest open-weight model with MLA'
+    }
+};
 
 // Attention type specifications
 const attentionSpecs = {
@@ -1690,7 +1475,377 @@ const modelDatabase = {
     }
 };
 
-// New Functions for Interactive Features
+// Architecture component database with real specifications
+const architectureComponents = {
+    attention: {
+        'mha': {
+            name: 'Multi-Head Attention',
+            memoryMultiplier: 1.0,
+            computeComplexity: 'O(n²d)',
+            implementationDifficulty: 1,
+            qualityScore: 8,
+            bestFor: ['research', 'transparency'],
+            realModels: ['GPT-1', 'GPT-2', 'BERT'],
+            pros: ['Simple implementation', 'Well understood', 'Debuggable'],
+            cons: ['High memory usage', 'Inefficient for long sequences', 'No sharing']
+        },
+        'gqa': {
+            name: 'Grouped Query Attention',
+            memoryMultiplier: 0.25,
+            computeComplexity: 'O(n²d/g)',
+            implementationDifficulty: 3,
+            qualityScore: 9,
+            bestFor: ['production', 'balanced'],
+            realModels: ['Llama 2/3/4', 'GPT-4', 'Gemma'],
+            pros: ['4x memory reduction', 'Proven in production', 'Good quality retention'],
+            cons: ['Slightly more complex', 'Group size tuning needed']
+        },
+        'mla': {
+            name: 'Multi-Head Latent Attention',
+            memoryMultiplier: 0.1,
+            computeComplexity: 'O(n²c + nd)',
+            implementationDifficulty: 8,
+            qualityScore: 9.5,
+            bestFor: ['efficiency', 'large-scale'],
+            realModels: ['DeepSeek V3', 'Kimi K2'],
+            pros: ['90% memory reduction', 'Superior scaling', 'Maintains quality'],
+            cons: ['Complex implementation', 'New/unproven', 'Training complexity']
+        },
+        'sliding': {
+            name: 'Sliding Window Attention',
+            memoryMultiplier: 0.1,
+            computeComplexity: 'O(nwd)',
+            implementationDifficulty: 4,
+            qualityScore: 8.5,
+            bestFor: ['local', 'consumer'],
+            realModels: ['Gemma 3', 'Mistral', 'Longformer'],
+            pros: ['Constant memory', 'Linear scaling', 'Local efficiency'],
+            cons: ['Limited long context', 'Pattern limitations', 'Window tuning']
+        }
+    },
+    normalization: {
+        'pre-norm': {
+            name: 'Pre-Normalization',
+            trainingStability: 9,
+            finalPerformance: 7,
+            implementationDifficulty: 1,
+            bestFor: ['training', 'stability'],
+            realModels: ['Llama', 'GPT-3+', 'Most modern'],
+            pros: ['Excellent stability', 'Easy training', 'Proven approach'],
+            cons: ['Slightly lower performance', 'Less expressive']
+        },
+        'post-norm': {
+            name: 'Post-Normalization',
+            trainingStability: 6,
+            finalPerformance: 9,
+            implementationDifficulty: 2,
+            bestFor: ['performance', 'research'],
+            realModels: ['Original Transformer', 'OLMo 2'],
+            pros: ['Best final performance', 'More expressive', 'Better gradients'],
+            cons: ['Training instability', 'Requires expertise', 'Careful tuning']
+        },
+        'qk-norm': {
+            name: 'QK-Normalization',
+            trainingStability: 8,
+            finalPerformance: 8,
+            implementationDifficulty: 3,
+            bestFor: ['attention-stability', 'research'],
+            realModels: ['OLMo 2'],
+            pros: ['Prevents collapse', 'Stable attention', 'Good performance'],
+            cons: ['Extra computation', 'Limited adoption', 'Research stage']
+        },
+        'dual-norm': {
+            name: 'Pre+Post Normalization',
+            trainingStability: 9,
+            finalPerformance: 9,
+            implementationDifficulty: 4,
+            bestFor: ['maximum-quality', 'resources-available'],
+            realModels: ['Gemma 3'],
+            pros: ['Best of both worlds', 'Maximum stability', 'Top performance'],
+            cons: ['2x normalization cost', 'Complex implementation', 'Memory overhead']
+        }
+    },
+    ffn: {
+        'dense': {
+            name: 'Dense Feed-Forward',
+            parameterEfficiency: 1.0,
+            implementationDifficulty: 1,
+            scalingPotential: 5,
+            bestFor: ['simplicity', 'small-models'],
+            realModels: ['Most models <30B'],
+            pros: ['Simple and reliable', 'Predictable behavior', 'Easy debugging'],
+            cons: ['Poor parameter efficiency', 'Limited scaling', 'Monolithic']
+        },
+        'moe': {
+            name: 'Mixture of Experts',
+            parameterEfficiency: 8.0,
+            implementationDifficulty: 7,
+            scalingPotential: 10,
+            bestFor: ['large-scale', 'efficiency'],
+            realModels: ['Switch-T', 'PaLM-2', 'DeepSeek V3'],
+            pros: ['Massive parameter scaling', 'Specialized experts', 'Conditional compute'],
+            cons: ['Complex routing', 'Load balancing', 'Training challenges']
+        },
+        'alternating': {
+            name: 'Alternating Dense/MoE',
+            parameterEfficiency: 6.0,
+            implementationDifficulty: 5,
+            scalingPotential: 8,
+            bestFor: ['balanced-scaling', 'production'],
+            realModels: ['Llama 4'],
+            pros: ['Balanced approach', 'Easier than full MoE', 'Good scaling'],
+            cons: ['Still complex', 'Suboptimal efficiency', 'Mixed benefits']
+        }
+    }
+};
+
+// Use case requirements
+const useCaseRequirements = {
+    'general': {
+        name: 'General Purpose',
+        memoryConstraint: 'medium',
+        performanceRequirement: 'high',
+        complexityTolerance: 'medium',
+        priorityOrder: ['quality', 'reliability', 'efficiency']
+    },
+    'code': {
+        name: 'Code Generation',
+        memoryConstraint: 'medium',
+        performanceRequirement: 'very-high',
+        complexityTolerance: 'high',
+        priorityOrder: ['quality', 'precision', 'context']
+    },
+    'research': {
+        name: 'Research/Science',
+        memoryConstraint: 'low',
+        performanceRequirement: 'medium',
+        complexityTolerance: 'very-high',
+        priorityOrder: ['transparency', 'reproducibility', 'innovation']
+    },
+    'chat': {
+        name: 'Chat/Assistant',
+        memoryConstraint: 'high',
+        performanceRequirement: 'high',
+        complexityTolerance: 'low',
+        priorityOrder: ['reliability', 'speed', 'efficiency']
+    },
+    'local': {
+        name: 'Local Deployment',
+        memoryConstraint: 'very-high',
+        performanceRequirement: 'medium',
+        complexityTolerance: 'low',
+        priorityOrder: ['efficiency', 'simplicity', 'memory']
+    }
+};
+
+function showEvolution(model) {
+    let html = '<div class="step"><h3>📈 ' + model.toUpperCase() + ' Innovation Spotlight</h3>';
+    
+    switch(model) {
+        case 'deepseek':
+            html += '<div class="example-box">';
+            html += '<strong>DeepSeek V3 Revolution (December 2024):</strong><br>';
+            html += '• Introduced Multi-Head Latent Attention (MLA) to production<br>';
+            html += '• Massive 671B parameters with only 37B active<br>';
+            html += '• 50% KV cache memory savings vs standard GQA<br>';
+            html += '• Shared expert design for better specialization<br>';
+            html += '• Outperformed GPT-4 while being more efficient';
+            html += '</div>';
+            break;
+            
+        case 'olmo':
+            html += '<div class="example-box">';
+            html += '<strong>OLMo 2 Transparency (January 2025):</strong><br>';
+            html += '• Returned to Post-Norm for better training stability<br>';
+            html += '• Added QK-Norm inside attention mechanism<br>';
+            html += '• Full training transparency - code, data, logs<br>';
+            html += '• Achieved Pareto frontier on compute/performance<br>';
+            html += '• Educational blueprint for LLM development';
+            html += '</div>';
+            break;
+            
+        case 'gemma':
+            html += '<div class="example-box">';
+            html += '<strong>Gemma 3 Efficiency (February 2025):</strong><br>';
+            html += '• Revolutionary 5:1 sliding window ratio<br>';
+            html += '• Reduced window size from 4K to 1K tokens<br>';
+            html += '• Massive KV cache memory savings<br>';
+            html += '• Pre+Post normalization for stability<br>';
+            html += '• Sweet spot 27B parameter size';
+            html += '</div>';
+            break;
+            
+        case 'llama':
+            html += '<div class="example-box">';
+            html += '<strong>Llama 4 Balance (March 2025):</strong><br>';
+            html += '• Alternating MoE/dense layer strategy<br>';
+            html += '• Proven GQA over experimental MLA<br>';
+            html += '• Larger experts (8K) with fewer active (2)<br>';
+            html += '• 400B total with 17B active parameters<br>';
+            html += '• Production-ready architecture focus';
+            html += '</div>';
+            break;
+            
+        case 'kimi':
+            html += '<div class="example-box">';
+            html += '<strong>Kimi K2 Scale (May 2025):</strong><br>';
+            html += '• First 1 trillion parameter open-weight model<br>';
+            html += '• Uses DeepSeek V3 architecture at massive scale<br>';
+            html += '• Muon optimizer over traditional AdamW<br>';
+            html += '• Smooth training loss curves<br>';
+            html += '• Matches proprietary model performance';
+            html += '</div>';
+            break;
+    }
+    
+    html += '</div>';
+    document.getElementById('evolutionDetails').innerHTML = html;
+}
+
+function compareArchitectures() {
+    const primary = document.getElementById('primaryModel').value;
+    const comparison = document.getElementById('comparisonModel').value;
+    const focus = document.getElementById('focusArea').value;
+    
+    const primarySpec = modelSpecs[primary];
+    const comparisonSpec = modelSpecs[comparison];
+    
+    let html = '<div class="step"><h3>🔍 ' + primarySpec.name + ' vs ' + comparisonSpec.name + '</h3>';
+    
+    // Architecture comparison table
+    html += '<div class="comparison-matrix">';
+    html += '<table>';
+    html += '<tr><th>Aspect</th><th>' + primarySpec.name + '</th><th>' + comparisonSpec.name + '</th><th>Analysis</th></tr>';
+    html += '<tr><td><strong>Total Parameters</strong></td><td>' + primarySpec.totalParams + '</td><td>' + comparisonSpec.totalParams + '</td><td>Capacity difference</td></tr>';
+    html += '<tr><td><strong>Active Parameters</strong></td><td>' + primarySpec.activeParams + '</td><td>' + comparisonSpec.activeParams + '</td><td>Inference efficiency</td></tr>';
+    html += '<tr><td><strong>Attention</strong></td><td>' + primarySpec.attention + '</td><td>' + comparisonSpec.attention + '</td><td>Memory/compute trade-off</td></tr>';
+    html += '<tr><td><strong>MoE Strategy</strong></td><td>' + primarySpec.moe + '</td><td>' + comparisonSpec.moe + '</td><td>Scaling approach</td></tr>';
+    html += '<tr><td><strong>Key Innovation</strong></td><td>' + primarySpec.keyFeature + '</td><td>' + comparisonSpec.keyFeature + '</td><td>Design philosophy</td></tr>';
+    html += '</table>';
+    html += '</div>';
+    
+    if (focus === 'attention') {
+        html += '<div class="info">';
+        html += '<strong>🎯 Attention Focus:</strong> ' + primarySpec.name + ' uses ' + primarySpec.attention + 
+                ' while ' + comparisonSpec.name + ' uses ' + comparisonSpec.attention + '. ';
+                
+        if (primarySpec.attention.includes('MLA')) {
+            html += 'MLA provides superior memory efficiency through KV compression but requires more complex implementation.';
+        } else if (primarySpec.attention.includes('Sliding')) {
+            html += 'Sliding window attention reduces memory quadratically while maintaining most performance.';
+        } else {
+            html += 'Standard GQA provides proven efficiency with simpler implementation.';
+        }
+        html += '</div>';
+    }
+    
+    html += '</div>';
+    document.getElementById('architectureComparison').innerHTML = html;
+}
+
+function showDetailedMoEComparison() {
+    let html = '<div class="step"><h3>🔬 MoE Implementation Deep Dive</h3>';
+    
+    html += '<div class="feature-comparison">';
+    html += '<div class="feature-card">';
+    html += '<div class="feature-title">🧠 DeepSeek V3 MoE Design</div>';
+    html += '<div class="math-formula">';
+    html += '<strong>Expert Configuration:</strong><br>';
+    html += '• 256 total experts per layer<br>';
+    html += '• 9 active: 8 routed + 1 shared<br>';
+    html += '• Expert size: 2,048 hidden units<br>';
+    html += '• Every layer has MoE (except first 3)<br>';
+    html += '• Shared expert always active<br><br>';
+    html += '<strong>Routing Math:</strong><br>';
+    html += 'token → router → top-8 experts + shared<br>';
+    html += 'output = Σ(weight_i × expert_i(token)) + shared(token)';
+    html += '</div>';
+    html += '</div>';
+    
+    html += '<div class="feature-card">';
+    html += '<div class="feature-title">🚀 Llama 4 MoE Design</div>';
+    html += '<div class="math-formula">';
+    html += '<strong>Expert Configuration:</strong><br>';
+    html += '• Fewer total experts per layer<br>';
+    html += '• 2 active experts per token<br>';
+    html += '• Expert size: 8,192 hidden units<br>';
+    html += '• Alternates: Layer N=MoE, N+1=Dense<br>';
+    html += '• No shared expert<br><br>';
+    html += '<strong>Routing Math:</strong><br>';
+    html += 'token → router → top-2 experts<br>';
+    html += 'output = weight_1 × expert_1(token) + weight_2 × expert_2(token)';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    
+    html += '<div class="warning">';
+    html += '<strong>🎯 Trade-off Analysis:</strong><br>';
+    html += '• <strong>DeepSeek:</strong> More experts = better specialization, higher routing overhead<br>';
+    html += '• <strong>Llama 4:</strong> Fewer experts = simpler routing, larger expert capacity<br>';
+    html += '• <strong>Shared Expert:</strong> Handles common patterns, reduces expert load imbalance<br>';
+    html += '• <strong>Alternating:</strong> Balances dense computation with sparse scaling';
+    html += '</div>';
+    
+    html += '</div>';
+    document.getElementById('moeDetails').innerHTML = html;
+}
+
+function selectUseCase(useCase) {
+    // Remove selection from all cards
+    document.querySelectorAll('.arch-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Add selection to clicked card
+    event.target.closest('.arch-card').classList.add('selected');
+    
+    let html = '<div class="step"><h3>🎯 ' + useCase.toUpperCase() + ' Use Case Recommendations</h3>';
+    
+    switch(useCase) {
+        case 'research':
+            html += '<div class="info">';
+            html += '<strong>🔬 Research & Experimentation:</strong><br>';
+            html += '• <strong>OLMo 2:</strong> Complete transparency, training logs, clean architecture<br>';
+            html += '• <strong>SmolLM3:</strong> Small scale for quick experiments, NoPE innovation<br>';
+            html += '• <strong>Benefits:</strong> Reproducible results, educational value, modification-friendly<br>';
+            html += '• <strong>Trade-offs:</strong> Not state-of-the-art performance, smaller scale';
+            html += '</div>';
+            break;
+            
+        case 'production':
+            html += '<div class="success">';
+            html += '<strong>🏭 Production Deployment:</strong><br>';
+            html += '• <strong>Llama 4:</strong> Battle-tested, extensive ecosystem, balanced architecture<br>';
+            html += '• <strong>Gemma 3:</strong> Efficient, well-optimized, good documentation<br>';
+            html += '• <strong>Benefits:</strong> Proven reliability, optimization support, community resources<br>';
+            html += '• <strong>Trade-offs:</strong> Less cutting-edge, potentially higher inference costs';
+            html += '</div>';
+            break;
+            
+        case 'efficiency':
+            html += '<div class="warning">';
+            html += '<strong>⚡ Maximum Efficiency:</strong><br>';
+            html += '• <strong>DeepSeek V3:</strong> MLA compression, optimal MoE design, memory efficient<br>';
+            html += '• <strong>Qwen3:</strong> Multiple variants, optimized routing, good performance/cost<br>';
+            html += '• <strong>Benefits:</strong> Lowest inference cost, cutting-edge optimizations<br>';
+            html += '• <strong>Trade-offs:</strong> Implementation complexity, newer/less tested';
+            html += '</div>';
+            break;
+            
+        case 'local':
+            html += '<div class="info">';
+            html += '<strong>💻 Local Deployment:</strong><br>';
+            html += '• <strong>Gemma 3:</strong> Sliding window reduces memory, multiple sizes<br>';
+            html += '• <strong>Qwen3 Small:</strong> Excellent small models, efficient architecture<br>';
+            html += '• <strong>Benefits:</strong> Consumer hardware friendly, privacy control<br>';
+            html += '• <strong>Trade-offs:</strong> Limited by local compute, smaller model capabilities';
+            html += '</div>';
+            break;
+    }
+    
+    html += '</div>';
+    document.getElementById('useCaseDetails').innerHTML = html;
+}
 
 function calculateAttentionMetrics() {
     const attentionType = document.getElementById('attentionType').value;
@@ -1923,171 +2078,6 @@ function calculateEfficiency() {
     html += '</div>';
     document.getElementById('efficiencyCalculator').innerHTML = html;
 }
-
-// Intelligent Architecture Builder - Replace the existing buildArchitecture() and analyzeTradeoffs() functions
-
-// Architecture component database with real specifications
-const architectureComponents = {
-    attention: {
-        'mha': {
-            name: 'Multi-Head Attention',
-            memoryMultiplier: 1.0,
-            computeComplexity: 'O(n²d)',
-            implementationDifficulty: 1,
-            qualityScore: 8,
-            bestFor: ['research', 'transparency'],
-            realModels: ['GPT-1', 'GPT-2', 'BERT'],
-            pros: ['Simple implementation', 'Well understood', 'Debuggable'],
-            cons: ['High memory usage', 'Inefficient for long sequences', 'No sharing']
-        },
-        'gqa': {
-            name: 'Grouped Query Attention',
-            memoryMultiplier: 0.25,
-            computeComplexity: 'O(n²d/g)',
-            implementationDifficulty: 3,
-            qualityScore: 9,
-            bestFor: ['production', 'balanced'],
-            realModels: ['Llama 2/3/4', 'GPT-4', 'Gemma'],
-            pros: ['4x memory reduction', 'Proven in production', 'Good quality retention'],
-            cons: ['Slightly more complex', 'Group size tuning needed']
-        },
-        'mla': {
-            name: 'Multi-Head Latent Attention',
-            memoryMultiplier: 0.1,
-            computeComplexity: 'O(n²c + nd)',
-            implementationDifficulty: 8,
-            qualityScore: 9.5,
-            bestFor: ['efficiency', 'large-scale'],
-            realModels: ['DeepSeek V3', 'Kimi K2'],
-            pros: ['90% memory reduction', 'Superior scaling', 'Maintains quality'],
-            cons: ['Complex implementation', 'New/unproven', 'Training complexity']
-        },
-        'sliding': {
-            name: 'Sliding Window Attention',
-            memoryMultiplier: 0.1,
-            computeComplexity: 'O(nwd)',
-            implementationDifficulty: 4,
-            qualityScore: 8.5,
-            bestFor: ['local', 'consumer'],
-            realModels: ['Gemma 3', 'Mistral', 'Longformer'],
-            pros: ['Constant memory', 'Linear scaling', 'Local efficiency'],
-            cons: ['Limited long context', 'Pattern limitations', 'Window tuning']
-        }
-    },
-    normalization: {
-        'pre-norm': {
-            name: 'Pre-Normalization',
-            trainingStability: 9,
-            finalPerformance: 7,
-            implementationDifficulty: 1,
-            bestFor: ['training', 'stability'],
-            realModels: ['Llama', 'GPT-3+', 'Most modern'],
-            pros: ['Excellent stability', 'Easy training', 'Proven approach'],
-            cons: ['Slightly lower performance', 'Less expressive']
-        },
-        'post-norm': {
-            name: 'Post-Normalization',
-            trainingStability: 6,
-            finalPerformance: 9,
-            implementationDifficulty: 2,
-            bestFor: ['performance', 'research'],
-            realModels: ['Original Transformer', 'OLMo 2'],
-            pros: ['Best final performance', 'More expressive', 'Better gradients'],
-            cons: ['Training instability', 'Requires expertise', 'Careful tuning']
-        },
-        'qk-norm': {
-            name: 'QK-Normalization',
-            trainingStability: 8,
-            finalPerformance: 8,
-            implementationDifficulty: 3,
-            bestFor: ['attention-stability', 'research'],
-            realModels: ['OLMo 2'],
-            pros: ['Prevents collapse', 'Stable attention', 'Good performance'],
-            cons: ['Extra computation', 'Limited adoption', 'Research stage']
-        },
-        'dual-norm': {
-            name: 'Pre+Post Normalization',
-            trainingStability: 9,
-            finalPerformance: 9,
-            implementationDifficulty: 4,
-            bestFor: ['maximum-quality', 'resources-available'],
-            realModels: ['Gemma 3'],
-            pros: ['Best of both worlds', 'Maximum stability', 'Top performance'],
-            cons: ['2x normalization cost', 'Complex implementation', 'Memory overhead']
-        }
-    },
-    ffn: {
-        'dense': {
-            name: 'Dense Feed-Forward',
-            parameterEfficiency: 1.0,
-            implementationDifficulty: 1,
-            scalingPotential: 5,
-            bestFor: ['simplicity', 'small-models'],
-            realModels: ['Most models <30B'],
-            pros: ['Simple and reliable', 'Predictable behavior', 'Easy debugging'],
-            cons: ['Poor parameter efficiency', 'Limited scaling', 'Monolithic']
-        },
-        'moe': {
-            name: 'Mixture of Experts',
-            parameterEfficiency: 8.0,
-            implementationDifficulty: 7,
-            scalingPotential: 10,
-            bestFor: ['large-scale', 'efficiency'],
-            realModels: ['Switch-T', 'PaLM-2', 'DeepSeek V3'],
-            pros: ['Massive parameter scaling', 'Specialized experts', 'Conditional compute'],
-            cons: ['Complex routing', 'Load balancing', 'Training challenges']
-        },
-        'alternating': {
-            name: 'Alternating Dense/MoE',
-            parameterEfficiency: 6.0,
-            implementationDifficulty: 5,
-            scalingPotential: 8,
-            bestFor: ['balanced-scaling', 'production'],
-            realModels: ['Llama 4'],
-            pros: ['Balanced approach', 'Easier than full MoE', 'Good scaling'],
-            cons: ['Still complex', 'Suboptimal efficiency', 'Mixed benefits']
-        }
-    }
-};
-
-// Use case requirements
-const useCaseRequirements = {
-    'general': {
-        name: 'General Purpose',
-        memoryConstraint: 'medium',
-        performanceRequirement: 'high',
-        complexityTolerance: 'medium',
-        priorityOrder: ['quality', 'reliability', 'efficiency']
-    },
-    'code': {
-        name: 'Code Generation',
-        memoryConstraint: 'medium',
-        performanceRequirement: 'very-high',
-        complexityTolerance: 'high',
-        priorityOrder: ['quality', 'precision', 'context']
-    },
-    'research': {
-        name: 'Research/Science',
-        memoryConstraint: 'low',
-        performanceRequirement: 'medium',
-        complexityTolerance: 'very-high',
-        priorityOrder: ['transparency', 'reproducibility', 'innovation']
-    },
-    'chat': {
-        name: 'Chat/Assistant',
-        memoryConstraint: 'high',
-        performanceRequirement: 'high',
-        complexityTolerance: 'low',
-        priorityOrder: ['reliability', 'speed', 'efficiency']
-    },
-    'local': {
-        name: 'Local Deployment',
-        memoryConstraint: 'very-high',
-        performanceRequirement: 'medium',
-        complexityTolerance: 'low',
-        priorityOrder: ['efficiency', 'simplicity', 'memory']
-    }
-};
 
 function buildArchitecture() {
     const baseArch = document.getElementById('baseArch').value;
@@ -2466,13 +2456,13 @@ function analyzeTradeoffs() {
     document.getElementById('recommendationEngine').innerHTML = html;
 }
 
-// Update range sliders and initialize new functions
+// Initialize everything when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Existing initialization
+    // Initialize basic functions
     compareArchitectures();
     showEvolution('deepseek');
     
-    // New initializations
+    // Initialize new interactive features
     calculateAttentionMetrics();
     showModelDetails();
     showEfficiencyDetails();
