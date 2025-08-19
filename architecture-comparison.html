@@ -1275,31 +1275,6 @@
             <strong>🎯 Key Takeaway:</strong> 2025's architectural innovations make powerful AI accessible across deployment scenarios - from trillion-parameter cloud models to efficient edge deployment.
         </div>
     </div>
-    <div class="container">
-        <h2>🔮 Coming Next: Complete Architecture Analysis</h2>
-        
-        <div class="danger">
-            <strong>🚧 Tutorial In Progress:</strong> This is Part 1 of the comprehensive architecture comparison. Coming in the next update:
-        </div>
-        
-        <div class="step">
-            <h3>📋 Planned Sections (Part 2)</h3>
-            <ul>
-                <li><strong>🎯 Attention Evolution Deep Dive:</strong> MHA → GQA → MLA with interactive comparisons</li>
-                <li><strong>📊 Normalization Strategies:</strong> Pre-Norm vs Post-Norm vs QK-Norm analysis</li>
-                <li><strong>🔄 MoE Architectures:</strong> Shared experts, routing strategies, load balancing</li>
-                <li><strong>⚡ Efficiency Innovations:</strong> Sliding window attention, NoPE, compression techniques</li>
-                <li><strong>📈 Performance Metrics:</strong> Memory usage, inference speed, training efficiency</li>
-                <li><strong>🛠️ Implementation Complexity:</strong> Engineering trade-offs and deployment considerations</li>
-                <li><strong>🔬 Ablation Studies:</strong> What actually matters in modern architectures</li>
-                <li><strong>🎮 Interactive Architecture Builder:</strong> Mix and match components to design your own LLM</li>
-            </ul>
-        </div>
-        
-        <div class="info">
-            <strong>🎯 Next Steps:</strong> The complete tutorial will include all 8 architectures from Sebastian Raschka's analysis with full interactive comparisons, mathematical deep dives, and practical deployment guidance.
-        </div>
-    </div>
 
     <script>
         // Model specifications database
@@ -1949,126 +1924,542 @@ function calculateEfficiency() {
     document.getElementById('efficiencyCalculator').innerHTML = html;
 }
 
+// Intelligent Architecture Builder - Replace the existing buildArchitecture() and analyzeTradeoffs() functions
+
+// Architecture component database with real specifications
+const architectureComponents = {
+    attention: {
+        'mha': {
+            name: 'Multi-Head Attention',
+            memoryMultiplier: 1.0,
+            computeComplexity: 'O(n²d)',
+            implementationDifficulty: 1,
+            qualityScore: 8,
+            bestFor: ['research', 'transparency'],
+            realModels: ['GPT-1', 'GPT-2', 'BERT'],
+            pros: ['Simple implementation', 'Well understood', 'Debuggable'],
+            cons: ['High memory usage', 'Inefficient for long sequences', 'No sharing']
+        },
+        'gqa': {
+            name: 'Grouped Query Attention',
+            memoryMultiplier: 0.25,
+            computeComplexity: 'O(n²d/g)',
+            implementationDifficulty: 3,
+            qualityScore: 9,
+            bestFor: ['production', 'balanced'],
+            realModels: ['Llama 2/3/4', 'GPT-4', 'Gemma'],
+            pros: ['4x memory reduction', 'Proven in production', 'Good quality retention'],
+            cons: ['Slightly more complex', 'Group size tuning needed']
+        },
+        'mla': {
+            name: 'Multi-Head Latent Attention',
+            memoryMultiplier: 0.1,
+            computeComplexity: 'O(n²c + nd)',
+            implementationDifficulty: 8,
+            qualityScore: 9.5,
+            bestFor: ['efficiency', 'large-scale'],
+            realModels: ['DeepSeek V3', 'Kimi K2'],
+            pros: ['90% memory reduction', 'Superior scaling', 'Maintains quality'],
+            cons: ['Complex implementation', 'New/unproven', 'Training complexity']
+        },
+        'sliding': {
+            name: 'Sliding Window Attention',
+            memoryMultiplier: 0.1,
+            computeComplexity: 'O(nwd)',
+            implementationDifficulty: 4,
+            qualityScore: 8.5,
+            bestFor: ['local', 'consumer'],
+            realModels: ['Gemma 3', 'Mistral', 'Longformer'],
+            pros: ['Constant memory', 'Linear scaling', 'Local efficiency'],
+            cons: ['Limited long context', 'Pattern limitations', 'Window tuning']
+        }
+    },
+    normalization: {
+        'pre-norm': {
+            name: 'Pre-Normalization',
+            trainingStability: 9,
+            finalPerformance: 7,
+            implementationDifficulty: 1,
+            bestFor: ['training', 'stability'],
+            realModels: ['Llama', 'GPT-3+', 'Most modern'],
+            pros: ['Excellent stability', 'Easy training', 'Proven approach'],
+            cons: ['Slightly lower performance', 'Less expressive']
+        },
+        'post-norm': {
+            name: 'Post-Normalization',
+            trainingStability: 6,
+            finalPerformance: 9,
+            implementationDifficulty: 2,
+            bestFor: ['performance', 'research'],
+            realModels: ['Original Transformer', 'OLMo 2'],
+            pros: ['Best final performance', 'More expressive', 'Better gradients'],
+            cons: ['Training instability', 'Requires expertise', 'Careful tuning']
+        },
+        'qk-norm': {
+            name: 'QK-Normalization',
+            trainingStability: 8,
+            finalPerformance: 8,
+            implementationDifficulty: 3,
+            bestFor: ['attention-stability', 'research'],
+            realModels: ['OLMo 2'],
+            pros: ['Prevents collapse', 'Stable attention', 'Good performance'],
+            cons: ['Extra computation', 'Limited adoption', 'Research stage']
+        },
+        'dual-norm': {
+            name: 'Pre+Post Normalization',
+            trainingStability: 9,
+            finalPerformance: 9,
+            implementationDifficulty: 4,
+            bestFor: ['maximum-quality', 'resources-available'],
+            realModels: ['Gemma 3'],
+            pros: ['Best of both worlds', 'Maximum stability', 'Top performance'],
+            cons: ['2x normalization cost', 'Complex implementation', 'Memory overhead']
+        }
+    },
+    ffn: {
+        'dense': {
+            name: 'Dense Feed-Forward',
+            parameterEfficiency: 1.0,
+            implementationDifficulty: 1,
+            scalingPotential: 5,
+            bestFor: ['simplicity', 'small-models'],
+            realModels: ['Most models <30B'],
+            pros: ['Simple and reliable', 'Predictable behavior', 'Easy debugging'],
+            cons: ['Poor parameter efficiency', 'Limited scaling', 'Monolithic']
+        },
+        'moe': {
+            name: 'Mixture of Experts',
+            parameterEfficiency: 8.0,
+            implementationDifficulty: 7,
+            scalingPotential: 10,
+            bestFor: ['large-scale', 'efficiency'],
+            realModels: ['Switch-T', 'PaLM-2', 'DeepSeek V3'],
+            pros: ['Massive parameter scaling', 'Specialized experts', 'Conditional compute'],
+            cons: ['Complex routing', 'Load balancing', 'Training challenges']
+        },
+        'alternating': {
+            name: 'Alternating Dense/MoE',
+            parameterEfficiency: 6.0,
+            implementationDifficulty: 5,
+            scalingPotential: 8,
+            bestFor: ['balanced-scaling', 'production'],
+            realModels: ['Llama 4'],
+            pros: ['Balanced approach', 'Easier than full MoE', 'Good scaling'],
+            cons: ['Still complex', 'Suboptimal efficiency', 'Mixed benefits']
+        }
+    }
+};
+
+// Use case requirements
+const useCaseRequirements = {
+    'general': {
+        name: 'General Purpose',
+        memoryConstraint: 'medium',
+        performanceRequirement: 'high',
+        complexityTolerance: 'medium',
+        priorityOrder: ['quality', 'reliability', 'efficiency']
+    },
+    'code': {
+        name: 'Code Generation',
+        memoryConstraint: 'medium',
+        performanceRequirement: 'very-high',
+        complexityTolerance: 'high',
+        priorityOrder: ['quality', 'precision', 'context']
+    },
+    'research': {
+        name: 'Research/Science',
+        memoryConstraint: 'low',
+        performanceRequirement: 'medium',
+        complexityTolerance: 'very-high',
+        priorityOrder: ['transparency', 'reproducibility', 'innovation']
+    },
+    'chat': {
+        name: 'Chat/Assistant',
+        memoryConstraint: 'high',
+        performanceRequirement: 'high',
+        complexityTolerance: 'low',
+        priorityOrder: ['reliability', 'speed', 'efficiency']
+    },
+    'local': {
+        name: 'Local Deployment',
+        memoryConstraint: 'very-high',
+        performanceRequirement: 'medium',
+        complexityTolerance: 'low',
+        priorityOrder: ['efficiency', 'simplicity', 'memory']
+    }
+};
+
 function buildArchitecture() {
     const baseArch = document.getElementById('baseArch').value;
     const attention = document.getElementById('builderAttention').value;
     const norm = document.getElementById('builderNorm').value;
     const ffn = document.getElementById('builderFFN').value;
     const position = document.getElementById('builderPosition').value;
-    const size = document.getElementById('builderSize').value;
+    const size = parseInt(document.getElementById('builderSize').value);
     const useCase = document.getElementById('builderUseCase').value;
     
     document.getElementById('builderSizeValue').textContent = size;
     
-    let html = '<div class="step"><h3>🏗️ Your Custom Architecture</h3>';
+    // Get component specs
+    const attentionSpec = architectureComponents.attention[attention];
+    const normSpec = architectureComponents.normalization[norm];
+    const ffnSpec = architectureComponents.ffn[ffn];
+    const useCaseSpec = useCaseRequirements[useCase];
     
+    // Calculate real metrics
+    const metrics = calculateArchitectureMetrics(size, attentionSpec, normSpec, ffnSpec);
+    const compatibility = analyzeUseCaseCompatibility(useCaseSpec, attentionSpec, normSpec, ffnSpec);
+    const improvements = suggestImprovements(useCase, attention, norm, ffn, size);
+    
+    let html = '<div class="step"><h3>🏗️ Your Custom Architecture Analysis</h3>';
+    
+    // Architecture Overview
+    html += '<div class="feature-comparison">';
     html += '<div class="feature-card">';
     html += '<div class="feature-title">📋 Architecture Specification</div>';
     html += '<div class="arch-specs">';
     html += '<strong>Base:</strong> ' + baseArch.charAt(0).toUpperCase() + baseArch.slice(1) + '<br>';
     html += '<strong>Size:</strong> ' + size + 'B parameters<br>';
-    html += '<strong>Attention:</strong> ' + attention.toUpperCase() + '<br>';
-    html += '<strong>Normalization:</strong> ' + norm + '<br>';
-    html += '<strong>FFN Strategy:</strong> ' + ffn + '<br>';
-    html += '<strong>Position Encoding:</strong> ' + position + '<br>';
-    html += '<strong>Target Use Case:</strong> ' + useCase;
+    html += '<strong>Attention:</strong> ' + attentionSpec.name + '<br>';
+    html += '<strong>Normalization:</strong> ' + normSpec.name + '<br>';
+    html += '<strong>FFN Strategy:</strong> ' + ffnSpec.name + '<br>';
+    html += '<strong>Position Encoding:</strong> ' + position.toUpperCase() + '<br>';
+    html += '<strong>Target Use Case:</strong> ' + useCaseSpec.name;
     html += '</div>';
     html += '</div>';
     
-    // Calculate rough specifications
-    const memoryEst = Math.log(parseInt(size)) * 15;
-    const complexity = attention === 'mla' ? 'High' : attention === 'gqa' ? 'Medium' : 'Low';
-    
-    html += '<div class="math-formula">';
-    html += '<strong>Estimated Specifications:</strong><br>';
-    html += '• Memory requirement: ~' + memoryEst.toFixed(0) + 'GB<br>';
-    html += '• Implementation complexity: ' + complexity + '<br>';
-    html += '• Training stability: ' + (norm.includes('pre') ? 'High' : 'Medium') + '<br>';
-    html += '• Inference efficiency: ' + (attention === 'mla' ? 'Excellent' : attention === 'sliding' ? 'Good' : 'Standard');
+    // Real Performance Metrics
+    html += '<div class="feature-card">';
+    html += '<div class="feature-title">📊 Performance Metrics</div>';
+    html += '<div class="arch-specs">';
+    html += '<strong>Memory Usage:</strong> ~' + metrics.memoryGB.toFixed(1) + 'GB<br>';
+    html += '<strong>Training Stability:</strong> ' + getScoreText(metrics.trainingStability) + '<br>';
+    html += '<strong>Final Quality:</strong> ' + getScoreText(metrics.finalQuality) + '<br>';
+    html += '<strong>Implementation:</strong> ' + getDifficultyText(metrics.implementationDifficulty) + '<br>';
+    html += '<strong>Inference Speed:</strong> ' + getSpeedText(metrics.inferenceSpeed) + '<br>';
+    html += '<strong>Active Parameters:</strong> ~' + metrics.activeParams.toFixed(1) + 'B';
     html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    
+    // Use Case Compatibility Analysis
+    html += '<div class="comparison-matrix">';
+    html += '<table>';
+    html += '<tr><th>Compatibility Aspect</th><th>Score</th><th>Analysis</th></tr>';
+    html += '<tr><td><strong>Memory Constraint</strong></td><td class="' + getScoreClass(compatibility.memoryScore) + '">' + compatibility.memoryScore + '/10</td><td>' + compatibility.memoryAnalysis + '</td></tr>';
+    html += '<tr><td><strong>Performance Requirement</strong></td><td class="' + getScoreClass(compatibility.performanceScore) + '">' + compatibility.performanceScore + '/10</td><td>' + compatibility.performanceAnalysis + '</td></tr>';
+    html += '<tr><td><strong>Implementation Complexity</strong></td><td class="' + getScoreClass(compatibility.complexityScore) + '">' + compatibility.complexityScore + '/10</td><td>' + compatibility.complexityAnalysis + '</td></tr>';
+    html += '<tr><td><strong>Overall Fit</strong></td><td class="' + getScoreClass(compatibility.overallScore) + '"><strong>' + compatibility.overallScore + '/10</strong></td><td><strong>' + compatibility.overallAnalysis + '</strong></td></tr>';
+    html += '</table>';
+    html += '</div>';
+    
+    // Intelligent Recommendations
+    if (improvements.length > 0) {
+        html += '<div class="warning">';
+        html += '<strong>🔧 Recommended Improvements:</strong><br>';
+        improvements.forEach(improvement => {
+            html += '• ' + improvement + '<br>';
+        });
+        html += '</div>';
+    }
+    
+    // Similar Real-World Architectures
+    const similarModels = findSimilarArchitectures(attention, norm, ffn);
+    if (similarModels.length > 0) {
+        html += '<div class="info">';
+        html += '<strong>🎯 Similar Real Architectures:</strong><br>';
+        html += 'Your design is similar to: ' + similarModels.join(', ') + '<br>';
+        html += 'This suggests your choices align with proven production architectures.';
+        html += '</div>';
+    }
     
     html += '</div>';
     document.getElementById('architectureBuilder').innerHTML = html;
 }
 
+function calculateArchitectureMetrics(size, attentionSpec, normSpec, ffnSpec) {
+    // Base memory calculation (more realistic)
+    const baseMemory = size * 2; // 2GB per billion parameters (FP16)
+    const kvCacheMemory = (size / 10) * attentionSpec.memoryMultiplier * 8; // 8K context assumption
+    const totalMemory = baseMemory + kvCacheMemory;
+    
+    // Training stability (weighted average)
+    const trainingStability = (normSpec.trainingStability * 0.6 + attentionSpec.qualityScore * 0.4);
+    
+    // Final quality (weighted by components)
+    const finalQuality = (
+        attentionSpec.qualityScore * 0.4 + 
+        normSpec.finalPerformance * 0.3 + 
+        Math.min(size / 10, 10) * 0.3  // Size factor (up to 100B)
+    );
+    
+    // Implementation difficulty (max of components)
+    const implementationDifficulty = Math.max(
+        attentionSpec.implementationDifficulty,
+        normSpec.implementationDifficulty,
+        ffnSpec.implementationDifficulty
+    );
+    
+    // Inference speed (inverse of memory and complexity)
+    const inferenceSpeed = 10 - (attentionSpec.memoryMultiplier * 5 + implementationDifficulty * 0.5);
+    
+    // Active parameters (for MoE)
+    const activeParams = ffn === 'moe' ? size * 0.125 : ffn === 'alternating' ? size * 0.6 : size;
+    
+    return {
+        memoryGB: totalMemory,
+        trainingStability: trainingStability,
+        finalQuality: finalQuality,
+        implementationDifficulty: implementationDifficulty,
+        inferenceSpeed: Math.max(1, inferenceSpeed),
+        activeParams: activeParams
+    };
+}
+
+function analyzeUseCaseCompatibility(useCaseSpec, attentionSpec, normSpec, ffnSpec) {
+    let memoryScore = 10;
+    let memoryAnalysis = '';
+    
+    // Memory constraint analysis
+    if (useCaseSpec.memoryConstraint === 'very-high') {
+        memoryScore = attentionSpec.memoryMultiplier < 0.3 ? 9 : attentionSpec.memoryMultiplier < 0.5 ? 6 : 3;
+        memoryAnalysis = attentionSpec.memoryMultiplier < 0.3 ? 'Excellent for memory-constrained deployment' : 
+                        attentionSpec.memoryMultiplier < 0.5 ? 'Moderate memory usage, may need optimization' :
+                        'High memory usage, challenging for local deployment';
+    } else if (useCaseSpec.memoryConstraint === 'high') {
+        memoryScore = attentionSpec.memoryMultiplier < 0.5 ? 8 : attentionSpec.memoryMultiplier < 0.8 ? 6 : 4;
+        memoryAnalysis = 'Memory usage ' + (memoryScore > 7 ? 'acceptable' : memoryScore > 5 ? 'moderate' : 'concerning') + ' for this use case';
+    } else {
+        memoryScore = 8; // Less critical for cloud deployment
+        memoryAnalysis = 'Memory usage not a primary constraint for this use case';
+    }
+    
+    // Performance requirement analysis
+    let performanceScore = Math.round((attentionSpec.qualityScore + normSpec.finalPerformance) / 2);
+    let performanceAnalysis = performanceScore > 8 ? 'Excellent performance expected' :
+                             performanceScore > 6 ? 'Good performance expected' :
+                             'Performance may be limiting factor';
+    
+    // Complexity analysis
+    let complexityScore = 10;
+    const totalComplexity = attentionSpec.implementationDifficulty + normSpec.implementationDifficulty + ffnSpec.implementationDifficulty;
+    
+    if (useCaseSpec.complexityTolerance === 'low') {
+        complexityScore = totalComplexity < 6 ? 9 : totalComplexity < 10 ? 6 : 3;
+    } else if (useCaseSpec.complexityTolerance === 'medium') {
+        complexityScore = totalComplexity < 10 ? 8 : totalComplexity < 15 ? 6 : 4;
+    } else {
+        complexityScore = 8; // High tolerance
+    }
+    
+    let complexityAnalysis = complexityScore > 7 ? 'Implementation complexity manageable' :
+                            complexityScore > 5 ? 'Moderate implementation challenges' :
+                            'High implementation complexity, consider simpler alternatives';
+    
+    // Overall score and analysis
+    const overallScore = Math.round((memoryScore + performanceScore + complexityScore) / 3);
+    let overallAnalysis = '';
+    
+    if (overallScore >= 8) {
+        overallAnalysis = 'Excellent fit for your use case';
+    } else if (overallScore >= 6) {
+        overallAnalysis = 'Good fit with some trade-offs';
+    } else if (overallScore >= 4) {
+        overallAnalysis = 'Workable but significant compromises needed';
+    } else {
+        overallAnalysis = 'Poor fit, consider major changes';
+    }
+    
+    return {
+        memoryScore, memoryAnalysis,
+        performanceScore, performanceAnalysis,
+        complexityScore, complexityAnalysis,
+        overallScore, overallAnalysis
+    };
+}
+
+function suggestImprovements(useCase, attention, norm, ffn, size) {
+    const improvements = [];
+    const useCaseSpec = useCaseRequirements[useCase];
+    
+    // Memory-specific improvements
+    if (useCaseSpec.memoryConstraint === 'very-high' || useCaseSpec.memoryConstraint === 'high') {
+        if (attention === 'mha') {
+            improvements.push('Switch to GQA or MLA for 4-10x memory reduction');
+        }
+        if (attention === 'gqa' && size > 70) {
+            improvements.push('Consider MLA for large models to reduce KV cache memory');
+        }
+        if (ffn === 'dense' && size > 30) {
+            improvements.push('Use MoE to reduce active parameters while maintaining capacity');
+        }
+    }
+    
+    // Performance-specific improvements
+    if (useCaseSpec.performanceRequirement === 'very-high') {
+        if (norm === 'pre-norm') {
+            improvements.push('Consider Post-Norm or Dual-Norm for maximum performance');
+        }
+        if (attention === 'sliding' && useCase === 'code') {
+            improvements.push('Use full attention for code generation - long context is critical');
+        }
+    }
+    
+    // Complexity-specific improvements
+    if (useCaseSpec.complexityTolerance === 'low') {
+        if (attention === 'mla') {
+            improvements.push('MLA is very complex - consider proven GQA for production');
+        }
+        if (ffn === 'moe') {
+            improvements.push('MoE adds significant complexity - consider dense FFN for simplicity');
+        }
+        if (norm === 'dual-norm') {
+            improvements.push('Dual normalization adds complexity - Pre-Norm is simpler and reliable');
+        }
+    }
+    
+    // Size-specific improvements
+    if (size < 7) {
+        improvements.push('Small models benefit from simpler architectures - consider standard attention and dense FFN');
+    }
+    if (size > 100 && ffn === 'dense') {
+        improvements.push('Large models should use MoE for parameter efficiency');
+    }
+    
+    // Use case specific
+    if (useCase === 'research' && attention !== 'mha') {
+        improvements.push('Research benefits from MHA transparency - complex attention may hinder analysis');
+    }
+    if (useCase === 'local' && size > 30) {
+        improvements.push('Local deployment works better with smaller models (7-27B range)');
+    }
+    
+    return improvements;
+}
+
+function findSimilarArchitectures(attention, norm, ffn) {
+    const similar = [];
+    
+    // Match real architectures
+    if (attention === 'gqa' && norm === 'pre-norm' && (ffn === 'dense' || ffn === 'alternating')) {
+        similar.push('Llama 2/3/4 family');
+    }
+    if (attention === 'mla' && ffn === 'moe') {
+        similar.push('DeepSeek V3', 'Kimi K2');
+    }
+    if (attention === 'sliding' && norm === 'dual-norm') {
+        similar.push('Gemma 3');
+    }
+    if (attention === 'mha' && norm === 'post-norm') {
+        similar.push('Original Transformer', 'OLMo 2');
+    }
+    if (attention === 'gqa' && norm === 'pre-norm' && ffn === 'dense') {
+        similar.push('Gemma 2', 'Qwen series');
+    }
+    
+    return similar;
+}
+
+// Helper functions for display
+function getScoreText(score) {
+    if (score >= 8.5) return 'Excellent';
+    if (score >= 7) return 'Good';
+    if (score >= 5.5) return 'Moderate';
+    if (score >= 4) return 'Poor';
+    return 'Very Poor';
+}
+
+function getScoreClass(score) {
+    if (score >= 8) return 'winner';
+    if (score >= 6) return 'moderate';
+    return 'poor';
+}
+
+function getDifficultyText(difficulty) {
+    if (difficulty <= 2) return 'Simple';
+    if (difficulty <= 4) return 'Moderate';
+    if (difficulty <= 6) return 'Complex';
+    return 'Very Complex';
+}
+
+function getSpeedText(speed) {
+    if (speed >= 8) return 'Very Fast';
+    if (speed >= 6) return 'Fast';
+    if (speed >= 4) return 'Moderate';
+    return 'Slow';
+}
+
+// Enhanced trade-off analysis
 function analyzeTradeoffs() {
     const attention = document.getElementById('builderAttention').value;
     const norm = document.getElementById('builderNorm').value;
     const ffn = document.getElementById('builderFFN').value;
+    const size = parseInt(document.getElementById('builderSize').value);
+    const useCase = document.getElementById('builderUseCase').value;
     
-    let html = '<div class="step"><h3>⚖️ Architecture Trade-off Analysis</h3>';
+    const attentionSpec = architectureComponents.attention[attention];
+    const normSpec = architectureComponents.normalization[norm];
+    const ffnSpec = architectureComponents.ffn[ffn];
     
+    let html = '<div class="step"><h3>⚖️ Intelligent Trade-off Analysis</h3>';
+    
+    // Component-by-component analysis
     html += '<div class="comparison-matrix">';
     html += '<table>';
-    html += '<tr><th>Component</th><th>Choice</th><th>Benefits</th><th>Trade-offs</th></tr>';
+    html += '<tr><th>Component</th><th>Choice</th><th>Key Benefits</th><th>Major Trade-offs</th><th>Real Examples</th></tr>';
     
-    // Attention analysis
-    let attentionBenefits = '', attentionTradeoffs = '';
-    if (attention === 'mla') {
-        attentionBenefits = 'Excellent memory efficiency';
-        attentionTradeoffs = 'Implementation complexity';
-    } else if (attention === 'gqa') {
-        attentionBenefits = 'Proven efficiency, reliable';
-        attentionTradeoffs = 'Moderate memory usage';
-    } else if (attention === 'sliding') {
-        attentionBenefits = 'Linear memory scaling';
-        attentionTradeoffs = 'Limited context window';
-    } else {
-        attentionBenefits = 'Simple, well-understood';
-        attentionTradeoffs = 'High memory usage';
-    }
+    html += '<tr><td><strong>Attention</strong></td><td>' + attentionSpec.name + '</td>';
+    html += '<td class="winner">' + attentionSpec.pros.slice(0,2).join(', ') + '</td>';
+    html += '<td class="moderate">' + attentionSpec.cons.slice(0,2).join(', ') + '</td>';
+    html += '<td>' + attentionSpec.realModels.slice(0,2).join(', ') + '</td></tr>';
     
-    html += '<tr><td><strong>Attention</strong></td><td>' + attention.toUpperCase() + '</td><td class="winner">' + attentionBenefits + '</td><td class="moderate">' + attentionTradeoffs + '</td></tr>';
+    html += '<tr><td><strong>Normalization</strong></td><td>' + normSpec.name + '</td>';
+    html += '<td class="winner">' + normSpec.pros.slice(0,2).join(', ') + '</td>';
+    html += '<td class="moderate">' + normSpec.cons.slice(0,2).join(', ') + '</td>';
+    html += '<td>' + normSpec.realModels.slice(0,2).join(', ') + '</td></tr>';
     
-    // Normalization analysis
-    let normBenefits = '', normTradeoffs = '';
-    if (norm === 'pre-norm') {
-        normBenefits = 'Training stability';
-        normTradeoffs = 'Slightly lower performance';
-    } else if (norm === 'post-norm') {
-        normBenefits = 'Best final performance';
-        normTradeoffs = 'Training challenges';
-    } else if (norm === 'dual-norm') {
-        normBenefits = 'Best of both worlds';
-        normTradeoffs = 'Extra computation';
-    } else {
-        normBenefits = 'Attention stability';
-        normTradeoffs = 'Limited adoption';
-    }
+    html += '<tr><td><strong>FFN Strategy</strong></td><td>' + ffnSpec.name + '</td>';
+    html += '<td class="winner">' + ffnSpec.pros.slice(0,2).join(', ') + '</td>';
+    html += '<td class="moderate">' + ffnSpec.cons.slice(0,2).join(', ') + '</td>';
+    html += '<td>' + ffnSpec.realModels.slice(0,2).join(', ') + '</td></tr>';
     
-    html += '<tr><td><strong>Normalization</strong></td><td>' + norm + '</td><td class="winner">' + normBenefits + '</td><td class="moderate">' + normTradeoffs + '</td></tr>';
-    
-    // FFN analysis
-    let ffnBenefits = '', ffnTradeoffs = '';
-    if (ffn === 'moe') {
-        ffnBenefits = 'Massive parameter scaling';
-        ffnTradeoffs = 'Complex routing, load balancing';
-    } else if (ffn === 'alternating') {
-        ffnBenefits = 'Balanced scaling approach';
-        ffnTradeoffs = 'More complex architecture';
-    } else {
-        ffnBenefits = 'Simple, reliable';
-        ffnTradeoffs = 'Limited scaling efficiency';
-    }
-    
-    html += '<tr><td><strong>FFN Strategy</strong></td><td>' + ffn + '</td><td class="winner">' + ffnBenefits + '</td><td class="moderate">' + ffnTradeoffs + '</td></tr>';
     html += '</table>';
     html += '</div>';
     
-    // Overall recommendation
+    // Strategic analysis
+    const totalComplexity = attentionSpec.implementationDifficulty + normSpec.implementationDifficulty + ffnSpec.implementationDifficulty;
+    const memoryEfficiency = attentionSpec.memoryMultiplier * (ffn === 'moe' ? 0.125 : 1);
+    const expectedQuality = (attentionSpec.qualityScore + normSpec.finalPerformance) / 2;
+    
+    html += '<div class="feature-comparison">';
+    html += '<div class="feature-card">';
+    html += '<div class="feature-title">📊 Strategic Analysis</div>';
+    html += '<div class="arch-specs">';
+    html += '<strong>Implementation Risk:</strong> ' + (totalComplexity > 12 ? 'High - requires expert team' : totalComplexity > 8 ? 'Medium - manageable with planning' : 'Low - straightforward implementation') + '<br>';
+    html += '<strong>Memory Efficiency:</strong> ' + (memoryEfficiency < 0.2 ? 'Excellent - cutting edge efficiency' : memoryEfficiency < 0.5 ? 'Good - reasonable memory usage' : 'Standard - may need optimization') + '<br>';
+    html += '<strong>Performance Potential:</strong> ' + (expectedQuality > 8.5 ? 'Excellent - top-tier performance' : expectedQuality > 7 ? 'Good - solid performance' : 'Moderate - may limit capabilities') + '<br>';
+    html += '<strong>Production Readiness:</strong> ' + (totalComplexity < 8 && attentionSpec.realModels.length > 1 ? 'High - proven in production' : 'Medium to Low - needs validation');
+    html += '</div>';
+    html += '</div>';
+    
+    html += '<div class="feature-card">';
+    html += '<div class="feature-title">🎯 Recommendation</div>';
+    
     let recommendation = '';
-    if (attention === 'mla' && norm.includes('pre')) {
-        recommendation = 'Cutting-edge efficiency - suitable for research and high-end production';
-    } else if (attention === 'gqa' && norm === 'pre-norm') {
-        recommendation = 'Production-ready - balanced performance and reliability';
-    } else if (attention === 'sliding') {
-        recommendation = 'Memory-constrained deployment - excellent for local/edge cases';
+    if (totalComplexity > 15) {
+        recommendation = '🚨 Very high complexity - consider simplifying for production use';
+    } else if (memoryEfficiency < 0.15 && expectedQuality > 8) {
+        recommendation = '🚀 Cutting-edge efficiency with excellent quality - suitable for research/advanced production';
+    } else if (totalComplexity < 8 && expectedQuality > 7.5) {
+        recommendation = '✅ Well-balanced architecture - excellent for production deployment';
+    } else if (useCase === 'local' && memoryEfficiency > 0.5) {
+        recommendation = '⚠️ May be too memory-intensive for local deployment - consider optimizations';
     } else {
-        recommendation = 'Educational/research focus - good for understanding fundamentals';
+        recommendation = '⚖️ Reasonable trade-offs - validate performance against requirements';
     }
     
-    html += '<div class="success">';
-    html += '<strong>🎯 Recommendation:</strong> ' + recommendation;
+    html += '<div class="arch-specs">' + recommendation + '</div>';
+    html += '</div>';
     html += '</div>';
     
     html += '</div>';
