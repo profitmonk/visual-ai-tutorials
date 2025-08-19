@@ -611,6 +611,671 @@
     </div>
 
     <div class="container">
+        <h2>🎯 Attention Evolution Deep Dive</h2>
+        
+        <div class="info">
+            <strong>🧠 The Attention Revolution:</strong> From Multi-Head Attention to compressed representations - how modern LLMs optimize the memory bottleneck.
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Attention Type:</strong></label>
+                <select id="attentionType">
+                    <option value="mha">Multi-Head Attention (MHA)</option>
+                    <option value="gqa" selected>Grouped Query Attention (GQA)</option>
+                    <option value="mla">Multi-Head Latent Attention (MLA)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Model Size:</strong></label>
+                <select id="modelSize">
+                    <option value="7B" selected>7B Parameters</option>
+                    <option value="13B">13B Parameters</option>
+                    <option value="70B">70B Parameters</option>
+                    <option value="405B">405B Parameters</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Sequence Length:</strong></label>
+                <input type="range" id="seqLength" min="1024" max="32768" value="8192" step="1024">
+                <span id="seqLengthValue">8192</span> tokens
+            </div>
+        </div>
+        
+        <button onclick="calculateAttentionMetrics()">🧮 Calculate Memory Usage</button>
+        <div id="attentionAnalysis"></div>
+        
+        <div class="step">
+            <h3>📊 Attention Mechanism Comparison</h3>
+            
+            <div class="feature-comparison">
+                <div class="feature-card">
+                    <div class="feature-title">🔹 Multi-Head Attention (MHA)</div>
+                    <div class="innovation-badge">Original</div>
+                    <div class="arch-specs">
+                        Used by: Original Transformers, GPT-1/2<br>
+                        Heads: All independent K,V,Q<br>
+                        Memory: Highest (full KV cache)<br>
+                        Quality: Baseline performance
+                    </div>
+                    <div class="math-formula">
+                        <strong>MHA Formula:</strong><br>
+                        heads = n_heads<br>
+                        KV_cache = 2 × seq_len × n_heads × head_dim<br>
+                        Each head: independent K, V matrices
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-title">🔸 Grouped Query Attention (GQA)</div>
+                    <div class="efficiency-badge">Proven</div>
+                    <div class="arch-specs">
+                        Used by: Llama 2/3/4, GPT-4, Gemma<br>
+                        Heads: Shared K,V across groups<br>
+                        Memory: ~4x reduction vs MHA<br>
+                        Quality: 99% of MHA performance
+                    </div>
+                    <div class="math-formula">
+                        <strong>GQA Formula:</strong><br>
+                        groups = n_heads // group_size<br>
+                        KV_cache = 2 × seq_len × groups × head_dim<br>
+                        Multiple Q heads share K,V pairs
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feature-comparison">
+                <div class="feature-card">
+                    <div class="feature-title">🔺 Multi-Head Latent Attention (MLA)</div>
+                    <div class="innovation-badge">Cutting-edge</div>
+                    <div class="arch-specs">
+                        Used by: DeepSeek V3, Kimi K2<br>
+                        Heads: Compressed latent space<br>
+                        Memory: ~50% of GQA usage<br>
+                        Quality: Matches/exceeds GQA
+                    </div>
+                    <div class="math-formula">
+                        <strong>MLA Formula:</strong><br>
+                        compressed_kv = low_rank_projection(K,V)<br>
+                        KV_cache = 2 × seq_len × compressed_dim<br>
+                        At inference: decompress → attention
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-title">🔲 Sliding Window Attention</div>
+                    <div class="efficiency-badge">Local-efficient</div>
+                    <div class="arch-specs">
+                        Used by: Gemma 3, Mistral, Longformer<br>
+                        Pattern: Local + sparse global<br>
+                        Memory: Linear in window size<br>
+                        Quality: Great for local patterns
+                    </div>
+                    <div class="math-formula">
+                        <strong>Sliding Window:</strong><br>
+                        window_size = 1024 (Gemma 3)<br>
+                        KV_cache = 2 × window_size × n_heads × head_dim<br>
+                        Constant memory regardless of sequence
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>🔬 Real Model Examples</h3>
+            
+            <div class="comparison-matrix">
+                <table>
+                    <tr>
+                        <th>Model</th>
+                        <th>Attention Type</th>
+                        <th>Heads Config</th>
+                        <th>KV Cache (8K seq)</th>
+                        <th>Innovation</th>
+                    </tr>
+                    <tr>
+                        <td><strong>GPT-4</strong></td>
+                        <td>GQA</td>
+                        <td>128 Q heads, 8 KV heads</td>
+                        <td class="moderate">~16x compression</td>
+                        <td>Production-proven</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Llama 4</strong></td>
+                        <td>GQA</td>
+                        <td>64 Q heads, 8 KV heads</td>
+                        <td class="moderate">~8x compression</td>
+                        <td>Balanced efficiency</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DeepSeek V3</strong></td>
+                        <td>MLA</td>
+                        <td>Compressed to 1024 dims</td>
+                        <td class="winner">~50x compression</td>
+                        <td>Memory breakthrough</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gemma 3</strong></td>
+                        <td>Sliding GQA</td>
+                        <td>16 Q heads, 4 KV, 1K window</td>
+                        <td class="winner">Constant memory</td>
+                        <td>Local efficiency</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📊 Normalization Strategy Analysis</h2>
+        
+        <div class="warning">
+            <strong>🎯 Normalization Wars:</strong> The placement and type of normalization layers dramatically impacts training stability and final performance.
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Normalization Strategy:</strong></label>
+                <select id="normStrategy" onchange="showNormStrategy()">
+                    <option value="pre-norm" selected>Pre-Norm (Llama style)</option>
+                    <option value="post-norm">Post-Norm (Original Transformer)</option>
+                    <option value="qk-norm">QK-Norm (OLMo 2)</option>
+                    <option value="dual-norm">Pre+Post (Gemma 3)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Training Phase:</strong></label>
+                <select id="trainingPhase">
+                    <option value="early">Early Training</option>
+                    <option value="middle" selected>Mid Training</option>
+                    <option value="late">Late Training</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="analyzeNormalization()">📈 Analyze Gradient Flow</button>
+        <div id="normalizationAnalysis"></div>
+        
+        <div class="step">
+            <h3>🏗️ Transformer Block Architectures</h3>
+            
+            <div class="architecture-grid">
+                <div class="arch-card" onclick="selectNormType('pre-norm')">
+                    <div class="arch-title">🔵 Pre-Norm (Modern)</div>
+                    <div class="efficiency-badge">Stable</div>
+                    <div class="arch-specs">
+                        Used by: Llama, GPT-3+, Gemma<br>
+                        Pattern: Norm → Attention → Add<br>
+                        Benefits: Training stability<br>
+                        Drawback: Slightly lower performance
+                    </div>
+                    <div class="example-box">
+                        x = x + attention(norm(x))<br>
+                        x = x + ffn(norm(x))
+                    </div>
+                </div>
+                
+                <div class="arch-card" onclick="selectNormType('post-norm')">
+                    <div class="arch-title">🟢 Post-Norm (Classic)</div>
+                    <div class="innovation-badge">Original</div>
+                    <div class="arch-specs">
+                        Used by: Original Transformer, OLMo 2<br>
+                        Pattern: Attention → Add → Norm<br>
+                        Benefits: Better final performance<br>
+                        Drawback: Training instability
+                    </div>
+                    <div class="example-box">
+                        x = norm(x + attention(x))<br>
+                        x = norm(x + ffn(x))
+                    </div>
+                </div>
+                
+                <div class="arch-card" onclick="selectNormType('qk-norm')">
+                    <div class="arch-title">🟡 QK-Norm (OLMo 2)</div>
+                    <div class="efficiency-badge">Innovative</div>
+                    <div class="arch-specs">
+                        Used by: OLMo 2, some research models<br>
+                        Pattern: Normalize inside attention<br>
+                        Benefits: Attention stability<br>
+                        Innovation: Prevents attention collapse
+                    </div>
+                    <div class="example-box">
+                        Q = norm_q(query_proj(x))<br>
+                        K = norm_k(key_proj(x))<br>
+                        attention(Q, K, V)
+                    </div>
+                </div>
+                
+                <div class="arch-card" onclick="selectNormType('dual-norm')">
+                    <div class="arch-title">🟣 Pre+Post (Gemma 3)</div>
+                    <div class="innovation-badge">Hybrid</div>
+                    <div class="arch-specs">
+                        Used by: Gemma 3<br>
+                        Pattern: Both normalizations<br>
+                        Benefits: Best of both worlds<br>
+                        Cost: Extra computation
+                    </div>
+                    <div class="example-box">
+                        x = norm_post(x + attention(norm_pre(x)))<br>
+                        x = norm_post(x + ffn(norm_pre(x)))
+                    </div>
+                </div>
+            </div>
+            
+            <div id="normTypeDetails"></div>
+        </div>
+        
+        <div class="step">
+            <h3>📊 Training Stability Analysis</h3>
+            
+            <div class="comparison-matrix">
+                <table>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>Training Stability</th>
+                        <th>Final Performance</th>
+                        <th>Implementation</th>
+                        <th>Used By</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Pre-Norm</strong></td>
+                        <td class="winner">Excellent</td>
+                        <td class="moderate">Good</td>
+                        <td class="winner">Simple</td>
+                        <td>Llama, GPT-3+</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Post-Norm</strong></td>
+                        <td class="poor">Challenging</td>
+                        <td class="winner">Best</td>
+                        <td class="winner">Simple</td>
+                        <td>Original, OLMo 2</td>
+                    </tr>
+                    <tr>
+                        <td><strong>QK-Norm</strong></td>
+                        <td class="winner">Excellent</td>
+                        <td class="moderate">Good</td>
+                        <td class="moderate">Moderate</td>
+                        <td>OLMo 2</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pre+Post</strong></td>
+                        <td class="winner">Excellent</td>
+                        <td class="winner">Excellent</td>
+                        <td class="poor">Complex</td>
+                        <td>Gemma 3</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔄 Complete Model Architecture Showcase</h2>
+        
+        <div class="info">
+            <strong>🎯 2025's Leading Architectures:</strong> Deep dive into each model's unique innovations and design philosophy.
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Model Focus:</strong></label>
+                <select id="modelFocus" onchange="showModelDetails()">
+                    <option value="olmo-2" selected>OLMo 2 - Transparency Leader</option>
+                    <option value="gemma-3">Gemma 3 - Sliding Window Master</option>
+                    <option value="qwen3">Qwen3 - Dense+MoE Strategy</option>
+                    <option value="mistral-small">Mistral Small 3.1 - Efficiency Focus</option>
+                    <option value="smollm3">SmolLM3 - NoPE Innovation</option>
+                    <option value="kimi-k2">Kimi K2 - Trillion Parameter Scale</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="modelDetailsContainer"></div>
+        
+        <div class="step">
+            <h3>🏆 Architecture Innovation Leaderboard</h3>
+            
+            <div class="comparison-matrix">
+                <table>
+                    <tr>
+                        <th>Innovation</th>
+                        <th>Pioneer Model</th>
+                        <th>Impact</th>
+                        <th>Adoption</th>
+                        <th>Future</th>
+                    </tr>
+                    <tr>
+                        <td><strong>MLA Compression</strong></td>
+                        <td class="winner">DeepSeek V3</td>
+                        <td>🔥 Game-changing</td>
+                        <td>Early adoption</td>
+                        <td>Industry standard</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sliding Window 5:1</strong></td>
+                        <td class="winner">Gemma 3</td>
+                        <td>🔥 Memory breakthrough</td>
+                        <td>Growing fast</td>
+                        <td>Local model standard</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Post-Norm Return</strong></td>
+                        <td class="moderate">OLMo 2</td>
+                        <td>📈 Performance boost</td>
+                        <td>Research interest</td>
+                        <td>Specialized use</td>
+                    </tr>
+                    <tr>
+                        <td><strong>No Positional Embedding</strong></td>
+                        <td class="moderate">SmolLM3</td>
+                        <td>📈 Simplification</td>
+                        <td>Experimental</td>
+                        <td>Small model trend</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Alternating MoE</strong></td>
+                        <td class="winner">Llama 4</td>
+                        <td>🔥 Balanced scaling</td>
+                        <td>Production proven</td>
+                        <td>MoE standard</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>⚡ Efficiency Innovations Deep Dive</h2>
+        
+        <div class="success">
+            <strong>💡 The Efficiency Revolution:</strong> Modern LLMs achieve better performance with fewer resources through architectural innovations.
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Efficiency Technique:</strong></label>
+                <select id="efficiencyTech" onchange="showEfficiencyDetails()">
+                    <option value="sliding-window" selected>Sliding Window Attention</option>
+                    <option value="nope">No Positional Embeddings (NoPE)</option>
+                    <option value="mla-compression">MLA KV Compression</option>
+                    <option value="memory-optimizations">Memory Optimizations</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Model Size:</strong></label>
+                <input type="range" id="efficiencySize" min="1" max="1000" value="70" step="1">
+                <span id="efficiencySizeValue">70</span>B parameters
+            </div>
+            <div class="control-group">
+                <label><strong>Sequence Length:</strong></label>
+                <input type="range" id="efficiencySeq" min="1024" max="131072" value="8192" step="1024">
+                <span id="efficiencySeqValue">8192</span> tokens
+            </div>
+        </div>
+        
+        <button onclick="calculateEfficiency()">⚡ Calculate Efficiency Gains</button>
+        <div id="efficiencyCalculator"></div>
+        
+        <div class="step">
+            <h3>🎯 Sliding Window Mastery: Gemma 3's Innovation</h3>
+            
+            <div class="feature-comparison">
+                <div class="feature-card">
+                    <div class="feature-title">🔄 Traditional Attention</div>
+                    <div class="poor">Quadratic Memory</div>
+                    <div class="math-formula">
+                        <strong>Full Attention:</strong><br>
+                        Memory = O(seq_len²)<br>
+                        For 32K: 1B attention ops<br>
+                        KV Cache: Linear growth<br>
+                        Problem: Unsustainable scaling
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-title">🪟 Sliding Window (Gemma 3)</div>
+                    <div class="winner">Linear Memory</div>
+                    <div class="math-formula">
+                        <strong>5:1 Window Strategy:</strong><br>
+                        Window: 1024 tokens (vs 4096)<br>
+                        Memory = O(window_size)<br>
+                        For any seq: 1M attention ops<br>
+                        Result: 75% memory reduction
+                    </div>
+                </div>
+            </div>
+            
+            <div class="warning">
+                <strong>🎯 Gemma 3 Innovation:</strong> Revolutionary 5:1 compression ratio - reduced window from 4K to 1K tokens while maintaining 99% performance. This enables running 27B parameter models on consumer hardware.
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>🚫 NoPE Revolution: SmolLM3's Position-Free Future</h3>
+            
+            <div class="feature-comparison">
+                <div class="feature-card">
+                    <div class="feature-title">📍 Traditional Positioning</div>
+                    <div class="moderate">RoPE/Absolute</div>
+                    <div class="example-box">
+                        <strong>Standard Approach:</strong><br>
+                        • Absolute positions (GPT)<br>
+                        • RoPE rotations (Llama)<br>
+                        • Learned embeddings<br>
+                        • ALiBi relative bias<br>
+                        → Extra parameters & computation
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-title">🚫 No Positional Embeddings</div>
+                    <div class="efficiency-badge">Zero Position</div>
+                    <div class="example-box">
+                        <strong>NoPE Approach:</strong><br>
+                        • No position information<br>
+                        • Pure content-based attention<br>
+                        • Causal masking only<br>
+                        • 15-20% parameter reduction<br>
+                        → Simpler, more efficient
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info">
+                <strong>💡 NoPE Benefits:</strong> SmolLM3 proves that small models don't need positional embeddings. The causal attention mask provides sufficient ordering information, reducing parameters and simplifying architecture.
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎮 Interactive Architecture Builder</h2>
+        
+        <div class="danger">
+            <strong>🛠️ Build Your LLM:</strong> Mix and match components from leading architectures to design your optimal model.
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Base Architecture:</strong></label>
+                <select id="baseArch">
+                    <option value="transformer" selected>Standard Transformer</option>
+                    <option value="llama">Llama-style (RMSNorm + RoPE)</option>
+                    <option value="deepseek">DeepSeek-style (MLA + MoE)</option>
+                    <option value="gemma">Gemma-style (Sliding + Dual-norm)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Attention Type:</strong></label>
+                <select id="builderAttention">
+                    <option value="mha">Multi-Head Attention</option>
+                    <option value="gqa" selected>Grouped Query Attention</option>
+                    <option value="mla">Multi-Head Latent Attention</option>
+                    <option value="sliding">Sliding Window</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Normalization:</strong></label>
+                <select id="builderNorm">
+                    <option value="pre-norm" selected>Pre-Norm</option>
+                    <option value="post-norm">Post-Norm</option>
+                    <option value="qk-norm">QK-Norm</option>
+                    <option value="dual-norm">Pre+Post</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>FFN Strategy:</strong></label>
+                <select id="builderFFN">
+                    <option value="dense" selected>Dense FFN</option>
+                    <option value="moe">Mixture of Experts</option>
+                    <option value="alternating">Alternating Dense/MoE</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><strong>Position Encoding:</strong></label>
+                <select id="builderPosition">
+                    <option value="rope" selected>RoPE</option>
+                    <option value="absolute">Absolute</option>
+                    <option value="alibi">ALiBi</option>
+                    <option value="nope">NoPE (None)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label><strong>Model Size:</strong></label>
+                <input type="range" id="builderSize" min="1" max="1000" value="70" step="1">
+                <span id="builderSizeValue">70</span>B parameters
+            </div>
+            <div class="control-group">
+                <label><strong>Target Use Case:</strong></label>
+                <select id="builderUseCase">
+                    <option value="general" selected>General Purpose</option>
+                    <option value="code">Code Generation</option>
+                    <option value="research">Research/Science</option>
+                    <option value="chat">Chat/Assistant</option>
+                    <option value="local">Local Deployment</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="buildArchitecture()">🏗️ Build Architecture</button>
+        <button onclick="analyzeTradeoffs()">⚖️ Analyze Trade-offs</button>
+        <div id="architectureBuilder"></div>
+        
+        <div class="step">
+            <h3>🎯 Architecture Recommendation Engine</h3>
+            <div id="recommendationEngine"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔬 Performance Analysis & Deployment Guide</h2>
+        
+        <div class="info">
+            <strong>📊 Real-World Performance:</strong> Comprehensive analysis of memory usage, inference speed, and deployment considerations.
+        </div>
+        
+        <div class="step">
+            <h3>💾 Memory Usage Comparison</h3>
+            
+            <div class="comparison-matrix">
+                <table>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>KV Cache (8K)</th>
+                        <th>Total Memory</th>
+                        <th>Efficiency Score</th>
+                    </tr>
+                    <tr>
+                        <td><strong>DeepSeek V3</strong></td>
+                        <td>671B (37B active)</td>
+                        <td class="winner">12GB (MLA)</td>
+                        <td>~180GB</td>
+                        <td class="winner">A+</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Llama 4</strong></td>
+                        <td>400B (17B active)</td>
+                        <td class="moderate">24GB (GQA)</td>
+                        <td>~120GB</td>
+                        <td class="winner">A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gemma 3</strong></td>
+                        <td>27B (dense)</td>
+                        <td class="winner">8GB (sliding)</td>
+                        <td>54GB</td>
+                        <td class="winner">A+</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Qwen3 235B</strong></td>
+                        <td>235B (22B active)</td>
+                        <td class="moderate">20GB (GQA)</td>
+                        <td>~100GB</td>
+                        <td class="moderate">B+</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>🚀 Deployment Recommendations</h3>
+            
+            <div class="architecture-grid">
+                <div class="arch-card">
+                    <div class="arch-title">☁️ Cloud Deployment</div>
+                    <div class="efficiency-badge">Scalable</div>
+                    <div class="arch-specs">
+                        Best: DeepSeek V3, Llama 4<br>
+                        Hardware: 8xH100, A100<br>
+                        Benefits: Full capability<br>
+                        Cost: $2-5/hour
+                    </div>
+                </div>
+                
+                <div class="arch-card">
+                    <div class="arch-title">🏢 Enterprise On-Prem</div>
+                    <div class="efficiency-badge">Secure</div>
+                    <div class="arch-specs">
+                        Best: Gemma 3, Qwen3<br>
+                        Hardware: 4xA6000, 4090<br>
+                        Benefits: Privacy control<br>
+                        Investment: $50-200K
+                    </div>
+                </div>
+                
+                <div class="arch-card">
+                    <div class="arch-title">💻 Developer Local</div>
+                    <div class="efficiency-badge">Accessible</div>
+                    <div class="arch-specs">
+                        Best: SmolLM3, Gemma 3 small<br>
+                        Hardware: RTX 4090, M3 Max<br>
+                        Benefits: Instant iteration<br>
+                        Cost: $1-5K hardware
+                    </div>
+                </div>
+                
+                <div class="arch-card">
+                    <div class="arch-title">📱 Edge Deployment</div>
+                    <div class="efficiency-badge">Efficient</div>
+                    <div class="arch-specs">
+                        Best: Quantized Gemma 3<br>
+                        Hardware: Mobile GPU, NPU<br>
+                        Benefits: Zero latency<br>
+                        Constraints: Limited capability
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="success">
+            <strong>🎯 Key Takeaway:</strong> 2025's architectural innovations make powerful AI accessible across deployment scenarios - from trillion-parameter cloud models to efficient edge deployment.
+        </div>
+    </div>
+    <div class="container">
         <h2>🔮 Coming Next: Complete Architecture Analysis</h2>
         
         <div class="danger">
@@ -921,6 +1586,524 @@
             compareArchitectures();
             showEvolution('deepseek');
         });
+        // Additional data objects and functions to add to your existing <script> section
+
+// Attention type specifications
+const attentionSpecs = {
+    'mha': {
+        name: 'Multi-Head Attention',
+        kvCompression: 1.0,
+        complexity: 'O(n²)',
+        memory: 'High',
+        description: 'Each head has independent K,V matrices'
+    },
+    'gqa': {
+        name: 'Grouped Query Attention',
+        kvCompression: 0.25,
+        complexity: 'O(n²)',
+        memory: 'Medium',
+        description: 'Groups share K,V matrices, ~4x memory reduction'
+    },
+    'mla': {
+        name: 'Multi-Head Latent Attention',
+        kvCompression: 0.1,
+        complexity: 'O(n²)',
+        memory: 'Low',
+        description: 'Compressed latent space, ~10x memory reduction'
+    }
+};
+
+// Normalization strategy details
+const normStrategies = {
+    'pre-norm': {
+        name: 'Pre-Normalization',
+        stability: 'High',
+        performance: 'Good',
+        description: 'Normalize before attention/FFN operations',
+        gradient: 'Stable gradients, easier training'
+    },
+    'post-norm': {
+        name: 'Post-Normalization',
+        stability: 'Medium',
+        performance: 'Best',
+        description: 'Normalize after residual connections',
+        gradient: 'Can have gradient issues but better final performance'
+    },
+    'qk-norm': {
+        name: 'QK-Normalization',
+        stability: 'High',
+        performance: 'Good',
+        description: 'Normalize query and key inside attention',
+        gradient: 'Prevents attention collapse'
+    },
+    'dual-norm': {
+        name: 'Pre+Post Normalization',
+        stability: 'Highest',
+        performance: 'Best',
+        description: 'Both pre and post normalization',
+        gradient: 'Maximum stability with performance'
+    }
+};
+
+// Complete model database
+const modelDatabase = {
+    'olmo-2': {
+        name: 'OLMo 2',
+        params: '13B',
+        attention: 'Multi-Head Attention',
+        normalization: 'Post-Norm + QK-Norm',
+        position: 'RoPE',
+        innovations: ['Training transparency', 'Post-norm return', 'QK normalization'],
+        strengths: ['Full training data', 'Educational value', 'Reproducible'],
+        weaknesses: ['Smaller scale', 'Research focus'],
+        useCase: 'Research and education'
+    },
+    'gemma-3': {
+        name: 'Gemma 3',
+        params: '27B',
+        attention: 'Sliding Window GQA (5:1 ratio)',
+        normalization: 'Pre+Post Normalization',
+        position: 'RoPE',
+        innovations: ['5:1 sliding window', 'Dual normalization', 'Memory optimization'],
+        strengths: ['Memory efficient', 'Local deployment', 'Stable training'],
+        weaknesses: ['Limited long context', 'Complex normalization'],
+        useCase: 'Production deployment with memory constraints'
+    },
+    'qwen3': {
+        name: 'Qwen3 235B-A22B',
+        params: '235B (22B active)',
+        attention: 'Grouped Query Attention',
+        normalization: 'Pre-Normalization',
+        position: 'RoPE',
+        innovations: ['Dense+MoE variants', 'Optimized routing', 'Multi-size strategy'],
+        strengths: ['Multiple variants', 'Good performance/cost', 'Proven MoE'],
+        weaknesses: ['Standard architecture', 'Less innovative'],
+        useCase: 'Balanced production deployment'
+    },
+    'mistral-small': {
+        name: 'Mistral Small 3.1',
+        params: '22B',
+        attention: 'Sliding Window + Flash Attention',
+        normalization: 'Pre-Normalization',
+        position: 'RoPE',
+        innovations: ['Optimized sliding window', 'Flash attention', 'Efficient inference'],
+        strengths: ['Fast inference', 'Memory efficient', 'Production ready'],
+        weaknesses: ['Smaller scale', 'Limited context'],
+        useCase: 'Fast inference applications'
+    },
+    'smollm3': {
+        name: 'SmolLM3',
+        params: '8.1B',
+        attention: 'Multi-Head Attention',
+        normalization: 'Pre-Normalization',
+        position: 'NoPE (No Positional Embeddings)',
+        innovations: ['No positional embeddings', 'Ultra efficient', 'Causal masking only'],
+        strengths: ['Minimal parameters', 'Simple architecture', 'Fast training'],
+        weaknesses: ['Limited capability', 'Small scale only'],
+        useCase: 'Lightweight applications and research'
+    },
+    'kimi-k2': {
+        name: 'Kimi K2',
+        params: '1T (~100B active)',
+        attention: 'Multi-Head Latent Attention',
+        normalization: 'Pre-Normalization',
+        position: 'RoPE',
+        innovations: ['Trillion parameters', 'Scaled MLA', 'Muon optimizer'],
+        strengths: ['Massive capacity', 'MLA efficiency', 'State-of-art'],
+        weaknesses: ['Complex deployment', 'High compute cost'],
+        useCase: 'Research and high-end applications'
+    }
+};
+
+// New Functions for Interactive Features
+
+function calculateAttentionMetrics() {
+    const attentionType = document.getElementById('attentionType').value;
+    const modelSize = document.getElementById('modelSize').value;
+    const seqLength = parseInt(document.getElementById('seqLength').value);
+    
+    document.getElementById('seqLengthValue').textContent = seqLength;
+    
+    const spec = attentionSpecs[attentionType];
+    const sizeMultiplier = parseInt(modelSize.replace('B', ''));
+    
+    // Calculate approximate memory usage (simplified)
+    const baseMemory = Math.log(sizeMultiplier) * 10; // Base model memory
+    const kvCacheBase = (seqLength / 1024) * (sizeMultiplier / 7) * 2; // KV cache base
+    const kvCacheActual = kvCacheBase * spec.kvCompression;
+    const totalMemory = baseMemory + kvCacheActual;
+    
+    let html = '<div class="step"><h3>📊 Memory Analysis Results</h3>';
+    html += '<div class="comparison-matrix">';
+    html += '<table>';
+    html += '<tr><th>Metric</th><th>Value</th><th>Analysis</th></tr>';
+    html += '<tr><td><strong>Attention Type</strong></td><td>' + spec.name + '</td><td>' + spec.description + '</td></tr>';
+    html += '<tr><td><strong>Model Size</strong></td><td>' + modelSize + ' parameters</td><td>Base memory: ~' + baseMemory.toFixed(1) + 'GB</td></tr>';
+    html += '<tr><td><strong>Sequence Length</strong></td><td>' + seqLength + ' tokens</td><td>Context window size</td></tr>';
+    html += '<tr><td><strong>KV Cache (baseline)</strong></td><td>' + kvCacheBase.toFixed(1) + 'GB</td><td>Standard attention memory</td></tr>';
+    html += '<tr><td><strong>KV Cache (optimized)</strong></td><td class="winner">' + kvCacheActual.toFixed(1) + 'GB</td><td>' + ((1-spec.kvCompression)*100).toFixed(0) + '% memory savings</td></tr>';
+    html += '<tr><td><strong>Total Memory Est.</strong></td><td>' + totalMemory.toFixed(1) + 'GB</td><td>Inference memory requirement</td></tr>';
+    html += '</table>';
+    html += '</div>';
+    
+    // Add efficiency insight
+    if (spec.kvCompression < 0.3) {
+        html += '<div class="success"><strong>🚀 Efficiency Leader:</strong> ' + spec.name + ' provides exceptional memory efficiency, making large models practical for deployment.</div>';
+    } else if (spec.kvCompression < 0.7) {
+        html += '<div class="info"><strong>⚖️ Balanced Approach:</strong> ' + spec.name + ' offers good efficiency with proven reliability.</div>';
+    } else {
+        html += '<div class="warning"><strong>📊 Baseline Approach:</strong> ' + spec.name + ' uses standard memory patterns, prioritizing simplicity.</div>';
+    }
+    
+    html += '</div>';
+    document.getElementById('attentionAnalysis').innerHTML = html;
+}
+
+function showNormStrategy() {
+    const strategy = document.getElementById('normStrategy').value;
+    analyzeNormalization();
+}
+
+function analyzeNormalization() {
+    const strategy = document.getElementById('normStrategy').value;
+    const phase = document.getElementById('trainingPhase').value;
+    const spec = normStrategies[strategy];
+    
+    let html = '<div class="step"><h3>📈 Normalization Analysis: ' + spec.name + '</h3>';
+    
+    html += '<div class="feature-comparison">';
+    html += '<div class="feature-card">';
+    html += '<div class="feature-title">🔬 Strategy Details</div>';
+    html += '<div class="arch-specs">';
+    html += '<strong>Description:</strong> ' + spec.description + '<br>';
+    html += '<strong>Training Stability:</strong> ' + spec.stability + '<br>';
+    html += '<strong>Final Performance:</strong> ' + spec.performance + '<br>';
+    html += '<strong>Gradient Flow:</strong> ' + spec.gradient;
+    html += '</div>';
+    html += '</div>';
+    
+    html += '<div class="feature-card">';
+    html += '<div class="feature-title">📊 Training Phase Impact</div>';
+    
+    let phaseDescription = '';
+    if (phase === 'early') {
+        phaseDescription = strategy === 'pre-norm' ? 
+            'Excellent stability, smooth gradient flow' :
+            'Potential instability, requires careful learning rates';
+    } else if (phase === 'middle') {
+        phaseDescription = strategy === 'post-norm' ? 
+            'Better performance emergence, stable training' :
+            'Continued stability, may plateau earlier';
+    } else {
+        phaseDescription = strategy === 'post-norm' ? 
+            'Achieves best final performance' :
+            'Stable but may not reach optimal performance';
+    }
+    
+    html += '<div class="arch-specs">';
+    html += '<strong>Phase:</strong> ' + phase.charAt(0).toUpperCase() + phase.slice(1) + ' Training<br>';
+    html += '<strong>Impact:</strong> ' + phaseDescription;
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    
+    html += '</div>';
+    document.getElementById('normalizationAnalysis').innerHTML = html;
+}
+
+function selectNormType(type) {
+    document.getElementById('normStrategy').value = type;
+    showNormTypeDetails(type);
+}
+
+function showNormTypeDetails(type) {
+    const spec = normStrategies[type];
+    
+    let html = '<div class="step"><h3>🔍 ' + spec.name + ' Deep Dive</h3>';
+    
+    html += '<div class="math-formula">';
+    if (type === 'pre-norm') {
+        html += '<strong>Pre-Norm Mathematical Flow:</strong><br>';
+        html += '1. x₁ = x₀ + attention(LayerNorm(x₀))<br>';
+        html += '2. x₂ = x₁ + ffn(LayerNorm(x₁))<br>';
+        html += '<strong>Benefits:</strong> Gradient flows directly through residual path';
+    } else if (type === 'post-norm') {
+        html += '<strong>Post-Norm Mathematical Flow:</strong><br>';
+        html += '1. x₁ = LayerNorm(x₀ + attention(x₀))<br>';
+        html += '2. x₂ = LayerNorm(x₁ + ffn(x₁))<br>';
+        html += '<strong>Benefits:</strong> Stronger normalization, better final performance';
+    } else if (type === 'qk-norm') {
+        html += '<strong>QK-Norm Mathematical Flow:</strong><br>';
+        html += '1. Q = LayerNorm_Q(query_projection(x))<br>';
+        html += '2. K = LayerNorm_K(key_projection(x))<br>';
+        html += '3. attention(Q, K, V) → normalized attention<br>';
+        html += '<strong>Benefits:</strong> Prevents attention collapse, stable training';
+    } else {
+        html += '<strong>Dual-Norm Mathematical Flow:</strong><br>';
+        html += '1. x₁ = LayerNorm_post(x₀ + attention(LayerNorm_pre(x₀)))<br>';
+        html += '2. x₂ = LayerNorm_post(x₁ + ffn(LayerNorm_pre(x₁)))<br>';
+        html += '<strong>Benefits:</strong> Maximum stability with optimal performance';
+    }
+    html += '</div>';
+    
+    html += '</div>';
+    document.getElementById('normTypeDetails').innerHTML = html;
+}
+
+function showModelDetails() {
+    const modelKey = document.getElementById('modelFocus').value;
+    const model = modelDatabase[modelKey];
+    
+    let html = '<div class="step"><h3>🔍 ' + model.name + ' Architecture Deep Dive</h3>';
+    
+    html += '<div class="feature-comparison">';
+    html += '<div class="feature-card">';
+    html += '<div class="feature-title">🏗️ Architecture Specifications</div>';
+    html += '<div class="arch-specs">';
+    html += '<strong>Parameters:</strong> ' + model.params + '<br>';
+    html += '<strong>Attention:</strong> ' + model.attention + '<br>';
+    html += '<strong>Normalization:</strong> ' + model.normalization + '<br>';
+    html += '<strong>Position Encoding:</strong> ' + model.position + '<br>';
+    html += '<strong>Primary Use Case:</strong> ' + model.useCase;
+    html += '</div>';
+    html += '</div>';
+    
+    html += '<div class="feature-card">';
+    html += '<div class="feature-title">💡 Key Innovations</div>';
+    html += '<div class="arch-specs">';
+    model.innovations.forEach(innovation => {
+        html += '• ' + innovation + '<br>';
+    });
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    
+    html += '<div class="feature-comparison">';
+    html += '<div class="feature-card">';
+    html += '<div class="feature-title">✅ Strengths</div>';
+    html += '<div class="arch-specs">';
+    model.strengths.forEach(strength => {
+        html += '• ' + strength + '<br>';
+    });
+    html += '</div>';
+    html += '</div>';
+    
+    html += '<div class="feature-card">';
+    html += '<div class="feature-title">⚠️ Considerations</div>';
+    html += '<div class="arch-specs">';
+    model.weaknesses.forEach(weakness => {
+        html += '• ' + weakness + '<br>';
+    });
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    
+    html += '</div>';
+    document.getElementById('modelDetailsContainer').innerHTML = html;
+}
+
+function showEfficiencyDetails() {
+    const tech = document.getElementById('efficiencyTech').value;
+    
+    document.getElementById('efficiencySizeValue').textContent = document.getElementById('efficiencySize').value;
+    document.getElementById('efficiencySeqValue').textContent = document.getElementById('efficiencySeq').value;
+}
+
+function calculateEfficiency() {
+    const tech = document.getElementById('efficiencyTech').value;
+    const size = parseInt(document.getElementById('efficiencySize').value);
+    const seqLen = parseInt(document.getElementById('efficiencySeq').value);
+    
+    let html = '<div class="step"><h3>⚡ Efficiency Analysis Results</h3>';
+    
+    if (tech === 'sliding-window') {
+        const standardMemory = Math.pow(seqLen / 1024, 2) * size / 10;
+        const slidingMemory = 1 * size / 10; // Constant for sliding window
+        const savings = ((standardMemory - slidingMemory) / standardMemory * 100);
+        
+        html += '<div class="comparison-matrix">';
+        html += '<table>';
+        html += '<tr><th>Metric</th><th>Standard Attention</th><th>Sliding Window</th><th>Improvement</th></tr>';
+        html += '<tr><td><strong>Memory Usage</strong></td><td>' + standardMemory.toFixed(1) + 'GB</td><td class="winner">' + slidingMemory.toFixed(1) + 'GB</td><td class="winner">' + savings.toFixed(0) + '% less</td></tr>';
+        html += '<tr><td><strong>Attention Ops</strong></td><td>O(n²)</td><td class="winner">O(window)</td><td class="winner">Linear scaling</td></tr>';
+        html += '<tr><td><strong>Context Length</strong></td><td>Full sequence</td><td class="moderate">Local window</td><td class="moderate">Trade-off</td></tr>';
+        html += '</table>';
+        html += '</div>';
+        
+    } else if (tech === 'mla-compression') {
+        const standardKV = seqLen * size / 100;
+        const compressedKV = standardKV * 0.1;
+        const savings = ((standardKV - compressedKV) / standardKV * 100);
+        
+        html += '<div class="comparison-matrix">';
+        html += '<table>';
+        html += '<tr><th>Metric</th><th>Standard KV Cache</th><th>MLA Compressed</th><th>Improvement</th></tr>';
+        html += '<tr><td><strong>KV Cache Size</strong></td><td>' + standardKV.toFixed(1) + 'GB</td><td class="winner">' + compressedKV.toFixed(1) + 'GB</td><td class="winner">' + savings.toFixed(0) + '% less</td></tr>';
+        html += '<tr><td><strong>Compression Ratio</strong></td><td>1:1</td><td class="winner">10:1</td><td class="winner">90% reduction</td></tr>';
+        html += '<tr><td><strong>Performance</strong></td><td>Baseline</td><td class="winner">Equal/Better</td><td class="winner">No degradation</td></tr>';
+        html += '</table>';
+        html += '</div>';
+    }
+    
+    html += '</div>';
+    document.getElementById('efficiencyCalculator').innerHTML = html;
+}
+
+function buildArchitecture() {
+    const baseArch = document.getElementById('baseArch').value;
+    const attention = document.getElementById('builderAttention').value;
+    const norm = document.getElementById('builderNorm').value;
+    const ffn = document.getElementById('builderFFN').value;
+    const position = document.getElementById('builderPosition').value;
+    const size = document.getElementById('builderSize').value;
+    const useCase = document.getElementById('builderUseCase').value;
+    
+    document.getElementById('builderSizeValue').textContent = size;
+    
+    let html = '<div class="step"><h3>🏗️ Your Custom Architecture</h3>';
+    
+    html += '<div class="feature-card">';
+    html += '<div class="feature-title">📋 Architecture Specification</div>';
+    html += '<div class="arch-specs">';
+    html += '<strong>Base:</strong> ' + baseArch.charAt(0).toUpperCase() + baseArch.slice(1) + '<br>';
+    html += '<strong>Size:</strong> ' + size + 'B parameters<br>';
+    html += '<strong>Attention:</strong> ' + attention.toUpperCase() + '<br>';
+    html += '<strong>Normalization:</strong> ' + norm + '<br>';
+    html += '<strong>FFN Strategy:</strong> ' + ffn + '<br>';
+    html += '<strong>Position Encoding:</strong> ' + position + '<br>';
+    html += '<strong>Target Use Case:</strong> ' + useCase;
+    html += '</div>';
+    html += '</div>';
+    
+    // Calculate rough specifications
+    const memoryEst = Math.log(parseInt(size)) * 15;
+    const complexity = attention === 'mla' ? 'High' : attention === 'gqa' ? 'Medium' : 'Low';
+    
+    html += '<div class="math-formula">';
+    html += '<strong>Estimated Specifications:</strong><br>';
+    html += '• Memory requirement: ~' + memoryEst.toFixed(0) + 'GB<br>';
+    html += '• Implementation complexity: ' + complexity + '<br>';
+    html += '• Training stability: ' + (norm.includes('pre') ? 'High' : 'Medium') + '<br>';
+    html += '• Inference efficiency: ' + (attention === 'mla' ? 'Excellent' : attention === 'sliding' ? 'Good' : 'Standard');
+    html += '</div>';
+    
+    html += '</div>';
+    document.getElementById('architectureBuilder').innerHTML = html;
+}
+
+function analyzeTradeoffs() {
+    const attention = document.getElementById('builderAttention').value;
+    const norm = document.getElementById('builderNorm').value;
+    const ffn = document.getElementById('builderFFN').value;
+    
+    let html = '<div class="step"><h3>⚖️ Architecture Trade-off Analysis</h3>';
+    
+    html += '<div class="comparison-matrix">';
+    html += '<table>';
+    html += '<tr><th>Component</th><th>Choice</th><th>Benefits</th><th>Trade-offs</th></tr>';
+    
+    // Attention analysis
+    let attentionBenefits = '', attentionTradeoffs = '';
+    if (attention === 'mla') {
+        attentionBenefits = 'Excellent memory efficiency';
+        attentionTradeoffs = 'Implementation complexity';
+    } else if (attention === 'gqa') {
+        attentionBenefits = 'Proven efficiency, reliable';
+        attentionTradeoffs = 'Moderate memory usage';
+    } else if (attention === 'sliding') {
+        attentionBenefits = 'Linear memory scaling';
+        attentionTradeoffs = 'Limited context window';
+    } else {
+        attentionBenefits = 'Simple, well-understood';
+        attentionTradeoffs = 'High memory usage';
+    }
+    
+    html += '<tr><td><strong>Attention</strong></td><td>' + attention.toUpperCase() + '</td><td class="winner">' + attentionBenefits + '</td><td class="moderate">' + attentionTradeoffs + '</td></tr>';
+    
+    // Normalization analysis
+    let normBenefits = '', normTradeoffs = '';
+    if (norm === 'pre-norm') {
+        normBenefits = 'Training stability';
+        normTradeoffs = 'Slightly lower performance';
+    } else if (norm === 'post-norm') {
+        normBenefits = 'Best final performance';
+        normTradeoffs = 'Training challenges';
+    } else if (norm === 'dual-norm') {
+        normBenefits = 'Best of both worlds';
+        normTradeoffs = 'Extra computation';
+    } else {
+        normBenefits = 'Attention stability';
+        normTradeoffs = 'Limited adoption';
+    }
+    
+    html += '<tr><td><strong>Normalization</strong></td><td>' + norm + '</td><td class="winner">' + normBenefits + '</td><td class="moderate">' + normTradeoffs + '</td></tr>';
+    
+    // FFN analysis
+    let ffnBenefits = '', ffnTradeoffs = '';
+    if (ffn === 'moe') {
+        ffnBenefits = 'Massive parameter scaling';
+        ffnTradeoffs = 'Complex routing, load balancing';
+    } else if (ffn === 'alternating') {
+        ffnBenefits = 'Balanced scaling approach';
+        ffnTradeoffs = 'More complex architecture';
+    } else {
+        ffnBenefits = 'Simple, reliable';
+        ffnTradeoffs = 'Limited scaling efficiency';
+    }
+    
+    html += '<tr><td><strong>FFN Strategy</strong></td><td>' + ffn + '</td><td class="winner">' + ffnBenefits + '</td><td class="moderate">' + ffnTradeoffs + '</td></tr>';
+    html += '</table>';
+    html += '</div>';
+    
+    // Overall recommendation
+    let recommendation = '';
+    if (attention === 'mla' && norm.includes('pre')) {
+        recommendation = 'Cutting-edge efficiency - suitable for research and high-end production';
+    } else if (attention === 'gqa' && norm === 'pre-norm') {
+        recommendation = 'Production-ready - balanced performance and reliability';
+    } else if (attention === 'sliding') {
+        recommendation = 'Memory-constrained deployment - excellent for local/edge cases';
+    } else {
+        recommendation = 'Educational/research focus - good for understanding fundamentals';
+    }
+    
+    html += '<div class="success">';
+    html += '<strong>🎯 Recommendation:</strong> ' + recommendation;
+    html += '</div>';
+    
+    html += '</div>';
+    document.getElementById('recommendationEngine').innerHTML = html;
+}
+
+// Update range sliders and initialize new functions
+document.addEventListener('DOMContentLoaded', function() {
+    // Existing initialization
+    compareArchitectures();
+    showEvolution('deepseek');
+    
+    // New initializations
+    calculateAttentionMetrics();
+    showModelDetails();
+    showEfficiencyDetails();
+    analyzeNormalization();
+    
+    // Add event listeners for range sliders
+    document.getElementById('seqLength').addEventListener('input', function() {
+        document.getElementById('seqLengthValue').textContent = this.value;
+    });
+    
+    document.getElementById('efficiencySize').addEventListener('input', function() {
+        document.getElementById('efficiencySizeValue').textContent = this.value;
+    });
+    
+    document.getElementById('efficiencySeq').addEventListener('input', function() {
+        document.getElementById('efficiencySeqValue').textContent = this.value;
+    });
+    
+    document.getElementById('builderSize').addEventListener('input', function() {
+        document.getElementById('builderSizeValue').textContent = this.value;
+    });
+});
     </script>
 </body>
 </html>
