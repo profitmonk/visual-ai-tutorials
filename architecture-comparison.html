@@ -1278,7 +1278,7 @@
 
     <script>
         // Model specifications database
-    // Model specifications database
+// Model specifications database
 const modelSpecs = {
     'deepseek-v3': {
         name: 'DeepSeek V3',
@@ -2164,7 +2164,14 @@ function buildArchitecture() {
     }
     
     html += '</div>';
-    document.getElementById('architectureBuilder').innerHTML = html;
+    
+    // This is the key fix - write to the correct element ID
+    const targetElement = document.getElementById('architectureBuilder');
+    if (targetElement) {
+        targetElement.innerHTML = html;
+    } else {
+        console.error('architectureBuilder element not found');
+    }
 }
 
 function calculateArchitectureMetrics(size, attentionSpec, normSpec, ffnSpec) {
