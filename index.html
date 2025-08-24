@@ -27,7 +27,7 @@
         
         .tutorial-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
             margin: 30px 0;
             align-items: stretch;
@@ -42,7 +42,7 @@
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            height: 280px;
+            height: 300px;
         }
         
         .tutorial-card:hover {
@@ -162,6 +162,38 @@
             text-transform: uppercase;
             margin-left: 10px;
         }
+        
+        .series-badge {
+            background: #6f42c1;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin: 50px 0 30px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            border: 2px solid #dee2e6;
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2d2d2d;
+            margin-bottom: 10px;
+        }
+        
+        .section-description {
+            color: #666;
+            font-size: 1.1em;
+        }
     </style>
 </head>
 <body>
@@ -180,7 +212,10 @@
     </div>
     
     <div class="container">
-        <h2>🚀 Available Tutorials</h2>
+        <div class="section-header">
+            <div class="section-title">🏛️ Foundation Tutorials</div>
+            <div class="section-description">Essential concepts and architectural understanding</div>
+        </div>
         
         <div class="tutorial-grid">
             <a href="transformer-basics.html" class="tutorial-link">
@@ -223,14 +258,68 @@
                 <div class="tutorial-card">
                     <div class="tutorial-title">🌀 RoPE: Rotary Position Embedding</div>
                     <div class="tutorial-description">
-                        Comprehensive guide to understanding how transformers encode position information through rotation with visual dimension pairing, complete mathematical walkthrough, and interactive examples with up to 128D embeddings.
+                        Comprehensive guide to understanding how transformers encode position information through rotation with visual dimension pairing, complete mathematical walkthrough, and interactive examples.
                     </div>
                     <div class="tutorial-concepts">
                         Position encoding • Dimension pairs • Rotation mathematics • Context scaling
                     </div>
                 </div>
             </a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="section-header">
+            <div class="section-title">🔧 Fine-tuning Mastery Series</div>
+            <div class="section-description">Complete guide to efficient model adaptation and customization</div>
+        </div>
+        
+        <div class="tutorial-grid">
+            <a href="lora-tutorial.html" class="tutorial-link">
+                <div class="tutorial-card">
+                    <div class="tutorial-title">🔍 LoRA: Low-Rank Adaptation Mathematics <span class="series-badge">Series 1</span></div>
+                    <div class="tutorial-description">
+                        Complete mathematical foundation of LoRA - the breakthrough technique for efficient fine-tuning. Interactive parameter calculator, matrix decomposition visualizer, and production deployment strategies.
+                    </div>
+                    <div class="tutorial-concepts">
+                        Low-rank decomposition • Parameter efficiency • Rank selection • Adapter strategies
+                    </div>
+                </div>
+            </a>
             
+            <a href="finetuning-comparison.html" class="tutorial-link">
+                <div class="tutorial-card">
+                    <div class="tutorial-title">🎛️ Full Fine-tuning vs LoRA: Complete Comparison <span class="series-badge">Series 2</span></div>
+                    <div class="tutorial-description">
+                        Master the complete spectrum of fine-tuning approaches. Interactive layer freezing, catastrophic forgetting analysis, memory calculators, and smart decision framework for optimal approach selection.
+                    </div>
+                    <div class="tutorial-concepts">
+                        Full fine-tuning • Layer freezing • Catastrophic forgetting • Resource optimization
+                    </div>
+                </div>
+            </a>
+            
+            <a href="advanced-peft.html" class="tutorial-link">
+                <div class="tutorial-card">
+                    <div class="tutorial-title">🚀 Advanced PEFT: QLoRA, DoRA & Modern Techniques <span class="series-badge">Series 3</span></div>
+                    <div class="tutorial-description">
+                        Cutting-edge Parameter-Efficient Fine-Tuning techniques. QLoRA's 4-bit quantization, DoRA weight decomposition, AdaLoRA adaptive allocation, and latest research developments.
+                    </div>
+                    <div class="tutorial-concepts">
+                        Quantization mathematics • Advanced PEFT • Deployment optimization • Latest research
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="section-header">
+            <div class="section-title">⚡ Core Mechanisms</div>
+            <div class="section-description">Deep dives into transformer internals and processing</div>
+        </div>
+        
+        <div class="tutorial-grid">
             <a href="complete-attention-mechanism.html" class="tutorial-link">
                 <div class="tutorial-card">
                     <div class="tutorial-title">⚡ Complete Attention Mechanism</div>
@@ -247,7 +336,7 @@
                 <div class="tutorial-card">
                     <div class="tutorial-title">🔄 Attention Mechanisms Evolution: MHA → GQA → MLA</div>
                     <div class="tutorial-description">
-                        Complete evolution of attention mechanisms from Multi-Head Attention through Grouped Query Attention to Multi-Head Latent Attention, with deep dive into KV caching, memory optimization, and compression techniques.
+                        Complete evolution of attention mechanisms with KV caching foundation, memory optimization techniques, and deep dive into compression mathematics across all variants.
                     </div>
                     <div class="tutorial-concepts">
                         KV caching • Memory optimization • Grouped attention • Compression techniques • Evolution timeline
@@ -259,19 +348,28 @@
                 <div class="tutorial-card">
                     <div class="tutorial-title">🚀 Text Generation Process</div>
                     <div class="tutorial-description">
-                        Complete mathematical walkthrough from attention output to next token prediction, including feed-forward networks, layer normalization, vocabulary projection, and sampling strategies with exact matrix computations.
+                        Complete mathematical walkthrough from attention output to next token prediction, including feed-forward networks, layer normalization, vocabulary projection, and sampling strategies.
                     </div>
                     <div class="tutorial-concepts">
                         FFN computation • Matrix flows • Vocabulary logits • Sampling strategies • Performance analysis
                     </div>
                 </div>
             </a>
-            
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="section-header">
+            <div class="section-title">🚀 Advanced Topics</div>
+            <div class="section-description">Scaling, optimization, and cutting-edge techniques</div>
+        </div>
+        
+        <div class="tutorial-grid">
             <a href="mixture-of-experts.html" class="tutorial-link">
                 <div class="tutorial-card">
                     <div class="tutorial-title">🎯 Mixture of Experts: Scaling Transformers Efficiently</div>
                     <div class="tutorial-description">
-                        Interactive exploration of how MoE scales transformer models through sparsity, routing, and selective expert activation. Covers dense vs sparse computation, router mechanics, expert specialization, and real-world MoE architectures.
+                        Interactive exploration of MoE scaling through sparsity, routing mechanics, expert specialization, load balancing, and real-world model analysis with cost-benefit considerations.
                     </div>
                     <div class="tutorial-concepts">
                         Sparse computation • Expert routing • Load balancing • Parameter scaling • Real MoE models
@@ -328,9 +426,9 @@
             </div>
             
             <div class="feature">
-                <div class="feature-icon">📚</div>
-                <div class="feature-title">Educational Focus</div>
-                <div>Designed for learning, not just reference</div>
+                <div class="feature-icon">🔧</div>
+                <div class="feature-title">Production Ready</div>
+                <div>Deployment strategies and resource planning</div>
             </div>
         </div>
     </div>
@@ -338,25 +436,42 @@
     <div class="container">
         <h2>🎯 Target Audience</h2>
         <ul>
-            <li><strong>AI/ML Engineers</strong> learning transformer internals</li>
-            <li><strong>Researchers</strong> studying attention mechanisms and position encoding</li>
+            <li><strong>AI/ML Engineers</strong> learning transformer internals and fine-tuning strategies</li>
+            <li><strong>Researchers</strong> studying attention mechanisms, PEFT techniques, and position encoding</li>
             <li><strong>Students</strong> in NLP/deep learning courses</li>
-            <li><strong>Developers</strong> working with LLMs who want to understand the underlying math</li>
+            <li><strong>Developers</strong> working with LLMs who want to understand underlying mathematics</li>
+            <li><strong>Practitioners</strong> fine-tuning models for production deployment</li>
             <li><strong>Anyone curious</strong> about how modern AI models like GPT, Claude, and Gemini work</li>
         </ul>
     </div>
     
     <div class="container">
-        <h2>🎓 Learning Path</h2>
-        <p><strong>Recommended order for maximum understanding:</strong></p>
+        <h2>🎓 Recommended Learning Path</h2>
+        
+        <h3>🏛️ Foundation Phase</h3>
         <ol>
             <li><strong>🏗️ Transformer Basics</strong> - Understand the revolutionary breakthrough and foundation</li>
             <li><strong>📊 Architecture Comparison</strong> - Learn how modern LLMs differ and why</li>
             <li><strong>🎯 Q, K, V Matrix Dimensions</strong> - Understand the basic building blocks</li>
             <li><strong>🌀 RoPE: Rotary Position Embedding</strong> - Learn how position is encoded</li>
+        </ol>
+        
+        <h3>⚡ Core Mechanisms Phase</h3>
+        <ol start="5">
             <li><strong>⚡ Complete Attention Mechanism</strong> - See how Q, K, V work together</li>
             <li><strong>🔄 Attention Mechanisms Evolution</strong> - Learn memory optimization and scaling techniques</li>
             <li><strong>🚀 Text Generation Process</strong> - Complete pipeline from attention to tokens</li>
+        </ol>
+        
+        <h3>🔧 Fine-tuning Mastery Phase</h3>
+        <ol start="8">
+            <li><strong>🔍 LoRA Mathematics</strong> - Master the most popular PEFT technique</li>
+            <li><strong>🎛️ Full Fine-tuning vs LoRA</strong> - Complete comparison and decision framework</li>
+            <li><strong>🚀 Advanced PEFT</strong> - Cutting-edge techniques (QLoRA, DoRA, etc.)</li>
+        </ol>
+        
+        <h3>🚀 Advanced Topics Phase</h3>
+        <ol start="11">
             <li><strong>🎯 Mixture of Experts</strong> - Advanced scaling through sparse computation</li>
             <li><strong>📊 Context Length Impact</strong> - Advanced concepts about training vs inference</li>
         </ol>
@@ -373,7 +488,7 @@
     </div>
     
     <div class="container" style="text-align: center;">
-        <h2>⭐ Star this repository if these tutorials helped you understand transformers better!</h2>
+        <h2>⭐ Star this repository if these tutorials helped you understand transformers and fine-tuning better!</h2>
         
         <a href="https://github.com/profitmonk/visual-ai-tutorials" class="github-link">
             🚀 Get Started Now
