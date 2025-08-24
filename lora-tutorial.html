@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoRA: Low-Rank Adaptation Mathematics</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background: #ffffff;
+            color: #2d2d2d;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-bar {
+            background: #2d2d2d;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-home {
+            background: #ffffff;
+            color: #2d2d2d;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-home:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border-left: 4px solid #2d2d2d;
+        }
+        
+        .example-box {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            border: 1px solid #4a4a4a;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        button {
+            background: #2d2d2d;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #2d2d2d;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .danger {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #2d2d2d;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .winner {
+            background: #d4edda;
+            font-weight: bold;
+        }
+        
+        .moderate {
+            background: #fff3cd;
+        }
+        
+        .poor {
+            background: #f8d7da;
+        }
+        
+        .math-formula {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .matrix-visualization {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .matrix {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            min-width: 120px;
+            position: relative;
+        }
+        
+        .matrix-label {
+            font-size: 12px;
+            color: #28a745;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .matrix-content {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .matrix-plus {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d2d2d;
+        }
+        
+        .matrix-equals {
+            font-size: 24px;
+            font-weight: bold;
+            color: #dc3545;
+        }
+        
+        .parameter-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        
+        .parameter-highlight {
+            background: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: #2d2d2d;
+        }
+        
+        .savings-display {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .layer-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .layer-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .layer-card:hover {
+            border-color: #2d2d2d;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .layer-card.selected {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .layer-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .layer-params {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .interactive-demo {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .demo-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #2d2d2d;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">🔍 LoRA: Low-Rank Adaptation Mathematics</div>
+        <a href="index.html" class="nav-home">🏠 Home</a>
+    </div>
+
+    <div class="container">
+        <h1>🔍 LoRA: Low-Rank Adaptation Mathematics</h1>
+        <p>Master the mathematical foundations of Low-Rank Adaptation - the breakthrough technique that enables efficient fine-tuning of large language models with minimal computational resources.</p>
+        
+        <div class="info">
+            <strong>🎯 What You'll Learn:</strong> LoRA's mathematical foundation, parameter efficiency calculations, optimal rank selection, layer targeting strategies, and real-world memory savings with production models.
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧠 The LoRA Revolution: Why It Changed Everything</h2>
+        
+        <div class="step">
+            <h3>❌ The Full Fine-tuning Problem</h3>
+            
+            <p>Before LoRA, fine-tuning a large language model meant updating <strong>every single parameter</strong>:</p>
+            
+            <div class="parameter-box">
+                <strong>LLaMA-2 7B Full Fine-tuning Requirements:</strong><br>
+                • <span class="parameter-highlight">7 billion parameters</span> to update<br>
+                • <span class="parameter-highlight">~28GB memory</span> for model weights (FP16)<br>
+                • <span class="parameter-highlight">~84GB additional</span> for optimizer states (AdamW)<br>
+                • <span class="parameter-highlight">Total: ~112GB VRAM</span> minimum required
+            </div>
+            
+            <div class="danger">
+                <strong>💸 The Cost Problem:</strong> Full fine-tuning a 70B model requires 8×A100 GPUs (~$20/hour), making it prohibitively expensive for most developers and researchers.
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>✨ LoRA's Breakthrough Insight</h3>
+            
+            <p>LoRA discovered that <strong>fine-tuning updates have low "intrinsic rank"</strong> - meaning the actual changes can be represented by much smaller matrices.</p>
+            
+            <div class="success">
+                <strong>🔑 Key Insight:</strong> Instead of updating the full weight matrix W, we can approximate the update ΔW with two small matrices: ΔW ≈ BA, where B and A are much smaller than W.
+            </div>
+            
+            <div class="math-formula">
+                <strong>LoRA Core Equation:</strong><br><br>
+                W<sub>new</sub> = W<sub>original</sub> + ΔW<br>
+                W<sub>new</sub> = W<sub>original</sub> + BA<br><br>
+                Where:<br>
+                W ∈ ℝ<sup>d×d</sup> (original weight matrix)<br>
+                B ∈ ℝ<sup>d×r</sup> (down-projection)<br>
+                A ∈ ℝ<sup>r×d</sup> (up-projection)<br>
+                r << d (rank is much smaller than dimensions)
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔢 Interactive LoRA Mathematics</h2>
+        
+        <div class="interactive-demo">
+            <div class="demo-title">🧮 LoRA Parameter Calculator</div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label><strong>Model Size:</strong></label>
+                    <select id="modelSize">
+                        <option value="7B">LLaMA-2 7B</option>
+                        <option value="13B" selected>LLaMA-2 13B</option>
+                        <option value="70B">LLaMA-2 70B</option>
+                        <option value="8B">LLaMA-3 8B</option>
+                        <option value="8x7B">Mixtral 8×7B</option>
+                        <option value="custom">Custom Model</option>
+                    </select>
+                </div>
+                <div class="control-group" id="customControls" style="display: none;">
+                    <label><strong>Hidden Dimension:</strong></label>
+                    <input type="number" id="customDim" value="4096" min="512" max="16384" step="128">
+                </div>
+                <div class="control-group">
+                    <label><strong>LoRA Rank (r):</strong></label>
+                    <input type="range" id="loraRank" min="1" max="256" value="16" step="1">
+                    <span id="rankValue">16</span>
+                </div>
+                <div class="control-group">
+                    <label><strong>Target Layers:</strong></label>
+                    <select id="targetLayers">
+                        <option value="attention">Attention Only (Q,K,V,O)</option>
+                        <option value="all" selected>All Linear Layers</option>
+                        <option value="qv">Q,V Only (Common)</option>
+                        <option value="custom">Custom Selection</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="calculateLoRA()">🔍 Calculate LoRA Parameters</button>
+            <div id="loraResults"></div>
+        </div>
+        
+        <div class="step">
+            <h3>📊 Visual Matrix Decomposition</h3>
+            
+            <p>Let's see how LoRA decomposes a weight matrix update:</p>
+            
+            <div class="matrix-visualization" id="matrixVisualization">
+                <div class="matrix">
+                    <div class="matrix-label">Original Weight W</div>
+                    <div class="matrix-content">4096×4096<br>16.8M params</div>
+                </div>
+                <div class="matrix-plus">+</div>
+                <div class="matrix">
+                    <div class="matrix-label">LoRA Update ΔW</div>
+                    <div class="matrix-content">4096×4096<br>16.8M params</div>
+                </div>
+                <div class="matrix-equals">=</div>
+                <div class="matrix">
+                    <div class="matrix-label">B Matrix</div>
+                    <div class="matrix-content">4096×16<br>65K params</div>
+                </div>
+                <div class="matrix-plus">×</div>
+                <div class="matrix">
+                    <div class="matrix-label">A Matrix</div>
+                    <div class="matrix-content">16×4096<br>65K params</div>
+                </div>
+            </div>
+            
+            <div class="savings-display" id="savingsDisplay">
+                💰 Parameter Reduction: 16.8M → 131K (99.2% fewer parameters!)
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Layer Targeting Strategy</h2>
+        
+        <div class="warning">
+            <strong>🤔 Critical Question:</strong> Which layers should you apply LoRA to? Different layers learn different types of patterns, and your choice dramatically impacts both performance and efficiency.
+        </div>
+        
+        <div class="interactive-demo">
+            <div class="demo-title">🎛️ Interactive Layer Targeting</div>
+            
+            <div class="layer-comparison">
+                <div class="layer-card" onclick="selectLayer('q_proj')" id="q_proj">
+                    <div class="layer-title">Query (Q)</div>
+                    <div class="layer-params">What to attend to</div>
+                    <div class="parameter-highlight">High Impact</div>
+                </div>
+                <div class="layer-card" onclick="selectLayer('k_proj')" id="k_proj">
+                    <div class="layer-title">Key (K)</div>
+                    <div class="layer-params">What can be attended</div>
+                    <div class="parameter-highlight">Medium Impact</div>
+                </div>
+                <div class="layer-card" onclick="selectLayer('v_proj')" id="v_proj">
+                    <div class="layer-title">Value (V)</div>
+                    <div class="layer-params">Information content</div>
+                    <div class="parameter-highlight">High Impact</div>
+                </div>
+                <div class="layer-card" onclick="selectLayer('o_proj')" id="o_proj">
+                    <div class="layer-title">Output (O)</div>
+                    <div class="layer-params">Attention aggregation</div>
+                    <div class="parameter-highlight">Medium Impact</div>
+                </div>
+                <div class="layer-card" onclick="selectLayer('gate_proj')" id="gate_proj">
+                    <div class="layer-title">Gate/Up</div>
+                    <div class="layer-params">FFN activation</div>
+                    <div class="parameter-highlight">Low Impact</div>
+                </div>
+                <div class="layer-card" onclick="selectLayer('down_proj')" id="down_proj">
+                    <div class="layer-title">Down</div>
+                    <div class="layer-params">FFN output</div>
+                    <div class="parameter-highlight">Low Impact</div>
+                </div>
+            </div>
+            
+            <div id="layerAnalysis"></div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label><strong>Targeting Strategy:</strong></label>
+                    <select id="targetingStrategy" onchange="showTargetingStrategy()">
+                        <option value="qv" selected>Q,V Only (Most Common)</option>
+                        <option value="attention">All Attention (Q,K,V,O)</option>
+                        <option value="all">All Linear Layers</option>
+                        <option value="selective">Selective (Advanced)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="analyzeLayerStrategy()">📊 Analyze Strategy Impact</button>
+            <div id="strategyResults"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>⚖️ Rank Selection: The Critical Trade-off</h2>
+        
+        <div class="step">
+            <h3>🎯 Understanding Rank Impact</h3>
+            
+            <p>The rank (r) is LoRA's most important hyperparameter. It controls the trade-off between <strong>parameter efficiency</strong> and <strong>adaptation capability</strong>.</p>
+            
+            <div class="interactive-demo">
+                <div class="demo-title">📈 Interactive Rank Analysis</div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label><strong>Matrix Dimension (d):</strong></label>
+                        <input type="range" id="matrixDim" min="512" max="8192" value="4096" step="128">
+                        <span id="dimValue">4096</span>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>LoRA Rank (r):</strong></label>
+                        <input type="range" id="rankSlider" min="1" max="512" value="32" step="1">
+                        <span id="rankSliderValue">32</span>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>Number of Layers:</strong></label>
+                        <input type="range" id="numLayers" min="12" max="80" value="32" step="4">
+                        <span id="layersValue">32</span>
+                    </div>
+                </div>
+                
+                <button onclick="analyzeRankImpact()">⚡ Analyze Rank Impact</button>
+                <div id="rankAnalysis"></div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>📊 Real Model Rank Recommendations</h3>
+            
+            <table>
+                <tr>
+                    <th>Model Size</th>
+                    <th>Conservative (r)</th>
+                    <th>Balanced (r)</th>
+                    <th>High Capacity (r)</th>
+                    <th>Use Case</th>
+                </tr>
+                <tr>
+                    <td><strong>7B</strong></td>
+                    <td class="winner">8-16</td>
+                    <td class="moderate">32-64</td>
+                    <td class="poor">128+</td>
+                    <td>General fine-tuning</td>
+                </tr>
+                <tr>
+                    <td><strong>13B</strong></td>
+                    <td class="winner">16-32</td>
+                    <td class="moderate">64-128</td>
+                    <td class="poor">256+</td>
+                    <td>Domain adaptation</td>
+                </tr>
+                <tr>
+                    <td><strong>70B+</strong></td>
+                    <td class="winner">32-64</td>
+                    <td class="moderate">128-256</td>
+                    <td class="poor">512+</td>
+                    <td>Complex tasks</td>
+                </tr>
+            </table>
+            
+            <div class="info">
+                <strong>💡 Rank Selection Guidelines:</strong><br>
+                • <strong>r = 8-32:</strong> Simple tasks (classification, basic QA)<br>
+                • <strong>r = 32-128:</strong> Complex tasks (instruction following, reasoning)<br>
+                • <strong>r = 128+:</strong> Domain-specific fine-tuning, creative tasks<br>
+                • <strong>Rule of thumb:</strong> Start with r = √(model_size_in_B) × 8
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>💾 Memory & Performance Analysis</h2>
+        
+        <div class="interactive-demo">
+            <div class="demo-title">🧮 Complete Resource Calculator</div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label><strong>Base Model:</strong></label>
+                    <select id="baseModel">
+                        <option value="llama2-7b">LLaMA-2 7B</option>
+                        <option value="llama2-13b" selected>LLaMA-2 13B</option>
+                        <option value="llama2-70b">LLaMA-2 70B</option>
+                        <option value="mistral-7b">Mistral 7B</option>
+                        <option value="mixtral-8x7b">Mixtral 8×7B</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>LoRA Configuration:</strong></label>
+                    <select id="loraConfig">
+                        <option value="minimal">Minimal (r=8, Q,V only)</option>
+                        <option value="standard" selected>Standard (r=32, Q,V only)</option>
+                        <option value="comprehensive">Comprehensive (r=64, all attention)</option>
+                        <option value="maximum">Maximum (r=128, all layers)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>Batch Size:</strong></label>
+                    <input type="range" id="batchSize" min="1" max="16" value="4" step="1">
+                    <span id="batchValue">4</span>
+                </div>
+                <div class="control-group">
+                    <label><strong>Sequence Length:</strong></label>
+                    <input type="range" id="seqLength" min="512" max="4096" value="2048" step="512">
+                    <span id="seqValue">2048</span>
+                </div>
+            </div>
+            
+            <button onclick="calculateResources()">💻 Calculate Resource Requirements</button>
+            <div id="resourceResults"></div>
+        </div>
+        
+        <div class="step">
+            <h3>⚡ Training Speed Comparison</h3>
+            
+            <div id="speedComparison"></div>
+            
+            <div class="success">
+                <strong>🚀 LoRA Training Benefits:</strong><br>
+                • <strong>Memory:</strong> 10-100× less GPU memory required<br>
+                • <strong>Speed:</strong> 2-5× faster training iterations<br>
+                • <strong>Storage:</strong> Adapter weights are only 1-5% of original model size<br>
+                • <strong>Flexibility:</strong> Multiple adapters can be stored and swapped easily
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔬 Advanced LoRA Techniques</h2>
+        
+        <div class="step">
+            <h3>⚙️ LoRA Variants & Optimizations</h3>
+            
+            <table>
+                <tr>
+                    <th>Technique</th>
+                    <th>Key Innovation</th>
+                    <th>Memory Impact</th>
+                    <th>Performance</th>
+                    <th>Best For</th>
+                </tr>
+                <tr>
+                    <td><strong>Standard LoRA</strong></td>
+                    <td>Low-rank decomposition</td>
+                    <td class="winner">Great</td>
+                    <td class="moderate">Good</td>
+                    <td>General fine-tuning</td>
+                </tr>
+                <tr>
+                    <td><strong>QLoRA</strong></td>
+                    <td>4-bit quantization + LoRA</td>
+                    <td class="winner">Excellent</td>
+                    <td class="moderate">Good</td>
+                    <td>Consumer hardware</td>
+                </tr>
+                <tr>
+                    <td><strong>AdaLoRA</strong></td>
+                    <td>Adaptive rank allocation</td>
+                    <td class="moderate">Good</td>
+                    <td class="winner">Better</td>
+                    <td>Complex tasks</td>
+                </tr>
+                <tr>
+                    <td><strong>LoRA+</strong></td>
+                    <td>Different LR for A, B</td>
+                    <td class="winner">Great</td>
+                    <td class="winner">Better</td>
+                    <td>Performance optimization</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="step">
+            <h3>🎯 LoRA Initialization Strategies</h3>
+            
+            <div class="math-formula">
+                <strong>Standard LoRA Initialization:</strong><br><br>
+                A ~ Normal(0, σ²) where σ = 1/√r<br>
+                B = 0 (zero initialization)<br><br>
+                <strong>Result:</strong> BA = 0 initially (no change to base model)<br>
+                <strong>Benefit:</strong> Training starts from base model performance
+            </div>
+            
+            <div class="warning">
+                <strong>💡 Advanced Initialization Tips:</strong><br>
+                • <strong>Zero B, Normal A:</strong> Standard approach, stable training<br>
+                • <strong>Small Random Both:</strong> Can help with very low ranks (r < 8)<br>
+                • <strong>Orthogonal Init:</strong> Better for high ranks, prevents collapse<br>
+                • <strong>Pre-trained Init:</strong> Initialize from existing LoRA (transfer learning)
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Production Deployment Guide</h2>
+        
+        <div class="step">
+            <h3>🚀 LoRA Deployment Strategies</h3>
+            
+            <div class="layer-comparison">
+                <div class="layer-card">
+                    <div class="layer-title">🔄 Adapter Swapping</div>
+                    <div class="layer-params">Load different LoRA adapters for different tasks</div>
+                    <div class="parameter-highlight">Multi-task Serving</div>
+                </div>
+                <div class="layer-card">
+                    <div class="layer-title">🎯 Specialized Models</div>
+                    <div class="layer-params">Merge LoRA into base weights for single-task deployment</div>
+                    <div class="parameter-highlight">Production Efficiency</div>
+                </div>
+                <div class="layer-card">
+                    <div class="layer-title">🌊 Batched Inference</div>
+                    <div class="layer-params">Process multiple LoRA adapters in single batch</div>
+                    <div class="parameter-highlight">Multi-tenant Systems</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>📊 Real-World LoRA Success Stories</h3>
+            
+            <div class="example-box">
+                <strong>🎯 Code Generation (StarCoder):</strong><br>
+                • Base: 15B parameter model<br>
+                • LoRA: r=32 on attention layers<br>
+                • Result: 99% of full fine-tuning performance<br>
+                • Memory: 120GB → 18GB (85% reduction)<br><br>
+                
+                <strong>📚 Domain Adaptation (Legal):</strong><br>
+                • Base: LLaMA-2 13B<br>
+                • LoRA: r=64 on Q,V,O layers<br>
+                • Training: 3 days → 8 hours<br>
+                • Accuracy: Matches full fine-tuning on legal tasks<br><br>
+                
+                <strong>🌐 Multi-language (Translation):</strong><br>
+                • Base: Mistral 7B<br>
+                • LoRA: 8 different adapters (r=16 each)<br>
+                • Storage: 8 × 50MB adapters vs 8 × 14GB models<br>
+                • Savings: 99.7% storage reduction
+            </div>
+        </div>
+        
+        <div class="success">
+            <strong>🎯 Key Takeaways:</strong><br>
+            • LoRA enables fine-tuning large models on consumer hardware<br>
+            • Careful rank selection is crucial for balancing efficiency and performance<br>
+            • Targeting Q,V layers gives best performance-to-parameter ratio<br>
+            • Multiple adapters can be stored and swapped for different tasks<br>
+            • Production systems can serve multiple LoRA variants efficiently
+        </div>
+    </div>
+
+    <script>
+        // Model specifications for calculations
+        const modelSpecs = {
+            '7B': { hiddenSize: 4096, numLayers: 32, numHeads: 32, totalParams: 7e9 },
+            '13B': { hiddenSize: 5120, numLayers: 40, numHeads: 40, totalParams: 13e9 },
+            '70B': { hiddenSize: 8192, numLayers: 80, numHeads: 64, totalParams: 70e9 },
+            '8B': { hiddenSize: 4096, numLayers: 32, numHeads: 32, totalParams: 8e9 },
+            '8x7B': { hiddenSize: 4096, numLayers: 32, numHeads: 32, totalParams: 47e9 }
+        };
+
+        const layerConfigs = {
+            'attention': { layers: ['q_proj', 'k_proj', 'v_proj', 'o_proj'], multiplier: 4 },
+            'all': { layers: ['q_proj', 'k_proj', 'v_proj', 'o_proj', 'gate_proj', 'up_proj', 'down_proj'], multiplier: 7 },
+            'qv': { layers: ['q_proj', 'v_proj'], multiplier: 2 },
+            'custom': { layers: ['q_proj', 'v_proj'], multiplier: 2 }
+        };
+
+        function updateSliders() {
+            document.getElementById('rankValue').textContent = document.getElementById('loraRank').value;
+            document.getElementById('dimValue').textContent = document.getElementById('matrixDim').value;
+            document.getElementById('rankSliderValue').textContent = document.getElementById('rankSlider').value;
+            document.getElementById('layersValue').textContent = document.getElementById('numLayers').value;
+            document.getElementById('batchValue').textContent = document.getElementById('batchSize').value;
+            document.getElementById('seqValue').textContent = document.getElementById('seqLength').value;
+        }
+
+        function calculateLoRA() {
+            const modelSize = document.getElementById('modelSize').value;
+            const rank = parseInt(document.getElementById('loraRank').value);
+            const targetLayers = document.getElementById('targetLayers').value;
+            
+            let spec;
+            if (modelSize === 'custom') {
+                const customDim = parseInt(document.getElementById('customDim').value);
+                spec = { hiddenSize: customDim, numLayers: 32, numHeads: 32, totalParams: customDim * customDim * 32 };
+            } else {
+                spec = modelSpecs[modelSize];
+            }
+            
+            const layerConfig = layerConfigs[targetLayers];
+            const hiddenSize = spec.hiddenSize;
+            const numLayers = spec.numLayers;
+            
+            // Calculate parameters
+            const originalParamsPerLayer = hiddenSize * hiddenSize;
+            const loraParamsPerLayer = 2 * hiddenSize * rank; // B and A matrices
+            
+            const totalOriginalParams = originalParamsPerLayer * layerConfig.multiplier * numLayers;
+            const totalLoRAParams = loraParamsPerLayer * layerConfig.multiplier * numLayers;
+            
+            const reductionRatio = totalLoRAParams / totalOriginalParams;
+            const reductionPercent = (1 - reductionRatio) * 100;
+            
+            // Calculate memory (assuming FP16)
+            const originalMemoryMB = totalOriginalParams * 2 / 1024 / 1024;
+            const loraMemoryMB = totalLoRAParams * 2 / 1024 / 1024;
+            const memorySavingsMB = originalMemoryMB - loraMemoryMB;
+            
+            let html = `
+                <div class="step">
+                    <h4>📊 LoRA Parameter Analysis for ${modelSize}</h4>
+                    
+                    <div class="parameter-box">
+                        <strong>Configuration:</strong><br>
+                        • Model: ${modelSize} (${hiddenSize} hidden size)<br>
+                        • Rank: ${rank}<br>
+                        • Target: ${layerConfig.layers.join(', ')}<br>
+                        • Layers: ${numLayers}
+                    </div>
+                    
+                    <table>
+                        <tr><th>Metric</th><th>Original</th><th>LoRA</th><th>Savings</th></tr>
+                        <tr>
+                            <td><strong>Parameters</strong></td>
+                            <td>${(totalOriginalParams / 1e6).toFixed(1)}M</td>
+                            <td class="winner">${(totalLoRAParams / 1e6).toFixed(1)}M</td>
+                            <td class="winner">${reductionPercent.toFixed(1)}%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Memory (FP16)</strong></td>
+                            <td>${originalMemoryMB.toFixed(0)}MB</td>
+                            <td class="winner">${loraMemoryMB.toFixed(0)}MB</td>
+                            <td class="winner">${memorySavingsMB.toFixed(0)}MB</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Storage Size</strong></td>
+                            <td>${(originalMemoryMB / 1024).toFixed(1)}GB</td>
+                            <td class="winner">${(loraMemoryMB / 1024).toFixed(2)}GB</td>
+                            <td class="winner">${((memorySavingsMB / 1024) / (originalMemoryMB / 1024) * 100).toFixed(1)}%</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="savings-display">
+                        💰 You save ${memorySavingsMB.toFixed(0)}MB of memory (${reductionPercent.toFixed(1)}% reduction)!
+                    </div>
+                </div>
+            `;
+            
+            // Update matrix visualization
+            updateMatrixVisualization(hiddenSize, rank, totalOriginalParams, totalLoRAParams, reductionPercent);
+            
+            document.getElementById('loraResults').innerHTML = html;
+        }
+
+        function updateMatrixVisualization(hiddenSize, rank, originalParams, loraParams, reductionPercent) {
+            const bParams = hiddenSize * rank;
+            const aParams = rank * hiddenSize;
+            
+            document.getElementById('matrixVisualization').innerHTML = `
+                <div class="matrix">
+                    <div class="matrix-label">Original Weight W</div>
+                    <div class="matrix-content">${hiddenSize}×${hiddenSize}<br>${(hiddenSize * hiddenSize / 1e6).toFixed(1)}M params</div>
+                </div>
+                <div class="matrix-plus">≈</div>
+                <div class="matrix">
+                    <div class="matrix-label">B Matrix</div>
+                    <div class="matrix-content">${hiddenSize}×${rank}<br>${(bParams / 1e3).toFixed(0)}K params</div>
+                </div>
+                <div class="matrix-plus">×</div>
+                <div class="matrix">
+                    <div class="matrix-label">A Matrix</div>
+                    <div class="matrix-content">${rank}×${hiddenSize}<br>${(aParams / 1e3).toFixed(0)}K params</div>
+                </div>
+            `;
+            
+            document.getElementById('savingsDisplay').innerHTML = `
+                💰 Parameter Reduction: ${(originalParams / 1e6).toFixed(1)}M → ${(loraParams / 1e3).toFixed(0)}K (${reductionPercent.toFixed(1)}% reduction!)
+            `;
+        }
+
+        function selectLayer(layerId) {
+            // Remove selection from all layers
+            document.querySelectorAll('.layer-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked layer
+            document.getElementById(layerId).classList.add('selected');
+            
+            // Show layer analysis
+            const layerInfo = {
+                'q_proj': {
+                    name: 'Query Projection',
+                    description: 'Transforms input to query vectors for attention computation',
+                    impact: 'High - directly affects what patterns the model attends to',
+                    recommendation: 'Essential for most fine-tuning tasks'
+                },
+                'k_proj': {
+                    name: 'Key Projection', 
+                    description: 'Transforms input to key vectors for attention compatibility',
+                    impact: 'Medium - affects attention pattern formation',
+                    recommendation: 'Include for complex reasoning tasks'
+                },
+                'v_proj': {
+                    name: 'Value Projection',
+                    description: 'Transforms input to value vectors carrying actual information',
+                    impact: 'High - directly affects what information is passed through',
+                    recommendation: 'Essential for most fine-tuning tasks'
+                },
+                'o_proj': {
+                    name: 'Output Projection',
+                    description: 'Aggregates multi-head attention outputs',
+                    impact: 'Medium - affects final attention representation',
+                    recommendation: 'Include for comprehensive fine-tuning'
+                },
+                'gate_proj': {
+                    name: 'Gate/Up Projection',
+                    description: 'FFN input transformation with gating mechanism',
+                    impact: 'Low-Medium - affects FFN activation patterns',
+                    recommendation: 'Skip for efficiency, include for maximum adaptation'
+                },
+                'down_proj': {
+                    name: 'Down Projection',
+                    description: 'FFN output transformation back to residual stream',
+                    impact: 'Low-Medium - affects final FFN output',
+                    recommendation: 'Skip for efficiency, include for maximum adaptation'
+                }
+            };
+            
+            const info = layerInfo[layerId];
+            const html = `
+                <div class="step">
+                    <h4>🔍 ${info.name} Analysis</h4>
+                    <div class="parameter-box">
+                        <strong>Function:</strong> ${info.description}<br>
+                        <strong>Impact:</strong> ${info.impact}<br>
+                        <strong>Recommendation:</strong> ${info.recommendation}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('layerAnalysis').innerHTML = html;
+        }
+
+        function showTargetingStrategy() {
+            const strategy = document.getElementById('targetingStrategy').value;
+            
+            const strategies = {
+                'qv': {
+                    name: 'Q,V Only Strategy',
+                    description: 'Most popular approach - adapts query and value projections only',
+                    benefits: 'Best balance of performance and efficiency',
+                    tradeoffs: 'May miss some attention pattern adaptations',
+                    params: '~50% of attention parameters'
+                },
+                'attention': {
+                    name: 'All Attention Strategy', 
+                    description: 'Adapts all attention mechanism components (Q,K,V,O)',
+                    benefits: 'Complete attention adaptation capability',
+                    tradeoffs: 'Higher parameter count, diminishing returns on O projection',
+                    params: '100% of attention parameters'
+                },
+                'all': {
+                    name: 'All Linear Layers Strategy',
+                    description: 'Adapts every linear transformation in the model',
+                    benefits: 'Maximum adaptation capability',
+                    tradeoffs: 'Much higher parameter count, potential overfitting',
+                    params: '100% of adaptable parameters'
+                },
+                'selective': {
+                    name: 'Selective Strategy',
+                    description: 'Carefully chosen layers based on task requirements',
+                    benefits: 'Optimized for specific use cases',
+                    tradeoffs: 'Requires expertise and experimentation',
+                    params: 'Variable based on selection'
+                }
+            };
+            
+            // This would update the UI to show the selected strategy details
+        }
+
+        function analyzeLayerStrategy() {
+            const strategy = document.getElementById('targetingStrategy').value;
+            const modelSize = document.getElementById('modelSize').value || '13B';
+            const rank = parseInt(document.getElementById('loraRank').value);
+            
+            const spec = modelSpecs[modelSize];
+            const config = layerConfigs[strategy];
+            
+            if (!spec || !config) return;
+            
+            const paramsPerLayer = 2 * spec.hiddenSize * rank;
+            const totalParams = paramsPerLayer * config.multiplier * spec.numLayers;
+            const memoryMB = totalParams * 2 / 1024 / 1024;
+            
+            const html = `
+                <div class="step">
+                    <h4>📊 Strategy Analysis: ${strategy.toUpperCase()}</h4>
+                    
+                    <div class="parameter-box">
+                        <strong>Target Layers:</strong> ${config.layers.join(', ')}<br>
+                        <strong>Parameters per Layer:</strong> ${(paramsPerLayer / 1000).toFixed(0)}K<br>
+                        <strong>Total LoRA Parameters:</strong> ${(totalParams / 1e6).toFixed(1)}M<br>
+                        <strong>Memory Requirement:</strong> ${memoryMB.toFixed(0)}MB<br>
+                        <strong>Adapter File Size:</strong> ${(memoryMB / 1024).toFixed(2)}GB
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${Math.min(100, config.multiplier * 15)}%">
+                            Complexity: ${config.multiplier}/7 layers
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('strategyResults').innerHTML = html;
+        }
+
+        function analyzeRankImpact() {
+            const dim = parseInt(document.getElementById('matrixDim').value);
+            const rank = parseInt(document.getElementById('rankSlider').value);
+            const layers = parseInt(document.getElementById('numLayers').value);
+            
+            // Calculate for attention-only targeting (4 matrices per layer)
+            const originalParams = dim * dim * 4 * layers;
+            const loraParams = 2 * dim * rank * 4 * layers;
+            const reduction = (1 - loraParams / originalParams) * 100;
+            
+            // Estimate performance based on rank
+            const maxRank = dim;
+            const rankRatio = rank / maxRank;
+            const estimatedPerformance = Math.min(100, 70 + rankRatio * 25); // Rough estimate
+            
+            const html = `
+                <div class="step">
+                    <h4>⚖️ Rank ${rank} Analysis</h4>
+                    
+                    <table>
+                        <tr><th>Metric</th><th>Value</th><th>Analysis</th></tr>
+                        <tr>
+                            <td><strong>Parameter Reduction</strong></td>
+                            <td class="winner">${reduction.toFixed(1)}%</td>
+                            <td>${reduction > 95 ? 'Excellent efficiency' : reduction > 90 ? 'Good efficiency' : 'Moderate efficiency'}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rank Ratio</strong></td>
+                            <td>${(rankRatio * 100).toFixed(1)}%</td>
+                            <td>${rankRatio < 0.1 ? 'Very low rank' : rankRatio < 0.3 ? 'Low rank' : 'Higher rank'}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Est. Performance</strong></td>
+                            <td class="${estimatedPerformance > 90 ? 'winner' : estimatedPerformance > 80 ? 'moderate' : 'poor'}">${estimatedPerformance.toFixed(0)}%</td>
+                            <td>${estimatedPerformance > 90 ? 'Near full fine-tuning' : estimatedPerformance > 80 ? 'Good performance' : 'May need higher rank'}</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${estimatedPerformance}%">
+                            Performance: ${estimatedPerformance.toFixed(0)}%
+                        </div>
+                    </div>
+                    
+                    <div class="${rank < 16 ? 'warning' : rank > 128 ? 'danger' : 'success'}">
+                        <strong>Recommendation:</strong> 
+                        ${rank < 8 ? 'Very low rank - may struggle with complex adaptations' :
+                          rank < 32 ? 'Good for simple tasks and efficient training' :
+                          rank < 128 ? 'Balanced approach for most use cases' :
+                          'High rank - use for complex tasks but watch for overfitting'}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('rankAnalysis').innerHTML = html;
+        }
+
+        function calculateResources() {
+            const baseModel = document.getElementById('baseModel').value;
+            const loraConfig = document.getElementById('loraConfig').value;
+            const batchSize = parseInt(document.getElementById('batchSize').value);
+            const seqLength = parseInt(document.getElementById('seqLength').value);
+            
+            // Model configurations
+            const models = {
+                'llama2-7b': { params: 7e9, hiddenSize: 4096, layers: 32 },
+                'llama2-13b': { params: 13e9, hiddenSize: 5120, layers: 40 },
+                'llama2-70b': { params: 70e9, hiddenSize: 8192, layers: 80 },
+                'mistral-7b': { params: 7e9, hiddenSize: 4096, layers: 32 },
+                'mixtral-8x7b': { params: 47e9, hiddenSize: 4096, layers: 32 }
+            };
+            
+            const configs = {
+                'minimal': { rank: 8, multiplier: 2 },
+                'standard': { rank: 32, multiplier: 2 },
+                'comprehensive': { rank: 64, multiplier: 4 },
+                'maximum': { rank: 128, multiplier: 7 }
+            };
+            
+            const model = models[baseModel];
+            const config = configs[loraConfig];
+            
+            // Memory calculations (GB)
+            const baseModelMemory = model.params * 2 / 1024 / 1024 / 1024; // FP16
+            const loraParams = 2 * model.hiddenSize * config.rank * config.multiplier * model.layers;
+            const loraMemory = loraParams * 2 / 1024 / 1024 / 1024;
+            
+            // Training memory (optimizer states, gradients, activations)
+            const optimizerMemory = loraMemory * 8; // AdamW states
+            const activationMemory = batchSize * seqLength * model.hiddenSize * model.layers * 4 / 1024 / 1024 / 1024;
+            const totalTrainingMemory = baseModelMemory + loraMemory + optimizerMemory + activationMemory;
+            
+            // Speed estimates (relative to full fine-tuning)
+            const speedMultiplier = Math.max(2, 10 - config.rank / 32);
+            
+            const html = `
+                <div class="step">
+                    <h4>💻 Resource Requirements Analysis</h4>
+                    
+                    <div class="parameter-box">
+                        <strong>Configuration:</strong><br>
+                        • Model: ${baseModel.replace('-', ' ').toUpperCase()}<br>
+                        • LoRA: ${loraConfig} (rank ${config.rank})<br>
+                        • Batch Size: ${batchSize}<br>
+                        • Sequence Length: ${seqLength}
+                    </div>
+                    
+                    <table>
+                        <tr><th>Component</th><th>Memory (GB)</th><th>Notes</th></tr>
+                        <tr>
+                            <td><strong>Base Model</strong></td>
+                            <td>${baseModelMemory.toFixed(1)}</td>
+                            <td>Frozen weights (FP16)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LoRA Adapters</strong></td>
+                            <td class="winner">${loraMemory.toFixed(2)}</td>
+                            <td>${(loraParams / 1e6).toFixed(1)}M parameters</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Optimizer States</strong></td>
+                            <td>${optimizerMemory.toFixed(1)}</td>
+                            <td>AdamW (momentum + variance)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Activations</strong></td>
+                            <td>${activationMemory.toFixed(1)}</td>
+                            <td>Forward/backward pass</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Training</strong></td>
+                            <td class="${totalTrainingMemory < 24 ? 'winner' : totalTrainingMemory < 48 ? 'moderate' : 'poor'}">${totalTrainingMemory.toFixed(1)}</td>
+                            <td>${totalTrainingMemory < 24 ? 'Single GPU' : totalTrainingMemory < 48 ? 'Multi-GPU' : 'Distributed training'}</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="savings-display">
+                        ⚡ Training Speed: ${speedMultiplier.toFixed(1)}× faster than full fine-tuning<br>
+                        💾 Storage: Only ${(loraMemory * 1000).toFixed(0)}MB adapter file
+                    </div>
+                    
+                    <div class="${totalTrainingMemory < 24 ? 'success' : totalTrainingMemory < 48 ? 'warning' : 'danger'}">
+                        <strong>Hardware Recommendation:</strong> 
+                        ${totalTrainingMemory < 24 ? 'RTX 4090 or A100 (24GB)' :
+                          totalTrainingMemory < 48 ? '2× A100 or H100 (40-80GB)' :
+                          'Multi-node distributed training required'}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('resourceResults').innerHTML = html;
+        }
+
+        // Event listeners for sliders
+        document.addEventListener('DOMContentLoaded', function() {
+            ['loraRank', 'matrixDim', 'rankSlider', 'numLayers', 'batchSize', 'seqLength'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', updateSliders);
+                }
+            });
+            
+            // Show/hide custom controls
+            document.getElementById('modelSize').addEventListener('change', function() {
+                const customControls = document.getElementById('customControls');
+                if (this.value === 'custom') {
+                    customControls.style.display = 'flex';
+                } else {
+                    customControls.style.display = 'none';
+                }
+            });
+            
+            // Initialize with default calculation
+            updateSliders();
+            calculateLoRA();
+        });
+    </script>
+</body>
+</html>
