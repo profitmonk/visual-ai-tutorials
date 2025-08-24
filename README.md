@@ -51,6 +51,54 @@ Interactive exploration of attention mechanism matrix sizes and their relationsh
 
 ---
 
+### 🔍 LoRA: Low-Rank Adaptation Mathematics **[NEW SERIES]**
+**File:** `lora-tutorial.html`
+
+Complete mathematical foundation of Low-Rank Adaptation - the breakthrough technique for efficient fine-tuning:
+- **LoRA core equation** - W = W₀ + BA with step-by-step derivation
+- **Interactive parameter calculator** - real-time memory savings and parameter reduction
+- **Matrix decomposition visualizer** - see how low-rank approximation works
+- **Layer targeting strategies** - which layers to adapt (Q,K,V vs FFN analysis)
+- **Rank selection guidance** - optimal rank for different model sizes and tasks
+- **Real model examples** - LLaMA, Mistral, Mixtral with actual specifications
+- **Production deployment** - multi-tenant serving and adapter swapping
+
+**Key Concepts:** Low-rank decomposition, parameter efficiency, rank selection, adapter strategies
+
+---
+
+### 🎛️ Full Fine-tuning vs LoRA: Complete Comparison **[NEW SERIES]**
+**File:** `finetuning-comparison.html`
+
+Master the complete spectrum of fine-tuning approaches - from full parameter updates to efficient adaptation:
+- **Mathematical comparison** - full update equations vs selective LoRA updates
+- **Interactive layer freezing** - strategic freezing for balanced efficiency/performance
+- **Catastrophic forgetting analysis** - risk assessment and mitigation strategies
+- **Memory & cost calculator** - real hardware requirements and cloud costs
+- **Decision framework** - smart advisor for choosing optimal approach
+- **Training speed analysis** - time and efficiency comparisons
+- **Production strategies** - multi-task serving and deployment patterns
+
+**Key Concepts:** Full fine-tuning mathematics, layer freezing, catastrophic forgetting, resource optimization
+
+---
+
+### 🚀 Advanced PEFT: QLoRA, DoRA & Modern Techniques **[NEW SERIES]**
+**File:** `advanced-peft.html`
+
+Cutting-edge Parameter-Efficient Fine-Tuning techniques for maximum efficiency:
+- **QLoRA deep dive** - 4-bit quantization + LoRA mathematics
+- **DoRA analysis** - Weight-Decomposed Low-Rank Adaptation
+- **AdaLoRA** - adaptive rank allocation during training
+- **Modern optimizations** - LoRA+, Delta-LoRA, and latest research
+- **Quantization strategies** - INT8, INT4, and mixed-precision approaches
+- **Production deployment** - serving quantized models efficiently
+- **Performance benchmarks** - comprehensive comparison across techniques
+
+**Key Concepts:** Quantization mathematics, advanced PEFT, deployment optimization, cutting-edge research
+
+---
+
 ### 🌀 RoPE: Rotary Position Embedding
 **File:** `rope-tutorial.html`
 
@@ -146,6 +194,9 @@ visual-ai-tutorials/
 ├── transformer-basics.html            # Transformer basics tutorial [NEW]
 ├── architecture-comparison.html       # Architecture comparison tutorial [NEW]
 ├── qkv-matrices.html                  # Q,K,V matrix tutorial  
+├── lora-tutorial.html                 # LoRA mathematics tutorial [NEW SERIES]
+├── finetuning-comparison.html         # Full fine-tuning vs LoRA [NEW SERIES]
+├── advanced-peft.html                 # Advanced PEFT techniques [NEW SERIES]
 ├── rope-tutorial.html                 # RoPE tutorial
 ├── complete-attention-mechanism.html  # Complete attention mechanism
 ├── attention-evolution.html           # Attention mechanisms evolution
@@ -157,10 +208,11 @@ visual-ai-tutorials/
 
 ## 🎯 Target Audience
 
-- **AI/ML Engineers** learning transformer internals
-- **Researchers** studying attention mechanisms and position encoding
+- **AI/ML Engineers** learning transformer internals and fine-tuning strategies
+- **Researchers** studying attention mechanisms, PEFT techniques, and position encoding
 - **Students** in NLP/deep learning courses
-- **Developers** working with LLMs who want to understand the underlying math
+- **Developers** working with LLMs who want to understand underlying mathematics
+- **Practitioners** fine-tuning models for production deployment
 - **Anyone curious** about how modern AI models like GPT, Claude, and Gemini work
 
 ## ✨ Features
@@ -171,13 +223,7 @@ visual-ai-tutorials/
 - **📊 Real Model Data** - Architecture specs from production models
 - **🎛️ Configurable Examples** - Adjust parameters to see immediate effects
 - **📚 Educational Focus** - Designed for learning, not just reference
-
-## 🛠️ Technology Stack
-
-- **Pure HTML/CSS/JavaScript** - No frameworks, works anywhere
-- **Interactive calculations** - Real-time mathematical demonstrations
-- **Responsive design** - Mobile-friendly layouts
-- **GitHub Pages ready** - Deploy with zero configuration
+- **💻 Production Ready** - Deployment strategies and resource planning
 
 ## 🚀 Getting Started
 
@@ -207,12 +253,16 @@ Simply visit the [live demo](https://profitmonk.github.io/visual-ai-tutorials/) 
 - **Concrete Examples**: Real token sequences, actual memory calculations, exact FLOP counts
 - **Progressive Complexity**: Build understanding step-by-step
 - **Performance Analysis**: Memory usage, bandwidth requirements, computational bottlenecks
+- **Production Focus**: Real deployment strategies and resource planning
 
 ### 🎓 Learning Outcomes
 
 After completing these tutorials, you'll understand:
 - **Foundation**: Why transformers revolutionized AI and how they work fundamentally
 - **Architecture Design**: How different companies approach LLM architecture and trade-offs
+- **Fine-tuning Mastery**: Complete spectrum from full fine-tuning to advanced PEFT techniques
+- **LoRA Mathematics**: Low-rank decomposition, parameter efficiency, and optimal strategies
+- **Resource Optimization**: Memory, compute, and cost analysis for production deployment
 - How RoPE encodes position through rotation mathematics
 - Why attention matrices scale quadratically with sequence length  
 - How model dimensions affect memory and computation requirements
@@ -231,15 +281,25 @@ After completing these tutorials, you'll understand:
 
 **For maximum understanding, follow this order:**
 
+### **🏛️ Foundation Phase**
 1. **🏗️ Transformer Basics** - Understand the revolutionary breakthrough and foundation
 2. **📊 Architecture Comparison** - Learn how modern LLMs differ and why
 3. **🎯 Q, K, V Matrix Dimensions** - Understand the basic building blocks
 4. **🌀 RoPE: Rotary Position Embedding** - Learn how position is encoded  
+
+### **⚡ Core Mechanisms Phase**
 5. **⚡ Complete Attention Mechanism** - See how Q, K, V work together
 6. **🔄 Attention Mechanisms Evolution** - Learn memory optimization and scaling techniques
 7. **🚀 Text Generation Process** - Complete pipeline from attention to tokens
-8. **🎯 Mixture of Experts** - Advanced scaling through sparse computation
-9. **📊 Context Length Impact** - Advanced concepts about training vs inference
+
+### **🔧 Fine-tuning Mastery Phase**
+8. **🔍 LoRA Mathematics** - Master the most popular PEFT technique
+9. **🎛️ Full Fine-tuning vs LoRA** - Complete comparison and decision framework
+10. **🚀 Advanced PEFT** - Cutting-edge techniques (QLoRA, DoRA, etc.)
+
+### **🚀 Advanced Topics Phase**
+11. **🎯 Mixture of Experts** - Advanced scaling through sparse computation
+12. **📊 Context Length Impact** - Advanced concepts about training vs inference
 
 ## 🤝 Contributing
 
@@ -258,16 +318,17 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 🙏 Acknowledgments
 
-- Built with educational focus to demystify transformer architecture
+- Built with educational focus to demystify transformer architecture and fine-tuning
 - Inspired by the need for visual, interactive explanations of complex AI concepts
 - Mathematical content based on original research papers and production model specifications
+- Fine-tuning tutorials address the practical gap between theory and implementation
 
 ## 📞 Contact
 
 - **GitHub Issues**: For bugs, feature requests, or questions
-- **Discussions**: For general questions about transformer architecture
+- **Discussions**: For general questions about transformer architecture and fine-tuning
 - **Pull Requests**: For contributions
 
 ---
 
-**⭐ Star this repository if these tutorials helped you understand transformers better!**
+**⭐ Star this repository if these tutorials helped you understand transformers and fine-tuning better!**
