@@ -1,0 +1,1924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Fine-tuning vs LoRA: Complete Comparison</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background: #ffffff;
+            color: #2d2d2d;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-bar {
+            background: #2d2d2d;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-home {
+            background: #ffffff;
+            color: #2d2d2d;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-home:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border-left: 4px solid #2d2d2d;
+        }
+        
+        .example-box {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            border: 1px solid #4a4a4a;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        button {
+            background: #2d2d2d;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #2d2d2d;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .danger {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #2d2d2d;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .winner {
+            background: #d4edda;
+            font-weight: bold;
+        }
+        
+        .moderate {
+            background: #fff3cd;
+        }
+        
+        .poor {
+            background: #f8d7da;
+        }
+        
+        .math-formula {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .method-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .method-card:hover {
+            border-color: #2d2d2d;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .method-card.selected {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .method-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .method-icon {
+            font-size: 3em;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .parameter-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        
+        .parameter-highlight {
+            background: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: #2d2d2d;
+        }
+        
+        .savings-display {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .cost-display {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .interactive-demo {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .demo-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #2d2d2d;
+        }
+        
+        .layer-freezing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .layer-block {
+            background: #2d2d2d;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .layer-block.frozen {
+            background: #6c757d;
+            opacity: 0.6;
+        }
+        
+        .layer-block.trainable {
+            background: #28a745;
+        }
+        
+        .layer-block:hover {
+            transform: scale(1.05);
+        }
+        
+        .forgetting-chart {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .chart-bar {
+            display: inline-block;
+            width: 40px;
+            background: linear-gradient(to top, #dc3545, #fd7e14);
+            margin: 0 5px;
+            border-radius: 4px;
+            position: relative;
+            vertical-align: bottom;
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .decision-matrix {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .decision-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .decision-card:hover {
+            border-color: #2d2d2d;
+            transform: translateY(-3px);
+        }
+        
+        .decision-card.recommended {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">🎛️ Full Fine-tuning vs LoRA: Complete Comparison</div>
+        <a href="index.html" class="nav-home">🏠 Home</a>
+    </div>
+
+    <div class="container">
+        <h1>🎛️ Full Fine-tuning vs LoRA: Complete Comparison</h1>
+        <p>Master the complete spectrum of fine-tuning approaches - from full parameter updates to efficient adaptation. Learn when to use each method, understand the trade-offs, and make informed decisions for your specific use case.</p>
+        
+        <div class="info">
+            <strong>🎯 What You'll Master:</strong> Full fine-tuning mathematics, strategic layer freezing, catastrophic forgetting prevention, resource optimization, and an intelligent decision framework to choose the optimal approach for any scenario.
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>⚖️ The Fundamental Trade-off: Performance vs Efficiency</h2>
+        
+        <div class="comparison-grid">
+            <div class="method-card" onclick="selectMethod('full')" id="fullMethod">
+                <div class="method-icon">🔥</div>
+                <div class="method-title">Full Fine-tuning</div>
+                <div class="parameter-box">
+                    <strong>Updates:</strong> All parameters<br>
+                    <strong>Memory:</strong> Very high<br>
+                    <strong>Performance:</strong> Maximum<br>
+                    <strong>Flexibility:</strong> Complete control
+                </div>
+            </div>
+            
+            <div class="method-card" onclick="selectMethod('lora')" id="loraMethod">
+                <div class="method-icon">⚡</div>
+                <div class="method-title">LoRA Fine-tuning</div>
+                <div class="parameter-box">
+                    <strong>Updates:</strong> Low-rank adapters<br>
+                    <strong>Memory:</strong> Very low<br>
+                    <strong>Performance:</strong> 95-99% of full<br>
+                    <strong>Flexibility:</strong> Efficient adaptation
+                </div>
+            </div>
+        </div>
+        
+        <div id="methodAnalysis"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔬 Mathematical Foundations</h2>
+        
+        <div class="step">
+            <h3>📐 Full Fine-tuning Mathematics</h3>
+            
+            <p>In full fine-tuning, <strong>every parameter</strong> in the model is updated using gradient descent:</p>
+            
+            <div class="math-formula">
+                <strong>Full Fine-tuning Update Rule:</strong><br><br>
+                θ<sub>t+1</sub> = θ<sub>t</sub> - η∇<sub>θ</sub>L(f(x; θ<sub>t</sub>), y)<br><br>
+                Where:<br>
+                θ ∈ ℝ<sup>N</sup> (all N parameters in the model)<br>
+                η = learning rate<br>
+                L = loss function<br>
+                f = model function<br><br>
+                <strong>Result:</strong> Every weight matrix W becomes W + ΔW
+            </div>
+            
+            <div class="warning">
+                <strong>💾 Memory Requirements:</strong> Full fine-tuning requires storing gradients and optimizer states for <em>every single parameter</em>, leading to massive memory consumption.
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>🔧 LoRA Mathematics Review</h3>
+            
+            <p>LoRA constrains updates to a low-rank subspace, dramatically reducing parameters:</p>
+            
+            <div class="math-formula">
+                <strong>LoRA Update Rule:</strong><br><br>
+                W<sub>new</sub> = W<sub>frozen</sub> + α(BA)<br><br>
+                Where:<br>
+                W ∈ ℝ<sup>d×d</sup> (original frozen weights)<br>
+                B ∈ ℝ<sup>d×r</sup>, A ∈ ℝ<sup>r×d</sup> (trainable adapters)<br>
+                r << d (low rank constraint)<br>
+                α = scaling factor<br><br>
+                <strong>Result:</strong> Only 2dr parameters updated vs d² for full
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>📊 Direct Mathematical Comparison</h3>
+            
+            <div class="interactive-demo">
+                <div class="demo-title">🧮 Mathematical Comparison Calculator</div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label><strong>Model:</strong></label>
+                        <select id="comparisonModel">
+                            <option value="llama2-7b">LLaMA-2 7B</option>
+                            <option value="llama2-13b" selected>LLaMA-2 13B</option>
+                            <option value="llama2-70b">LLaMA-2 70B</option>
+                            <option value="mistral-7b">Mistral 7B</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>LoRA Rank:</strong></label>
+                        <input type="range" id="comparisonRank" min="8" max="256" value="32" step="8">
+                        <span id="comparisonRankValue">32</span>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>Batch Size:</strong></label>
+                        <input type="range" id="comparisonBatch" min="1" max="8" value="2" step="1">
+                        <span id="comparisonBatchValue">2</span>
+                    </div>
+                </div>
+                
+                <button onclick="compareApproaches()">⚖️ Compare Approaches</button>
+                <div id="comparisonResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧊 Strategic Layer Freezing: The Middle Ground</h2>
+        
+        <div class="step">
+            <h3>🎯 Understanding Layer Freezing Strategy</h3>
+            
+            <p>Layer freezing offers a middle ground between full fine-tuning and LoRA - selectively updating only certain parts of the model:</p>
+            
+            <div class="interactive-demo">
+                <div class="demo-title">❄️ Interactive Layer Freezing Explorer</div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label><strong>Freezing Strategy:</strong></label>
+                        <select id="freezingStrategy" onchange="updateLayerVisualization()">
+                            <option value="embeddings">Freeze Embeddings Only</option>
+                            <option value="early-layers">Freeze Early Layers (1-8)</option>
+                            <option value="attention-only" selected>Train Attention Only</option>
+                            <option value="late-layers">Train Late Layers Only</option>
+                            <option value="alternating">Alternating Layers</option>
+                            <option value="custom">Custom Strategy</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>Model Layers:</strong></label>
+                        <input type="range" id="totalLayers" min="12" max="80" value="32" step="4" onchange="updateLayerVisualization()">
+                        <span id="totalLayersValue">32</span>
+                    </div>
+                </div>
+                
+                <div class="layer-freezing-grid" id="layerGrid"></div>
+                
+                <div class="controls">
+                    <button onclick="analyzeFreezingStrategy()">📊 Analyze Strategy</button>
+                    <button onclick="resetLayers()">🔄 Reset Layers</button>
+                </div>
+                
+                <div id="freezingAnalysis"></div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>📈 Layer Freezing Guidelines</h3>
+            
+            <table>
+                <tr>
+                    <th>Strategy</th>
+                    <th>What to Freeze</th>
+                    <th>What to Train</th>
+                    <th>Best For</th>
+                    <th>Memory Savings</th>
+                </tr>
+                <tr>
+                    <td><strong>Conservative</strong></td>
+                    <td>Embeddings + Early layers</td>
+                    <td class="winner">Late layers + Output</td>
+                    <td>Similar domain tasks</td>
+                    <td class="moderate">30-50%</td>
+                </tr>
+                <tr>
+                    <td><strong>Attention-Only</strong></td>
+                    <td>All FFN layers</td>
+                    <td class="winner">All attention layers</td>
+                    <td>Task-specific adaptation</td>
+                    <td class="winner">60-70%</td>
+                </tr>
+                <tr>
+                    <td><strong>Aggressive</strong></td>
+                    <td>First 75% of layers</td>
+                    <td class="winner">Final 25% layers</td>
+                    <td>Fine-grained control</td>
+                    <td class="winner">70-85%</td>
+                </tr>
+                <tr>
+                    <td><strong>Selective</strong></td>
+                    <td>Task-dependent analysis</td>
+                    <td class="winner">Critical layers only</td>
+                    <td>Expert optimization</td>
+                    <td class="moderate">Variable</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧠 Catastrophic Forgetting: The Hidden Danger</h2>
+        
+        <div class="step">
+            <h3>⚠️ Understanding Catastrophic Forgetting</h3>
+            
+            <p>When models learn new tasks, they can forget previous knowledge. The severity depends on how much of the model you update:</p>
+            
+            <div class="interactive-demo">
+                <div class="demo-title">📉 Catastrophic Forgetting Simulator</div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label><strong>Fine-tuning Method:</strong></label>
+                        <select id="forgettingMethod" onchange="simulateForgetting()">
+                            <option value="full">Full Fine-tuning</option>
+                            <option value="layer-freeze">Layer Freezing (50%)</option>
+                            <option value="attention-only">Attention Only</option>
+                            <option value="lora-low" selected>LoRA (r=16)</option>
+                            <option value="lora-high">LoRA (r=128)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>Learning Rate:</strong></label>
+                        <input type="range" id="forgettingLR" min="1" max="50" value="20" step="1" onchange="simulateForgetting()">
+                        <span id="forgettingLRValue">2e-4</span>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>Training Steps:</strong></label>
+                        <input type="range" id="forgettingSteps" min="100" max="5000" value="1000" step="100" onchange="simulateForgetting()">
+                        <span id="forgettingStepsValue">1000</span>
+                    </div>
+                </div>
+                
+                <div class="forgetting-chart" id="forgettingChart"></div>
+                
+                <div id="forgettingAnalysis"></div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>🛡️ Catastrophic Forgetting Prevention</h3>
+            
+            <div class="comparison-grid">
+                <div class="method-card">
+                    <div class="method-title">🔒 Parameter Regularization</div>
+                    <div class="parameter-box">
+                        <strong>Method:</strong> L2 penalty on parameter changes<br>
+                        <strong>Formula:</strong> L_total = L_task + λ||θ - θ₀||²<br>
+                        <strong>Best For:</strong> Full fine-tuning<br>
+                        <strong>Effectiveness:</strong> Moderate
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-title">🧊 Selective Freezing</div>
+                    <div class="parameter-box">
+                        <strong>Method:</strong> Keep critical layers frozen<br>
+                        <strong>Formula:</strong> Update only subset S: θₛ ← θₛ - η∇θₛL<br>
+                        <strong>Best For:</strong> Domain adaptation<br>
+                        <strong>Effectiveness:</strong> High
+                    </div>
+                </div>
+            </div>
+            
+            <div class="comparison-grid">
+                <div class="method-card">
+                    <div class="method-title">⚡ Low-Rank Adaptation</div>
+                    <div class="parameter-box">
+                        <strong>Method:</strong> Constrain updates to low-rank space<br>
+                        <strong>Formula:</strong> W_new = W₀ + BA (r << d)<br>
+                        <strong>Best For:</strong> Task-specific adaptation<br>
+                        <strong>Effectiveness:</strong> Very High
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-title">📚 Continual Learning</div>
+                    <div class="parameter-box">
+                        <strong>Method:</strong> Replay or rehearsal mechanisms<br>
+                        <strong>Formula:</strong> Mixed training on old + new data<br>
+                        <strong>Best For:</strong> Multi-task scenarios<br>
+                        <strong>Effectiveness:</strong> Variable
+                    </div>
+                </div>
+            </div>
+            
+            <div class="success">
+                <strong>💡 Key Insight:</strong> LoRA's low-rank constraint naturally prevents catastrophic forgetting by limiting the magnitude of updates to the original model weights. This is why LoRA often maintains base model performance while adapting to new tasks.
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>💰 Resource Cost Analysis</h2>
+        
+        <div class="interactive-demo">
+            <div class="demo-title">💻 Complete Cost Calculator</div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label><strong>Model Size:</strong></label>
+                    <select id="costModel">
+                        <option value="7b">7B Parameters</option>
+                        <option value="13b" selected>13B Parameters</option>
+                        <option value="70b">70B Parameters</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>Hardware:</strong></label>
+                    <select id="costHardware">
+                        <option value="rtx4090">RTX 4090 ($1.5/hr)</option>
+                        <option value="a100" selected>A100 40GB ($2.5/hr)</option>
+                        <option value="h100">H100 80GB ($4.0/hr)</option>
+                        <option value="multi-a100">8×A100 ($20/hr)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>Training Duration:</strong></label>
+                    <input type="range" id="costDuration" min="1" max="72" value="8" step="1">
+                    <span id="costDurationValue">8</span> hours
+                </div>
+                <div class="control-group">
+                    <label><strong>Cloud Provider:</strong></label>
+                    <select id="costProvider">
+                        <option value="aws" selected>AWS (standard pricing)</option>
+                        <option value="gcp">Google Cloud (10% discount)</option>
+                        <option value="azure">Azure (5% discount)</option>
+                        <option value="runpod">RunPod (30% discount)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="calculateCosts()">💰 Calculate Training Costs</button>
+            <div id="costResults"></div>
+        </div>
+        
+        <div class="step">
+            <h3>📊 Real-World Cost Comparison</h3>
+            
+            <table>
+                <tr>
+                    <th>Model</th>
+                    <th>Full Fine-tuning</th>
+                    <th>Layer Freezing</th>
+                    <th>LoRA (r=32)</th>
+                    <th>Savings</th>
+                </tr>
+                <tr>
+                    <td><strong>LLaMA-2 7B</strong></td>
+                    <td class="poor">$120-200</td>
+                    <td class="moderate">$60-100</td>
+                    <td class="winner">$20-40</td>
+                    <td class="winner">80-85%</td>
+                </tr>
+                <tr>
+                    <td><strong>LLaMA-2 13B</strong></td>
+                    <td class="poor">$200-350</td>
+                    <td class="moderate">$100-180</td>
+                    <td class="winner">$40-70</td>
+                    <td class="winner">80-85%</td>
+                </tr>
+                <tr>
+                    <td><strong>LLaMA-2 70B</strong></td>
+                    <td class="poor">$800-1500</td>
+                    <td class="moderate">$400-800</td>
+                    <td class="winner">$150-300</td>
+                    <td class="winner">80-85%</td>
+                </tr>
+            </table>
+            
+            <div class="info">
+                <strong>💡 Cost Factors:</strong><br>
+                • <strong>Compute:</strong> Hardware rental costs (60-80% of total)<br>
+                • <strong>Storage:</strong> Model checkpoints and datasets (10-15%)<br>
+                • <strong>Bandwidth:</strong> Data transfer and model downloads (5-10%)<br>
+                • <strong>Engineering:</strong> Setup and monitoring time (15-25%)
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Intelligent Decision Framework</h2>
+        
+        <div class="interactive-demo">
+            <div class="demo-title">🧠 Smart Fine-tuning Advisor</div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label><strong>Task Type:</strong></label>
+                    <select id="advisorTask">
+                        <option value="classification">Classification</option>
+                        <option value="generation" selected>Text Generation</option>
+                        <option value="qa">Question Answering</option>
+                        <option value="summarization">Summarization</option>
+                        <option value="translation">Translation</option>
+                        <option value="reasoning">Reasoning</option>
+                        <option value="creative">Creative Writing</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>Dataset Size:</strong></label>
+                    <select id="advisorData">
+                        <option value="small">Small (<1K examples)</option>
+                        <option value="medium" selected>Medium (1K-100K)</option>
+                        <option value="large">Large (100K-1M)</option>
+                        <option value="massive">Massive (>1M)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>Domain Similarity:</strong></label>
+                    <select id="advisorDomain">
+                        <option value="same">Same Domain</option>
+                        <option value="similar" selected>Similar Domain</option>
+                        <option value="different">Different Domain</option>
+                        <option value="specialized">Highly Specialized</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>Budget Constraint:</strong></label>
+                    <select id="advisorBudget">
+                        <option value="tight">Very Tight (<$100)</option>
+                        <option value="moderate" selected>Moderate ($100-500)</option>
+                        <option value="flexible">Flexible ($500-2000)</option>
+                        <option value="unlimited">No Limit (>$2000)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label><strong>Performance Requirement:</strong></label>
+                    <select id="advisorPerformance">
+                        <option value="good">Good Enough (85-90%)</option>
+                        <option value="high" selected>High Performance (90-95%)</option>
+                        <option value="maximum">Maximum (95-100%)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="getRecommendation()">🎯 Get Recommendation</button>
+            <div id="recommendationResults"></div>
+        </div>
+        
+        <div class="step">
+            <h3>📋 Quick Decision Matrix</h3>
+            
+            <div class="decision-matrix">
+                <div class="decision-card" onclick="showScenario('prototype')">
+                    <div class="method-title">🚀 Prototype/Research</div>
+                    <div class="parameter-box">
+                        <strong>Best Choice:</strong> LoRA (r=16-32)<br>
+                        <strong>Why:</strong> Fast iteration, low cost<br>
+                        <strong>Trade-off:</strong> Good enough performance
+                    </div>
+                </div>
+                
+                <div class="decision-card" onclick="showScenario('production')">
+                    <div class="method-title">🏭 Production System</div>
+                    <div class="parameter-box">
+                        <strong>Best Choice:</strong> Full or High-rank LoRA<br>
+                        <strong>Why:</strong> Maximum performance<br>
+                        <strong>Trade-off:</strong> Higher costs justified
+                    </div>
+                </div>
+                
+                <div class="decision-card" onclick="showScenario('multi-task')">
+                    <div class="method-title">🎭 Multi-task Serving</div>
+                    <div class="parameter-box">
+                        <strong>Best Choice:</strong> Multiple LoRA adapters<br>
+                        <strong>Why:</strong> Efficient task switching<br>
+                        <strong>Trade-off:</strong> Complexity in serving
+                    </div>
+                </div>
+            </div>
+            
+            <div id="scenarioDetails"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>⚡ Training Speed & Efficiency Analysis</h2>
+        
+        <div class="step">
+            <h3>🏃‍♂️ Training Speed Comparison</h3>
+            
+            <div class="interactive-demo">
+                <div class="demo-title">⏱️ Speed Benchmark Simulator</div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label><strong>Model:</strong></label>
+                        <select id="speedModel">
+                            <option value="7b">7B Model</option>
+                            <option value="13b" selected>13B Model</option>
+                            <option value="70b">70B Model</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>Hardware:</strong></label>
+                        <select id="speedHardware">
+                            <option value="single-gpu">Single A100</option>
+                            <option value="multi-gpu" selected>4×A100</option>
+                            <option value="cluster">8×H100</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>Sequence Length:</strong></label>
+                        <input type="range" id="speedSeqLen" min="512" max="4096" value="2048" step="512">
+                        <span id="speedSeqLenValue">2048</span>
+                    </div>
+                </div>
+                
+                <button onclick="benchmarkSpeed()">⚡ Run Speed Benchmark</button>
+                <div id="speedResults"></div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>🔋 Memory Efficiency Breakdown</h3>
+            
+            <div class="parameter-box">
+                <strong>Full Fine-tuning Memory Usage:</strong><br>
+                • <span class="parameter-highlight">Model Weights:</span> 100% (base memory)<br>
+                • <span class="parameter-highlight">Gradients:</span> 100% (same as weights)<br>
+                • <span class="parameter-highlight">Optimizer States:</span> 200% (Adam momentum + variance)<br>
+                • <span class="parameter-highlight">Activations:</span> 50-100% (depends on batch size)<br>
+                • <span class="parameter-highlight">Total:</span> 450-500% of model size
+            </div>
+            
+            <div class="parameter-box">
+                <strong>LoRA Memory Usage:</strong><br>
+                • <span class="parameter-highlight">Frozen Weights:</span> 100% (no gradients needed)<br>
+                • <span class="parameter-highlight">LoRA Gradients:</span> 1-5% (only adapters)<br>
+                • <span class="parameter-highlight">LoRA Optimizer:</span> 2-10% (adapter states only)<br>
+                • <span class="parameter-highlight">Activations:</span> 50-100% (same as full)<br>
+                • <span class="parameter-highlight">Total:</span> 153-215% of model size
+            </div>
+            
+            <div class="savings-display">
+                💾 LoRA Memory Savings: 2-3× less memory required!
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎭 Advanced Techniques & Hybrid Approaches</h2>
+        
+        <div class="step">
+            <h3>🔀 Hybrid Fine-tuning Strategies</h3>
+            
+            <table>
+                <tr>
+                    <th>Technique</th>
+                    <th>Approach</th>
+                    <th>Memory</th>
+                    <th>Performance</th>
+                    <th>Complexity</th>
+                </tr>
+                <tr>
+                    <td><strong>Staged Training</strong></td>
+                    <td>LoRA → Full fine-tuning</td>
+                    <td class="moderate">Medium</td>
+                    <td class="winner">Excellent</td>
+                    <td class="moderate">Medium</td>
+                </tr>
+                <tr>
+                    <td><strong>Adaptive Freezing</strong></td>
+                    <td>Gradual unfreezing during training</td>
+                    <td class="winner">Low→High</td>
+                    <td class="winner">Excellent</td>
+                    <td class="poor">High</td>
+                </tr>
+                <tr>
+                    <td><strong>Mixed Precision LoRA</strong></td>
+                    <td>Different ranks for different layers</td>
+                    <td class="winner">Very Low</td>
+                    <td class="moderate">Good</td>
+                    <td class="moderate">Medium</td>
+                </tr>
+                <tr>
+                    <td><strong>Dynamic LoRA</strong></td>
+                    <td>Rank adaptation during training</td>
+                    <td class="winner">Low</td>
+                    <td class="winner">Very Good</td>
+                    <td class="poor">High</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="step">
+            <h3>🎯 Production Deployment Patterns</h3>
+            
+            <div class="comparison-grid">
+                <div class="method-card">
+                    <div class="method-title">🔄 Hot-swappable LoRA</div>
+                    <div class="parameter-box">
+                        <strong>Use Case:</strong> Multi-tenant systems<br>
+                        <strong>Benefits:</strong> One base model, many tasks<br>
+                        <strong>Implementation:</strong> Runtime adapter loading<br>
+                        <strong>Memory:</strong> Base + single adapter active
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-title">🎪 Ensemble LoRA</div>
+                    <div class="parameter-box">
+                        <strong>Use Case:</strong> Maximum performance<br>
+                        <strong>Benefits:</strong> Multiple specializations<br>
+                        <strong>Implementation:</strong> Weighted combination<br>
+                        <strong>Memory:</strong> Base + multiple adapters
+                    </div>
+                </div>
+            </div>
+            
+            <div class="comparison-grid">
+                <div class="method-card">
+                    <div class="method-title">⚡ Merged Deployment</div>
+                    <div class="parameter-box">
+                        <strong>Use Case:</strong> Single-task optimization<br>
+                        <strong>Benefits:</strong> No runtime overhead<br>
+                        <strong>Implementation:</strong> Merge LoRA into weights<br>
+                        <strong>Memory:</strong> Same as original model
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <div class="method-title">🌊 Batched LoRA</div>
+                    <div class="parameter-box">
+                        <strong>Use Case:</strong> High throughput serving<br>
+                        <strong>Benefits:</strong> Multiple tasks per batch<br>
+                        <strong>Implementation:</strong> Specialized kernels<br>
+                        <strong>Memory:</strong> Complex but efficient
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📊 Real-World Case Studies</h2>
+        
+        <div class="step">
+            <h3>🏆 Success Stories & Lessons Learned</h3>
+            
+            <div class="example-box">
+                <strong>📚 Case Study 1: Legal Document Analysis</strong><br>
+                • <strong>Task:</strong> Contract classification and entity extraction<br>
+                • <strong>Model:</strong> LLaMA-2 13B<br>
+                • <strong>Approach:</strong> LoRA (r=64) on Q,V,O layers<br>
+                • <strong>Dataset:</strong> 50K annotated legal documents<br>
+                • <strong>Results:</strong> 97% of full fine-tuning performance<br>
+                • <strong>Cost:</strong> $150 vs $800 for full fine-tuning<br>
+                • <strong>Time:</strong> 6 hours vs 48 hours<br><br>
+                
+                <strong>🩺 Case Study 2: Medical Question Answering</strong><br>
+                • <strong>Task:</strong> Clinical QA with safety constraints<br>
+                • <strong>Model:</strong> Mistral 7B<br>
+                • <strong>Approach:</strong> Conservative layer freezing (train last 8 layers)<br>
+                • <strong>Dataset:</strong> 25K medical Q&A pairs<br>
+                • <strong>Results:</strong> 94% accuracy, preserved safety guardrails<br>
+                • <strong>Cost:</strong> $200 vs $500 for full fine-tuning<br>
+                • <strong>Key Learning:</strong> Catastrophic forgetting prevention crucial<br><br>
+                
+                <strong>🌍 Case Study 3: Multi-language Support</strong><br>
+                • <strong>Task:</strong> Customer support in 12 languages<br>
+                • <strong>Model:</strong> LLaMA-2 70B<br>
+                • <strong>Approach:</strong> 12 separate LoRA adapters (r=32 each)<br>
+                • <strong>Dataset:</strong> 10K examples per language<br>
+                • <strong>Results:</strong> Language-specific performance gains<br>
+                • <strong>Deployment:</strong> Hot-swappable adapters (50ms switch time)<br>
+                • <strong>Storage:</strong> 12 × 200MB vs 12 × 140GB full models
+            </div>
+        </div>
+        
+        <div class="success">
+            <strong>🎯 Key Takeaways from Production:</strong><br>
+            • <strong>LoRA Dominates:</strong> 80%+ of production fine-tuning uses LoRA or variants<br>
+            • <strong>Rank Sweet Spot:</strong> r=32-64 offers best performance/efficiency balance<br>
+            • <strong>Layer Selection Matters:</strong> Q,V targeting gives 90% of full attention benefits<br>
+            • <strong>Cost Factor:</strong> LoRA reduces fine-tuning costs by 3-10×<br>
+            • <strong>Deployment Flexibility:</strong> Multiple adapters enable multi-task systems<br>
+            • <strong>Quality Control:</strong> LoRA naturally prevents catastrophic forgetting
+        </div>
+    </div>
+
+    <script>
+        // Model specifications for calculations
+        const modelSpecs = {
+            'llama2-7b': { 
+                params: 7e9, 
+                hiddenSize: 4096, 
+                numLayers: 32, 
+                attentionParams: 0.3,
+                ffnParams: 0.6,
+                embedParams: 0.1 
+            },
+            'llama2-13b': { 
+                params: 13e9, 
+                hiddenSize: 5120, 
+                numLayers: 40, 
+                attentionParams: 0.3,
+                ffnParams: 0.6,
+                embedParams: 0.1 
+            },
+            'llama2-70b': { 
+                params: 70e9, 
+                hiddenSize: 8192, 
+                numLayers: 80, 
+                attentionParams: 0.3,
+                ffnParams: 0.6,
+                embedParams: 0.1 
+            },
+            'mistral-7b': { 
+                params: 7e9, 
+                hiddenSize: 4096, 
+                numLayers: 32, 
+                attentionParams: 0.3,
+                ffnParams: 0.6,
+                embedParams: 0.1 
+            }
+        };
+
+        const hardwareSpecs = {
+            'rtx4090': { vram: 24, costPerHour: 1.5, name: 'RTX 4090' },
+            'a100': { vram: 40, costPerHour: 2.5, name: 'A100 40GB' },
+            'h100': { vram: 80, costPerHour: 4.0, name: 'H100 80GB' },
+            'multi-a100': { vram: 320, costPerHour: 20.0, name: '8×A100' }
+        };
+
+        function updateSliders() {
+            document.getElementById('comparisonRankValue').textContent = document.getElementById('comparisonRank').value;
+            document.getElementById('comparisonBatchValue').textContent = document.getElementById('comparisonBatch').value;
+            document.getElementById('totalLayersValue').textContent = document.getElementById('totalLayers').value;
+            document.getElementById('costDurationValue').textContent = document.getElementById('costDuration').value;
+            document.getElementById('speedSeqLenValue').textContent = document.getElementById('speedSeqLen').value;
+            
+            // Update learning rate display
+            const lrSlider = document.getElementById('forgettingLR');
+            const lrDisplay = document.getElementById('forgettingLRValue');
+            if (lrSlider && lrDisplay) {
+                const lrValue = (parseFloat(lrSlider.value) / 10000).toExponential(0);
+                lrDisplay.textContent = lrValue;
+            }
+            
+            document.getElementById('forgettingStepsValue').textContent = document.getElementById('forgettingSteps').value;
+        }
+
+        function selectMethod(method) {
+            // Remove selection from both methods
+            document.querySelectorAll('.method-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked method
+            document.getElementById(method + 'Method').classList.add('selected');
+            
+            const methodInfo = {
+                'full': {
+                    name: 'Full Fine-tuning',
+                    description: 'Updates every parameter in the model using standard gradient descent',
+                    pros: ['Maximum adaptation capability', 'Complete model customization', 'Best possible performance', 'Full control over all layers'],
+                    cons: ['Very high memory requirements', 'Risk of catastrophic forgetting', 'Expensive training costs', 'Slow training iterations'],
+                    bestFor: 'Domain-specific models, maximum performance requirements, abundant compute resources'
+                },
+                'lora': {
+                    name: 'LoRA Fine-tuning', 
+                    description: 'Updates only low-rank adapter matrices while keeping base model frozen',
+                    pros: ['Extremely memory efficient', 'Fast training iterations', 'Multiple adapters possible', 'Prevents catastrophic forgetting'],
+                    cons: ['Slightly lower performance ceiling', 'Requires rank tuning', 'Limited to linear layers', 'Additional implementation complexity'],
+                    bestFor: 'Resource-constrained environments, multi-task systems, rapid prototyping'
+                }
+            };
+            
+            const info = methodInfo[method];
+            const html = `
+                <div class="step">
+                    <h4>📋 ${info.name} Analysis</h4>
+                    <div class="parameter-box">
+                        <strong>Description:</strong> ${info.description}<br><br>
+                        <strong>Best For:</strong> ${info.bestFor}
+                    </div>
+                    
+                    <div class="comparison-grid">
+                        <div class="method-card winner">
+                            <div class="method-title">✅ Advantages</div>
+                            <ul>
+                                ${info.pros.map(pro => `<li>${pro}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="method-card poor">
+                            <div class="method-title">⚠️ Disadvantages</div>
+                            <ul>
+                                ${info.cons.map(con => `<li>${con}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('methodAnalysis').innerHTML = html;
+        }
+
+        function compareApproaches() {
+            const modelKey = document.getElementById('comparisonModel').value;
+            const rank = parseInt(document.getElementById('comparisonRank').value);
+            const batchSize = parseInt(document.getElementById('comparisonBatch').value);
+            
+            const spec = modelSpecs[modelKey];
+            if (!spec) return;
+            
+            // Full fine-tuning calculations
+            const fullParams = spec.params;
+            const fullMemoryBase = fullParams * 2 / (1024**3); // FP16 in GB
+            const fullMemoryOptim = fullMemoryBase * 2; // Adam states
+            const fullMemoryGrad = fullMemoryBase; // Gradients
+            const activationMemory = batchSize * 2048 * spec.hiddenSize * spec.numLayers * 4 / (1024**3);
+            const fullMemoryTotal = fullMemoryBase + fullMemoryOptim + fullMemoryGrad + activationMemory;
+            
+            // LoRA calculations (assume Q,V only = 50% of attention params)
+            const attentionParams = spec.params * spec.attentionParams * 0.5; // Q,V only
+            const loraParams = 2 * Math.sqrt(attentionParams) * rank * spec.numLayers; // Rough estimate
+            const loraMemoryAdapters = loraParams * 2 / (1024**3);
+            const loraMemoryOptim = loraMemoryAdapters * 2;
+            const loraMemoryTotal = fullMemoryBase + loraMemoryAdapters + loraMemoryOptim + activationMemory;
+            
+            // Cost estimates (using A100 pricing)
+            const fullTrainingTime = 48; // hours
+            const loraTrainingTime = 8; // hours
+            const hourlyRate = 2.5;
+            const fullCost = fullTrainingTime * hourlyRate;
+            const loraCost = loraTrainingTime * hourlyRate;
+            
+            // Performance estimates
+            const fullPerformance = 100;
+            const loraPerformance = Math.min(98, 85 + (rank / 256) * 13); // Rough estimate based on rank
+            
+            const html = `
+                <div class="step">
+                    <h4>⚖️ Complete Comparison: ${modelKey.toUpperCase()}</h4>
+                    
+                    <table>
+                        <tr><th>Metric</th><th>Full Fine-tuning</th><th>LoRA (r=${rank})</th><th>LoRA Advantage</th></tr>
+                        <tr>
+                            <td><strong>Trainable Parameters</strong></td>
+                            <td class="poor">${(fullParams / 1e9).toFixed(1)}B (100%)</td>
+                            <td class="winner">${(loraParams / 1e6).toFixed(1)}M (${((loraParams / fullParams) * 100).toFixed(2)}%)</td>
+                            <td class="winner">${(100 - (loraParams / fullParams) * 100).toFixed(1)}% fewer</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Memory Required</strong></td>
+                            <td class="poor">${fullMemoryTotal.toFixed(1)}GB</td>
+                            <td class="winner">${loraMemoryTotal.toFixed(1)}GB</td>
+                            <td class="winner">${(fullMemoryTotal - loraMemoryTotal).toFixed(1)}GB saved</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Training Time</strong></td>
+                            <td class="poor">${fullTrainingTime}h</td>
+                            <td class="winner">${loraTrainingTime}h</td>
+                            <td class="winner">${(fullTrainingTime / loraTrainingTime).toFixed(1)}× faster</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Training Cost</strong></td>
+                            <td class="poor">$${fullCost}</td>
+                            <td class="winner">$${loraCost}</td>
+                            <td class="winner">${((fullCost - loraCost) / fullCost * 100).toFixed(0)}% savings</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Expected Performance</strong></td>
+                            <td class="winner">${fullPerformance}%</td>
+                            <td class="moderate">${loraPerformance.toFixed(1)}%</td>
+                            <td class="${loraPerformance > 95 ? 'winner' : 'moderate'}">${(fullPerformance - loraPerformance).toFixed(1)}% gap</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Catastrophic Forgetting Risk</strong></td>
+                            <td class="poor">High</td>
+                            <td class="winner">Very Low</td>
+                            <td class="winner">Much safer</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="${loraCost < fullCost / 3 ? 'savings-display' : 'cost-display'}">
+                        💰 LoRA saves $${fullCost - loraCost} (${((fullCost - loraCost) / fullCost * 100).toFixed(0)}% cost reduction)
+                        with only ${(fullPerformance - loraPerformance).toFixed(1)}% performance gap!
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('comparisonResults').innerHTML = html;
+        }
+
+        function updateLayerVisualization() {
+            const strategy = document.getElementById('freezingStrategy').value;
+            const totalLayers = parseInt(document.getElementById('totalLayers').value);
+            
+            const grid = document.getElementById('layerGrid');
+            grid.innerHTML = '';
+            
+            // Create layer blocks
+            for (let i = 0; i < totalLayers; i++) {
+                const block = document.createElement('div');
+                block.className = 'layer-block';
+                block.textContent = `L${i + 1}`;
+                block.onclick = () => toggleLayer(block);
+                
+                // Apply strategy
+                let isTrainable = false;
+                switch(strategy) {
+                    case 'embeddings':
+                        isTrainable = i > 0; // All except embeddings
+                        break;
+                    case 'early-layers':
+                        isTrainable = i >= 8; // Train layers 9+
+                        break;
+                    case 'attention-only':
+                        isTrainable = true; // All layers, but only attention (conceptual)
+                        break;
+                    case 'late-layers':
+                        isTrainable = i >= totalLayers * 0.75; // Train last 25%
+                        break;
+                    case 'alternating':
+                        isTrainable = i % 2 === 1; // Train odd layers
+                        break;
+                    default:
+                        isTrainable = i >= totalLayers / 2; // Train second half
+                }
+                
+                block.classList.add(isTrainable ? 'trainable' : 'frozen');
+                grid.appendChild(block);
+            }
+        }
+
+        function toggleLayer(block) {
+            if (block.classList.contains('trainable')) {
+                block.classList.remove('trainable');
+                block.classList.add('frozen');
+            } else {
+                block.classList.remove('frozen');
+                block.classList.add('trainable');
+            }
+        }
+
+        function resetLayers() {
+            updateLayerVisualization();
+        }
+
+        function analyzeFreezingStrategy() {
+            const totalLayers = parseInt(document.getElementById('totalLayers').value);
+            const trainableBlocks = document.querySelectorAll('.layer-block.trainable');
+            const trainableLayers = trainableBlocks.length;
+            const frozenLayers = totalLayers - trainableLayers;
+            
+            const trainableRatio = trainableLayers / totalLayers;
+            const memorySaving = (1 - trainableRatio) * 70; // Rough estimate
+            const performanceImpact = trainableRatio < 0.3 ? 10 : trainableRatio < 0.7 ? 5 : 2;
+            
+            let recommendation = '';
+            if (trainableRatio < 0.2) {
+                recommendation = 'Very aggressive freezing - may lose adaptation capability';
+            } else if (trainableRatio < 0.5) {
+                recommendation = 'Conservative approach - good balance of efficiency and performance';
+            } else if (trainableRatio < 0.8) {
+                recommendation = 'Moderate freezing - maintains most capabilities';
+            } else {
+                recommendation = 'Minimal freezing - close to full fine-tuning';
+            }
+            
+            const html = `
+                <div class="step">
+                    <h4>📊 Layer Freezing Analysis</h4>
+                    
+                    <div class="parameter-box">
+                        <strong>Strategy Breakdown:</strong><br>
+                        • Trainable Layers: ${trainableLayers} / ${totalLayers} (${(trainableRatio * 100).toFixed(1)}%)<br>
+                        • Frozen Layers: ${frozenLayers} (${((1 - trainableRatio) * 100).toFixed(1)}%)<br>
+                        • Estimated Memory Savings: ${memorySaving.toFixed(0)}%<br>
+                        • Expected Performance Impact: -${performanceImpact}%
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${trainableRatio * 100}%">
+                            ${(trainableRatio * 100).toFixed(1)}% trainable
+                        </div>
+                    </div>
+                    
+                    <div class="${trainableRatio < 0.3 ? 'warning' : trainableRatio > 0.8 ? 'info' : 'success'}">
+                        <strong>Recommendation:</strong> ${recommendation}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('freezingAnalysis').innerHTML = html;
+        }
+
+        function simulateForgetting() {
+            const method = document.getElementById('forgettingMethod').value;
+            const lr = parseFloat(document.getElementById('forgettingLR').value) / 10000;
+            const steps = parseInt(document.getElementById('forgettingSteps').value);
+            
+            // Simulate forgetting based on method and parameters
+            const forgettingRates = {
+                'full': { initial: 95, finalMin: 60, rate: 0.008 },
+                'layer-freeze': { initial: 95, finalMin: 75, rate: 0.004 },
+                'attention-only': { initial: 95, finalMin: 80, rate: 0.003 },
+                'lora-low': { initial: 95, finalMin: 88, rate: 0.001 },
+                'lora-high': { initial: 95, finalMin: 85, rate: 0.0015 }
+            };
+            
+            const config = forgettingRates[method];
+            const lrMultiplier = Math.log10(lr * 10000) / 2; // Normalize learning rate effect
+            const stepsMultiplier = Math.log10(steps) / 4;
+            
+            // Calculate final performance
+            const forgettingAmount = config.rate * lrMultiplier * stepsMultiplier * 100;
+            const finalPerformance = Math.max(config.finalMin, config.initial - forgettingAmount);
+            const forgettingPercent = config.initial - finalPerformance;
+            
+            // Generate chart bars
+            const chartHTML = `
+                <div style="margin: 20px 0;">
+                    <h4>📉 Performance Retention Simulation</h4>
+                    <div style="display: flex; justify-content: space-around; align-items: end; height: 200px; margin: 20px 0;">
+                        ${generateChartBar('Original', 95, '#28a745')}
+                        ${generateChartBar('Step 100', Math.max(finalPerformance, config.initial - forgettingAmount * 0.1), '#28a745')}
+                        ${generateChartBar('Step 500', Math.max(finalPerformance, config.initial - forgettingAmount * 0.5), '#ffc107')}
+                        ${generateChartBar('Step 1000', Math.max(finalPerformance, config.initial - forgettingAmount * 0.8), '#fd7e14')}
+                        ${generateChartBar('Final', finalPerformance, finalPerformance > 85 ? '#28a745' : finalPerformance > 75 ? '#ffc107' : '#dc3545')}
+                    </div>
+                </div>
+            `;
+            
+            const analysisHTML = `
+                <div class="parameter-box">
+                    <strong>Forgetting Analysis:</strong><br>
+                    • Method: ${method.replace('-', ' ').toUpperCase()}<br>
+                    • Learning Rate: ${lr.toExponential(1)}<br>
+                    • Training Steps: ${steps}<br>
+                    • Performance Drop: ${forgettingPercent.toFixed(1)}%<br>
+                    • Final Performance: ${finalPerformance.toFixed(1)}%
+                </div>
+                
+                <div class="${forgettingPercent < 5 ? 'success' : forgettingPercent < 15 ? 'warning' : 'danger'}">
+                    <strong>Risk Level:</strong> 
+                    ${forgettingPercent < 5 ? 'Very Low - Excellent retention' :
+                      forgettingPercent < 10 ? 'Low - Good retention' :
+                      forgettingPercent < 20 ? 'Medium - Some knowledge loss' :
+                      'High - Significant forgetting risk'}
+                </div>
+            `;
+            
+            document.getElementById('forgettingChart').innerHTML = chartHTML;
+            document.getElementById('forgettingAnalysis').innerHTML = analysisHTML;
+        }
+
+        function generateChartBar(label, height, color) {
+            const barHeight = (height / 100) * 150; // Scale to max 150px
+            return `
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <div style="width: 40px; height: ${barHeight}px; background: ${color}; border-radius: 4px; position: relative; display: flex; align-items: end; justify-content: center; padding-bottom: 5px; color: white; font-size: 10px; font-weight: bold;">
+                        ${height.toFixed(0)}%
+                    </div>
+                    <div style="margin-top: 10px; font-size: 11px; font-weight: bold; text-align: center;">
+                        ${label}
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateCosts() {
+            const modelSize = document.getElementById('costModel').value;
+            const hardware = document.getElementById('costHardware').value;
+            const duration = parseInt(document.getElementById('costDuration').value);
+            const provider = document.getElementById('costProvider').value;
+            
+            const hardwareSpec = hardwareSpecs[hardware];
+            const providerMultipliers = {
+                'aws': 1.0,
+                'gcp': 0.9,
+                'azure': 0.95,
+                'runpod': 0.7
+            };
+            
+            const baseCostPerHour = hardwareSpec.costPerHour * providerMultipliers[provider];
+            
+            // Calculate costs for different methods
+            const fullCost = duration * baseCostPerHour;
+            const layerFreezeCost = duration * 0.6 * baseCostPerHour; // 40% memory savings
+            const loraCost = duration * 0.3 * baseCostPerHour; // 70% memory savings, faster training
+            
+            // Memory requirements
+            const memoryRequirements = {
+                '7b': { full: 112, freeze: 70, lora: 35 },
+                '13b': { full: 195, freeze: 120, lora: 60 },
+                '70b': { full: 980, freeze: 600, lora: 300 }
+            };
+            
+            const memory = memoryRequirements[modelSize];
+            const canRun = {
+                full: memory.full <= hardwareSpec.vram,
+                freeze: memory.freeze <= hardwareSpec.vram,
+                lora: memory.lora <= hardwareSpec.vram
+            };
+            
+            const html = `
+                <div class="step">
+                    <h4>💰 Cost Analysis: ${modelSize.toUpperCase()} on ${hardwareSpec.name}</h4>
+                    
+                    <div class="parameter-box">
+                        <strong>Configuration:</strong><br>
+                        • Model: ${modelSize.toUpperCase()}<br>
+                        • Hardware: ${hardwareSpec.name} (${hardwareSpec.vram}GB VRAM)<br>
+                        • Duration: ${duration} hours<br>
+                        • Provider: ${provider.toUpperCase()} (${((1 - providerMultipliers[provider]) * 100).toFixed(0)}% discount)
+                    </div>
+                    
+                    <table>
+                        <tr><th>Method</th><th>Memory Need</th><th>Can Run?</th><th>Total Cost</th><th>Cost/Hour</th></tr>
+                        <tr>
+                            <td><strong>Full Fine-tuning</strong></td>
+                            <td class="poor">${memory.full}GB</td>
+                            <td class="${canRun.full ? 'winner' : 'poor'}">${canRun.full ? '✅ Yes' : '❌ No'}</td>
+                            <td class="poor">${fullCost.toFixed(2)}</td>
+                            <td>${baseCostPerHour.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Layer Freezing</strong></td>
+                            <td class="moderate">${memory.freeze}GB</td>
+                            <td class="${canRun.freeze ? 'winner' : 'poor'}">${canRun.freeze ? '✅ Yes' : '❌ No'}</td>
+                            <td class="moderate">${layerFreezeCost.toFixed(2)}</td>
+                            <td>${(baseCostPerHour * 0.6).toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LoRA</strong></td>
+                            <td class="winner">${memory.lora}GB</td>
+                            <td class="${canRun.lora ? 'winner' : 'poor'}">${canRun.lora ? '✅ Yes' : '❌ No'}</td>
+                            <td class="winner">${loraCost.toFixed(2)}</td>
+                            <td>${(baseCostPerHour * 0.3).toFixed(2)}</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="${loraCost < fullCost / 2 ? 'savings-display' : 'cost-display'}">
+                        💰 LoRA saves ${(fullCost - loraCost).toFixed(2)} compared to full fine-tuning<br>
+                        (${((fullCost - loraCost) / fullCost * 100).toFixed(0)}% cost reduction)
+                    </div>
+                    
+                    ${!canRun.full && !canRun.freeze && canRun.lora ? `
+                    <div class="success">
+                        <strong>💡 Hardware Constraint:</strong> Only LoRA fits in ${hardwareSpec.vram}GB VRAM. 
+                        This is a common scenario where LoRA enables fine-tuning that would otherwise be impossible!
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.getElementById('costResults').innerHTML = html;
+        }
+
+        function getRecommendation() {
+            const task = document.getElementById('advisorTask').value;
+            const dataSize = document.getElementById('advisorData').value;
+            const domain = document.getElementById('advisorDomain').value;
+            const budget = document.getElementById('advisorBudget').value;
+            const performance = document.getElementById('advisorPerformance').value;
+            
+            // Decision logic
+            let recommendedMethod = 'lora';
+            let confidence = 85;
+            let reasoning = [];
+            
+            // Budget constraints
+            if (budget === 'tight') {
+                recommendedMethod = 'lora';
+                reasoning.push('Tight budget strongly favors LoRA');
+                confidence += 10;
+            } else if (budget === 'unlimited' && performance === 'maximum') {
+                recommendedMethod = 'full';
+                reasoning.push('Unlimited budget with maximum performance requirement');
+                confidence += 15;
+            }
+            
+            // Performance requirements
+            if (performance === 'maximum' && budget !== 'tight') {
+                if (domain === 'specialized') {
+                    recommendedMethod = 'full';
+                    reasoning.push('Specialized domain + maximum performance needs full fine-tuning');
+                    confidence += 20;
+                } else {
+                    recommendedMethod = 'lora-high';
+                    reasoning.push('High-rank LoRA can achieve near-maximum performance');
+                    confidence += 10;
+                }
+            }
+            
+            // Data size considerations
+            if (dataSize === 'massive' && performance === 'maximum') {
+                recommendedMethod = 'full';
+                reasoning.push('Massive dataset can fully utilize full fine-tuning capacity');
+                confidence += 15;
+            } else if (dataSize === 'small') {
+                recommendedMethod = 'lora';
+                reasoning.push('Small dataset works well with LoRA, reduces overfitting risk');
+                confidence += 10;
+            }
+            
+            // Domain similarity
+            if (domain === 'same' || domain === 'similar') {
+                recommendedMethod = 'lora';
+                reasoning.push('Similar domain allows effective low-rank adaptation');
+                confidence += 10;
+            } else if (domain === 'specialized' && budget !== 'tight') {
+                recommendedMethod = 'layer-freeze';
+                reasoning.push('Specialized domain benefits from selective layer training');
+            }
+            
+            // Task-specific adjustments
+            const taskAdjustments = {
+                'classification': { method: 'lora', reason: 'Classification works excellently with LoRA' },
+                'generation': { method: 'lora-high', reason: 'Generation benefits from higher-rank LoRA' },
+                'reasoning': { method: 'full', reason: 'Reasoning tasks often need full model adaptation' },
+                'creative': { method: 'full', reason: 'Creative tasks benefit from complete model flexibility' }
+            };
+            
+            if (taskAdjustments[task]) {
+                if (budget !== 'tight' || taskAdjustments[task].method.includes('lora')) {
+                    reasoning.push(taskAdjustments[task].reason);
+                }
+            }
+            
+            // Final method mapping
+            const methodDetails = {
+                'lora': {
+                    name: 'LoRA (r=32-64)',
+                    description: 'Standard LoRA with balanced rank',
+                    expectedPerf: '92-97%',
+                    cost: 'Low',
+                    memory: 'Low'
+                },
+                'lora-high': {
+                    name: 'High-Rank LoRA (r=128-256)',
+                    description: 'Higher capacity LoRA for complex tasks',
+                    expectedPerf: '95-99%',
+                    cost: 'Medium',
+                    memory: 'Medium'
+                },
+                'layer-freeze': {
+                    name: 'Strategic Layer Freezing',
+                    description: 'Freeze early layers, train later ones',
+                    expectedPerf: '90-95%',
+                    cost: 'Medium',
+                    memory: 'Medium'
+                },
+                'full': {
+                    name: 'Full Fine-tuning',
+                    description: 'Update all model parameters',
+                    expectedPerf: '98-100%',
+                    cost: 'High',
+                    memory: 'High'
+                }
+            };
+            
+            const method = methodDetails[recommendedMethod];
+            
+            const html = `
+                <div class="step">
+                    <h4>🎯 Personalized Recommendation</h4>
+                    
+                    <div class="parameter-box">
+                        <strong>Your Requirements:</strong><br>
+                        • Task: ${task.charAt(0).toUpperCase() + task.slice(1)}<br>
+                        • Data: ${dataSize.charAt(0).toUpperCase() + dataSize.slice(1)} dataset<br>
+                        • Domain: ${domain.charAt(0).toUpperCase() + domain.slice(1)} domain<br>
+                        • Budget: ${budget.charAt(0).toUpperCase() + budget.slice(1)}<br>
+                        • Performance: ${performance.charAt(0).toUpperCase() + performance.slice(1)}
+                    </div>
+                    
+                    <div class="savings-display">
+                        🎯 Recommended: ${method.name}<br>
+                        Confidence: ${confidence}%
+                    </div>
+                    
+                    <table>
+                        <tr><th>Aspect</th><th>Details</th></tr>
+                        <tr><td><strong>Method</strong></td><td>${method.description}</td></tr>
+                        <tr><td><strong>Expected Performance</strong></td><td>${method.expectedPerf} of full fine-tuning</td></tr>
+                        <tr><td><strong>Cost Level</strong></td><td>${method.cost}</td></tr>
+                        <tr><td><strong>Memory Requirements</strong></td><td>${method.memory}</td></tr>
+                    </table>
+                    
+                    <div class="info">
+                        <strong>🧠 Reasoning:</strong><br>
+                        ${reasoning.map((r, i) => `${i + 1}. ${r}`).join('<br>')}
+                    </div>
+                    
+                    <div class="success">
+                        <strong>💡 Next Steps:</strong><br>
+                        • Start with the recommended approach<br>
+                        • Monitor performance on validation set<br>
+                        • Consider hybrid approaches if needed<br>
+                        • Scale up gradually based on results
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('recommendationResults').innerHTML = html;
+        }
+
+        function showScenario(scenario) {
+            // Remove selection from all cards
+            document.querySelectorAll('.decision-card').forEach(card => {
+                card.classList.remove('recommended');
+            });
+            
+            // Add selection to clicked card
+            event.currentTarget.classList.add('recommended');
+            
+            const scenarios = {
+                'prototype': {
+                    title: '🚀 Prototype/Research Scenario',
+                    description: 'Rapid experimentation and proof-of-concept development',
+                    recommendation: 'LoRA with rank 16-32',
+                    reasoning: [
+                        'Fast iteration cycles are critical for research',
+                        'Cost efficiency allows multiple experiments',
+                        'Good performance for validating concepts',
+                        'Easy to compare different approaches'
+                    ],
+                    implementation: [
+                        'Use LoRA on Q,V projections only',
+                        'Start with rank 16, increase if needed',
+                        'Keep learning rates moderate (1e-4)',
+                        'Save adapters for quick comparisons'
+                    ],
+                    tradeoffs: 'Slightly lower peak performance acceptable for speed gains'
+                },
+                'production': {
+                    title: '🏭 Production System Scenario',
+                    description: 'Maximum performance for deployed applications',
+                    recommendation: 'Full fine-tuning or high-rank LoRA (r=128+)',
+                    reasoning: [
+                        'Performance directly impacts user experience',
+                        'Higher costs justified by business value',
+                        'Single-task optimization possible',
+                        'Can invest in proper infrastructure'
+                    ],
+                    implementation: [
+                        'Consider full fine-tuning for critical tasks',
+                        'Use LoRA r=128+ if memory constrained',
+                        'Implement careful validation protocols',
+                        'Monitor for catastrophic forgetting'
+                    ],
+                    tradeoffs: 'Higher costs acceptable for maximum quality'
+                },
+                'multi-task': {
+                    title: '🎭 Multi-task Serving Scenario',
+                    description: 'Serving multiple specialized tasks from one base model',
+                    recommendation: 'Multiple LoRA adapters with hot-swapping',
+                    reasoning: [
+                        'One base model serves multiple tasks',
+                        'Efficient memory utilization',
+                        'Fast task switching capability',
+                        'Independent optimization per task'
+                    ],
+                    implementation: [
+                        'Train separate LoRA adapters per task',
+                        'Use consistent rank (32-64) across tasks',
+                        'Implement efficient adapter loading',
+                        'Consider adapter composition techniques'
+                    ],
+                    tradeoffs: 'Engineering complexity for operational efficiency'
+                }
+            };
+            
+            const info = scenarios[scenario];
+            const html = `
+                <div class="step">
+                    <h4>${info.title}</h4>
+                    
+                    <div class="parameter-box">
+                        <strong>Scenario:</strong> ${info.description}<br>
+                        <strong>Recommended Approach:</strong> ${info.recommendation}
+                    </div>
+                    
+                    <div class="comparison-grid">
+                        <div class="method-card">
+                            <div class="method-title">🎯 Why This Works</div>
+                            <ul>
+                                ${info.reasoning.map(reason => `<li>${reason}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="method-card">
+                            <div class="method-title">🔧 Implementation</div>
+                            <ul>
+                                ${info.implementation.map(impl => `<li>${impl}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="info">
+                        <strong>⚖️ Key Tradeoff:</strong> ${info.tradeoffs}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('scenarioDetails').innerHTML = html;
+        }
+
+        function benchmarkSpeed() {
+            const modelSize = document.getElementById('speedModel').value;
+            const hardware = document.getElementById('speedHardware').value;
+            const seqLen = parseInt(document.getElementById('speedSeqLen').value);
+            
+            // Rough speed estimates (tokens/second)
+            const baseSpeedEstimates = {
+                '7b': { 'single-gpu': 100, 'multi-gpu': 350, 'cluster': 800 },
+                '13b': { 'single-gpu': 60, 'multi-gpu': 220, 'cluster': 500 },
+                '70b': { 'single-gpu': 12, 'multi-gpu': 45, 'cluster': 120 }
+            };
+            
+            const baseSpeed = baseSpeedEstimates[modelSize][hardware];
+            
+            // Sequence length penalty (quadratic attention)
+            const seqPenalty = Math.pow(seqLen / 2048, 1.5);
+            const adjustedSpeed = baseSpeed / seqPenalty;
+            
+            // Method multipliers
+            const fullSpeed = adjustedSpeed;
+            const freezeSpeed = adjustedSpeed * 1.8; // Faster due to fewer params
+            const loraSpeed = adjustedSpeed * 2.5; // Much faster
+            
+            // Training time estimates (hours for 1000 steps)
+            const stepsPerHour = {
+                full: fullSpeed * 3.6, // rough conversion
+                freeze: freezeSpeed * 3.6,
+                lora: loraSpeed * 3.6
+            };
+            
+            const trainingTime = {
+                full: 1000 / stepsPerHour.full,
+                freeze: 1000 / stepsPerHour.freeze,
+                lora: 1000 / stepsPerHour.lora
+            };
+            
+            const html = `
+                <div class="step">
+                    <h4>⚡ Speed Benchmark: ${modelSize.toUpperCase()} on ${hardware.replace('-', ' ')}</h4>
+                    
+                    <div class="parameter-box">
+                        <strong>Configuration:</strong><br>
+                        • Model: ${modelSize.toUpperCase()}<br>
+                        • Hardware: ${hardware.replace('-', ' ')}<br>
+                        • Sequence Length: ${seqLen} tokens<br>
+                        • Target: 1000 training steps
+                    </div>
+                    
+                    <table>
+                        <tr><th>Method</th><th>Training Speed</th><th>Time for 1K Steps</th><th>Speedup</th></tr>
+                        <tr>
+                            <td><strong>Full Fine-tuning</strong></td>
+                            <td class="poor">${fullSpeed.toFixed(0)} tokens/sec</td>
+                            <td class="poor">${trainingTime.full.toFixed(1)}h</td>
+                            <td>1.0× (baseline)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Layer Freezing</strong></td>
+                            <td class="moderate">${freezeSpeed.toFixed(0)} tokens/sec</td>
+                            <td class="moderate">${trainingTime.freeze.toFixed(1)}h</td>
+                            <td class="moderate">${(fullSpeed / freezeSpeed * -1 + 1 + 1).toFixed(1)}×</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LoRA</strong></td>
+                            <td class="winner">${loraSpeed.toFixed(0)} tokens/sec</td>
+                            <td class="winner">${trainingTime.lora.toFixed(1)}h</td>
+                            <td class="winner">${(trainingTime.full / trainingTime.lora).toFixed(1)}×</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="savings-display">
+                        ⚡ LoRA is ${(trainingTime.full / trainingTime.lora).toFixed(1)}× faster than full fine-tuning!<br>
+                        Save ${(trainingTime.full - trainingTime.lora).toFixed(1)} hours per 1000 steps
+                    </div>
+                    
+                    <div class="info">
+                        <strong>💡 Speed Factors:</strong><br>
+                        • LoRA updates fewer parameters → less computation<br>
+                        • Smaller optimizer states → less memory bandwidth<br>
+                        • Faster convergence → fewer total steps needed<br>
+                        • Better parallelization → improved GPU utilization
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('speedResults').innerHTML = html;
+        }
+
+        // Event listeners and initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for all sliders and inputs
+            ['comparisonRank', 'comparisonBatch', 'totalLayers', 'forgettingLR', 'forgettingSteps', 
+             'costDuration', 'speedSeqLen'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', updateSliders);
+                }
+            });
+            
+            // Initialize with default values
+            updateSliders();
+            updateLayerVisualization();
+            simulateForgetting();
+            
+            // Set default method selection
+            selectMethod('lora');
+        });
+    </script>
+</body>
+</html>
