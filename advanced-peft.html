@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced PEFT: QLoRA, DoRA & Modern Techniques</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background: #ffffff;
+            color: #2d2d2d;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-bar {
+            background: #2d2d2d;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-home {
+            background: #ffffff;
+            color: #2d2d2d;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-home:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border-left: 4px solid #2d2d2d;
+        }
+        
+        .example-box {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            border: 1px solid #4a4a4a;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        button {
+            background: #2d2d2d;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #2d2d2d;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .danger {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #2d2d2d;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .winner {
+            background: #d4edda;
+            font-weight: bold;
+        }
+        
+        .moderate {
+            background: #fff3cd;
+        }
+        
+        .poor {
+            background: #f8d7da;
+        }
+        
+        .math-formula {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .technique-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .technique-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .technique-card:hover {
+            border-color: #2d2d2d;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .technique-card.selected {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .technique-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .technique-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .cutting-edge-badge {
+            background: #6f42c1;
+            color: white;
+        }
+        
+        .popular-badge {
+            background: #28a745;
+            color: white;
+        }
+        
+        .experimental-badge {
+            background: #fd7e14;
+            color: white;
+        }
+        
+        .quantization-visual {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .precision-box {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 120px;
+            position: relative;
+        }
+        
+        .precision-label {
+            font-size: 12px;
+            color: #28a745;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .precision-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .precision-memory {
+            font-size: 12px;
+            color: #ffc107;
+        }
+        
+        .interactive-demo {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .demo-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #2d2d2d;
+        }
+        
+        .parameter-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        
+        .parameter-highlight {
+            background: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: #2d2d2d;
+        }
+        
+        .savings-display {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .dora-visualization {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .dora-component {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            min-width: 100px;
+        }
+        
+        .dora-label {
+            font-size: 12px;
+            color: #28a745;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .dora-formula {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .component-plus {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d2d2d;
+        }
+        
+        .performance-matrix {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        .radar-chart {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .method-selector {
+            background: #2d2d2d;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .selector-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .selector-option {
+            background: #4a4a4a;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .selector-option:hover {
+            background: #5a5a5a;
+            transform: translateY(-2px);
+        }
+        
+        .selector-option.selected {
+            background: #28a745;
+        }
+        
+        .deployment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .deployment-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .deployment-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2d2d2d;
+        }
+        
+        .deployment-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .deployment-stats {
+            background: #2d2d2d;
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">🚀 Advanced PEFT: QLoRA, DoRA & Modern Techniques</div>
+        <a href="index.html" class="nav-home">🏠 Home</a>
+    </div>
+
+    <div class="container">
+        <h1>🚀 Advanced PEFT: QLoRA, DoRA & Modern Techniques</h1>
+        <p>Master cutting-edge Parameter-Efficient Fine-Tuning techniques that push the boundaries of efficiency while maintaining performance. Learn quantization mathematics, weight decomposition, and state-of-the-art adaptation methods.</p>
+        
+        <div class="info">
+            <strong>🎯 What You'll Master:</strong> QLoRA's quantization + LoRA fusion, DoRA's weight decomposition mathematics, AdaLoRA's adaptive allocation, modern optimization techniques, and production deployment strategies for maximum efficiency.
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🌟 The PEFT Evolution: Beyond Standard LoRA</h2>
+        
+        <div class="step">
+            <h3>📈 PEFT Technique Timeline</h3>
+            
+            <div class="technique-comparison">
+                <div class="technique-card">
+                    <div class="technique-badge popular-badge">Popular</div>
+                    <div class="technique-title">LoRA (2021)</div>
+                    <div class="technique-description">
+                        <strong>W = W₀ + BA</strong><br>
+                        Low-rank approximation<br>
+                        Memory: ~1-5% of full model<br>
+                        <span class="parameter-highlight">Foundation technique</span>
+                    </div>
+                </div>
+                
+                <div class="technique-card">
+                    <div class="technique-badge popular-badge">Popular</div>
+                    <div class="technique-title">QLoRA (2023)</div>
+                    <div class="technique-description">
+                        <strong>4-bit quantization + LoRA</strong><br>
+                        Extreme memory efficiency<br>
+                        Memory: 4× less than LoRA<br>
+                        <span class="parameter-highlight">Consumer GPU friendly</span>
+                    </div>
+                </div>
+                
+                <div class="technique-card">
+                    <div class="technique-badge cutting-edge-badge">Cutting-edge</div>
+                    <div class="technique-title">DoRA (2024)</div>
+                    <div class="technique-description">
+                        <strong>Weight-decomposed adaptation</strong><br>
+                        Magnitude + direction separation<br>
+                        Performance: Better than LoRA<br>
+                        <span class="parameter-highlight">State-of-the-art</span>
+                    </div>
+                </div>
+                
+                <div class="technique-card">
+                    <div class="technique-badge experimental-badge">Advanced</div>
+                    <div class="technique-title">AdaLoRA (2023)</div>
+                    <div class="technique-description">
+                        <strong>Adaptive rank allocation</strong><br>
+                        Dynamic importance scoring<br>
+                        Efficiency: Optimized parameter use<br>
+                        <span class="parameter-highlight">Intelligent adaptation</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="success">
+                <strong>🎯 Key Insight:</strong> Each technique addresses different limitations: QLoRA tackles memory, DoRA improves performance, AdaLoRA optimizes parameter allocation. Modern systems often combine multiple techniques for maximum efficiency.
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔬 QLoRA: Quantization Meets Low-Rank Adaptation</h2>
+        
+        <div class="step">
+            <h3>💡 QLoRA's Revolutionary Insight</h3>
+            
+            <p>QLoRA discovered that you can <strong>quantize the base model to 4-bit precision</strong> while keeping LoRA adapters in full precision, achieving massive memory savings with minimal performance loss.</p>
+            
+            <div class="math-formula">
+                <strong>QLoRA Mathematics:</strong><br><br>
+                W<sub>quantized</sub> = Quantize<sub>4bit</sub>(W₀) + LoRA<sub>FP16</sub>(BA)<br><br>
+                Where:<br>
+                • Base weights: INT4 (4 bits per parameter)<br>
+                • LoRA adapters: FP16 (16 bits per parameter)<br>
+                • Computation: Dequantize on-the-fly for forward pass
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>⚡ Interactive Quantization Analysis</h3>
+            
+            <div class="quantization-visual">
+                <div class="precision-box">
+                    <div class="precision-label">FP32 (Standard)</div>
+                    <div class="precision-value">32-bit</div>
+                    <div class="precision-memory">4 bytes/param</div>
+                </div>
+                <div class="precision-box">
+                    <div class="precision-label">FP16 (Half)</div>
+                    <div class="precision-value">16-bit</div>
+                    <div class="precision-memory">2 bytes/param</div>
+                </div>
+                <div class="precision-box">
+                    <div class="precision-label">INT8 (Quantized)</div>
+                    <div class="precision-value">8-bit</div>
+                    <div class="precision-memory">1 byte/param</div>
+                </div>
+                <div class="precision-box">
+                    <div class="precision-label">INT4 (QLoRA)</div>
+                    <div class="precision-value">4-bit</div>
+                    <div class="precision-memory">0.5 bytes/param</div>
+                </div>
+            </div>
+            
+            <div class="interactive-demo">
+                <div class="demo-title">🧮 QLoRA Memory Calculator</div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label><strong>Model Size:</strong></label>
+                        <select id="qloraModel">
+                            <option value="7B">LLaMA-2 7B</option>
+                            <option value="13B" selected>LLaMA-2 13B</option>
+                            <option value="70B">LLaMA-2 70B</option>
+                            <option value="8B">LLaMA-3 8B</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>LoRA Rank:</strong></label>
+                        <input type="range" id="qloraRank" min="4" max="128" value="32" step="4">
+                        <span id="qloraRankValue">32</span>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>Base Quantization:</strong></label>
+                        <select id="quantizationType">
+                            <option value="fp16">FP16 (Standard)</option>
+                            <option value="int8">INT8</option>
+                            <option value="int4" selected>INT4 (QLoRA)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>Target Layers:</strong></label>
+                        <select id="qloraLayers">
+                            <option value="qv" selected>Q,V Only</option>
+                            <option value="attention">All Attention</option>
+                            <option value="all">All Linear</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button onclick="calculateQLoRA()">🔍 Calculate QLoRA Memory</button>
+                <div id="qloraResults"></div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>🎯 QLoRA Implementation Deep Dive</h3>
+            
+            <div class="example-box">
+# QLoRA Forward Pass Pseudocode
+
+def qlora_forward(x, W_4bit, lora_A, lora_B, scale, zero_point):
+    # 1. Dequantize base weights on-the-fly
+    W_dequant = dequantize(W_4bit, scale, zero_point)
+    
+    # 2. Base model computation
+    base_output = x @ W_dequant
+    
+    # 3. LoRA computation (full precision)
+    lora_output = (x @ lora_A) @ lora_B
+    
+    # 4. Combine outputs
+    return base_output + lora_output
+
+# Memory savings: Base model uses 4x less memory!
+            </div>
+            
+            <div class="warning">
+                <strong>⚠️ QLoRA Trade-offs:</strong><br>
+                • <strong>Memory:</strong> 4× reduction in base model size<br>
+                • <strong>Speed:</strong> ~10-15% slower due to dequantization<br>
+                • <strong>Accuracy:</strong> 1-3% degradation vs full precision<br>
+                • <strong>Hardware:</strong> Requires modern GPUs with efficient INT4 ops
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>⚗️ DoRA: Weight-Decomposed Low-Rank Adaptation</h2>
+        
+        <div class="step">
+            <h3>🧠 DoRA's Core Innovation</h3>
+            
+            <p>DoRA recognizes that weight updates have two components: <strong>magnitude changes</strong> and <strong>directional changes</strong>. By decomposing these explicitly, DoRA achieves better performance than standard LoRA.</p>
+            
+            <div class="math-formula">
+                <strong>DoRA Decomposition:</strong><br><br>
+                W = m · (W₀ + BA) / ||W₀ + BA||<br><br>
+                Where:<br>
+                • m: Learnable magnitude vector<br>
+                • W₀ + BA: Directional component (LoRA)<br>
+                • ||·||: Vector norm (typically L2)<br><br>
+                <strong>Key Insight:</strong> Magnitude and direction are learned separately
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>📊 DoRA Visual Decomposition</h3>
+            
+            <div class="dora-visualization">
+                <div class="dora-component">
+                    <div class="dora-label">Magnitude (m)</div>
+                    <div class="dora-formula">Scalar scaling<br>per output dim</div>
+                </div>
+                <div class="component-plus">×</div>
+                <div class="dora-component">
+                    <div class="dora-label">Direction</div>
+                    <div class="dora-formula">(W₀ + BA)<br>/ ||W₀ + BA||</div>
+                </div>
+                <div class="component-plus">=</div>
+                <div class="dora-component">
+                    <div class="dora-label">Final Weight</div>
+                    <div class="dora-formula">W<sub>DoRA</sub><br>Combined</div>
+                </div>
+            </div>
+            
+            <div class="interactive-demo">
+                <div class="demo-title">⚗️ DoRA vs LoRA Comparison</div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label><strong>Model Architecture:</strong></label>
+                        <select id="doraModel">
+                            <option value="llama7b">LLaMA-2 7B</option>
+                            <option value="llama13b" selected>LLaMA-2 13B</option>
+                            <option value="mistral7b">Mistral 7B</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>Rank (r):</strong></label>
+                        <input type="range" id="doraRank" min="8" max="128" value="32" step="8">
+                        <span id="doraRankValue">32</span>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>Task Type:</strong></label>
+                        <select id="doraTask">
+                            <option value="instruction" selected>Instruction Following</option>
+                            <option value="reasoning">Mathematical Reasoning</option>
+                            <option value="coding">Code Generation</option>
+                            <option value="creative">Creative Writing</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button onclick="compareDoRALoRA()">📈 Compare DoRA vs LoRA</button>
+                <div id="doraComparison"></div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>🔬 DoRA Parameter Analysis</h3>
+            
+            <div class="parameter-box">
+                <strong>DoRA Parameter Count:</strong><br>
+                • <strong>LoRA parameters:</strong> 2 × d × r (same as standard LoRA)<br>
+                • <strong>Magnitude parameters:</strong> d (one per output dimension)<br>
+                • <strong>Total overhead:</strong> 2dr + d ≈ 2dr (magnitude is negligible)<br>
+                • <strong>Memory increase vs LoRA:</strong> ~0.1% (practically identical)
+            </div>
+            
+            <div class="success">
+                <strong>🎯 DoRA Benefits:</strong><br>
+                • <strong>Performance:</strong> 5-15% better than LoRA on complex tasks<br>
+                • <strong>Stability:</strong> More stable training, less prone to collapse<br>
+                • <strong>Interpretability:</strong> Separate magnitude/direction analysis<br>
+                • <strong>Memory:</strong> Virtually identical to LoRA<br>
+                • <strong>Compatibility:</strong> Works with all LoRA variants (QDoRA possible)
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧬 AdaLoRA: Adaptive Low-Rank Adaptation</h2>
+        
+        <div class="step">
+            <h3>🎯 The Rank Allocation Problem</h3>
+            
+            <p>Standard LoRA uses the <strong>same rank for all layers</strong>, but different layers might need different adaptation capacities. AdaLoRA solves this by <strong>dynamically allocating ranks</strong> based on importance.</p>
+            
+            <div class="math-formula">
+                <strong>AdaLoRA Importance Scoring:</strong><br><br>
+                I<sub>l</sub> = ||∇<sub>A<sub>l</sub></sub>||<sub>F</sub> + ||∇<sub>B<sub>l</sub></sub>||<sub>F</sub><br><br>
+                Where:<br>
+                • I<sub>l</sub>: Importance score for layer l<br>
+                • ∇<sub>A<sub>l</sub></sub>, ∇<sub>B<sub>l</sub></sub>: Gradients of LoRA matrices<br>
+                • ||·||<sub>F</sub>: Frobenius norm<br><br>
+                <strong>Rank Allocation:</strong> r<sub>l</sub> ∝ I<sub>l</sub> (higher importance → higher rank)
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>📊 Interactive AdaLoRA Demonstration</h3>
+            
+            <div class="interactive-demo">
+                <div class="demo-title">🧬 AdaLoRA Rank Allocation</div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label><strong>Total Rank Budget:</strong></label>
+                        <input type="range" id="adaloraBudget" min="256" max="2048" value="1024" step="128">
+                        <span id="adaloraBudgetValue">1024</span>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>Task Type:</strong></label>
+                        <select id="adaloraTask">
+                            <option value="classification">Text Classification</option>
+                            <option value="qa" selected>Question Answering</option>
+                            <option value="generation">Text Generation</option>
+                            <option value="reasoning">Complex Reasoning</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label><strong>Allocation Strategy:</strong></label>
+                        <select id="adaloraStrategy">
+                            <option value="importance" selected>Importance-based</option>
+                            <option value="uniform">Uniform (Standard LoRA)</option>
+                            <option value="decay">Layer Depth Decay</option>
+                            <option value="attention">Attention-focused</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button onclick="simulateAdaLoRA()">🔄 Simulate Rank Allocation</button>
+                <div id="adaloraResults"></div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>📈 AdaLoRA Benefits & Limitations</h3>
+            
+            <table>
+                <tr>
+                    <th>Aspect</th>
+                    <th>Standard LoRA</th>
+                    <th>AdaLoRA</th>
+                    <th>Improvement</th>
+                </tr>
+                <tr>
+                    <td><strong>Parameter Efficiency</strong></td>
+                    <td class="moderate">Fixed allocation</td>
+                    <td class="winner">Adaptive allocation</td>
+                    <td class="winner">10-20% better</td>
+                </tr>
+                <tr>
+                    <td><strong>Training Complexity</strong></td>
+                    <td class="winner">Simple</td>
+                    <td class="moderate">Complex</td>
+                    <td class="poor">More overhead</td>
+                </tr>
+                <tr>
+                    <td><strong>Performance</strong></td>
+                    <td class="moderate">Good</td>
+                    <td class="winner">Better</td>
+                    <td class="winner">5-10% gain</td>
+                </tr>
+                <tr>
+                    <td><strong>Implementation</strong></td>
+                    <td class="winner">Straightforward</td>
+                    <td class="poor">Complex</td>
+                    <td class="poor">Harder to implement</td>
+                </tr>
+            </table>
+            
+            <div class="info">
+                <strong>💡 When to Use AdaLoRA:</strong><br>
+                • <strong>Complex tasks:</strong> Multi-step reasoning, complex QA<br>
+                • <strong>Limited parameter budget:</strong> Want maximum efficiency<br>
+                • <strong>Research settings:</strong> Willing to invest in implementation complexity<br>
+                • <strong>Avoid when:</strong> Simple tasks, rapid prototyping, production constraints
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>⚖️ Comprehensive PEFT Method Comparison</h2>
+        
+        <div class="performance-matrix">
+            <table>
+                <tr>
+                    <th>Method</th>
+                    <th>Memory Efficiency</th>
+                    <th>Performance</th>
+                    <th>Training Speed</th>
+                    <th>Implementation</th>
+                    <th>Best Use Case</th>
+                </tr>
+                <tr>
+                    <td><strong>LoRA</strong></td>
+                    <td class="winner">Excellent</td>
+                    <td class="moderate">Good</td>
+                    <td class="winner">Fast</td>
+                    <td class="winner">Simple</td>
+                    <td>General fine-tuning</td>
+                </tr>
+                <tr>
+                    <td><strong>QLoRA</strong></td>
+                    <td class="winner">Outstanding</td>
+                    <td class="moderate">Good</td>
+                    <td class="moderate">Moderate</td>
+                    <td class="moderate">Medium</td>
+                    <td>Consumer hardware</td>
+                </tr>
+                <tr>
+                    <td><strong>DoRA</strong></td>
+                    <td class="winner">Excellent</td>
+                    <td class="winner">Better</td>
+                    <td class="moderate">Moderate</td>
+                    <td class="moderate">Medium</td>
+                    <td>Performance-critical tasks</td>
+                </tr>
+                <tr>
+                    <td><strong>AdaLoRA</strong></td>
+                    <td class="winner">Superior</td>
+                    <td class="winner">Best</td>
+                    <td class="poor">Slower</td>
+                    <td class="poor">Complex</td>
+                    <td>Research & optimization</td>
+                </tr>
+                <tr>
+                    <td><strong>Full Fine-tuning</strong></td>
+                    <td class="poor">Poor</td>
+                    <td class="winner">Best</td>
+                    <td class="poor">Slow</td>
+                    <td class="winner">Simple</td>
+                    <td>Maximum performance</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="method-selector">
+            <div class="selector-title">🎯 PEFT Method Recommendation Engine</div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label style="color: white;"><strong>Hardware Constraint:</strong></label>
+                    <select id="hardwareConstraint">
+                        <option value="consumer">Consumer GPU (RTX 4090)</option>
+                        <option value="professional" selected>Professional GPU (A100)</option>
+                        <option value="enterprise">Enterprise (Multi-GPU)</option>
+                        <option value="unlimited">Unlimited Resources</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label style="color: white;"><strong>Task Complexity:</strong></label>
+                    <select id="taskComplexity">
+                        <option value="simple">Simple (Classification)</option>
+                        <option value="moderate" selected>Moderate (QA, Summarization)</option>
+                        <option value="complex">Complex (Reasoning, Code)</option>
+                        <option value="research">Research (Experimental)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label style="color: white;"><strong>Performance Priority:</strong></label>
+                    <select id="performancePriority">
+                        <option value="efficiency">Memory Efficiency</option>
+                        <option value="balanced" selected>Balanced</option>
+                        <option value="performance">Maximum Performance</option>
+                        <option value="speed">Training Speed</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="recommendMethod()">🎯 Get Method Recommendation</button>
+            <div id="methodRecommendation"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🚀 Production Deployment Strategies</h2>
+        
+        <div class="step">
+            <h3>🏭 Advanced PEFT in Production</h3>
+            
+            <div class="deployment-grid">
+                <div class="deployment-card">
+                    <div class="deployment-title">🔄 Multi-Adapter Serving</div>
+                    <div class="deployment-description">
+                        Deploy base model once, swap adapters dynamically for different tasks or users.
+                    </div>
+                    <div class="deployment-stats">
+                        Memory: 1 base + N adapters<br>
+                        Latency: +5-10ms per swap<br>
+                        Throughput: Near native<br>
+                        Use case: Multi-tenant SaaS
+                    </div>
+                </div>
+                
+                <div class="deployment-card">
+                    <div class="deployment-title">⚡ Quantized Serving</div>
+                    <div class="deployment-description">
+                        Combine quantization with PEFT adapters for maximum memory efficiency.
+                    </div>
+                    <div class="deployment-stats">
+                        Memory: 4-8× reduction<br>
+                        Latency: +10-15% overhead<br>
+                        Quality: 95-98% of full<br>
+                        Use case: Edge deployment
+                    </div>
+                </div>
+                
+                <div class="deployment-card">
+                    <div class="deployment-title">🎯 Specialized Merging</div>
+                    <div class="deployment-description">
+                        Merge adapters into base weights for single-task deployment optimization.
+                    </div>
+                    <div class="deployment-stats">
+                        Memory: Same as base model<br>
+                        Latency: Native performance<br>
+                        Flexibility: Single task only<br>
+                        Use case: High-throughput APIs
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>📊 Real-World Success Stories</h3>
+            
+            <div class="example-box">
+<strong>🏥 Medical AI (QLoRA + Specialized Data):</strong>
+• Base: LLaMA-2 70B → 4-bit quantization
+• Adapters: r=64 DoRA on medical terminology layers
+• Hardware: Single A100 (40GB) vs 8×A100 for full fine-tuning
+• Result: 97% of full fine-tuning accuracy, 8× less hardware
+
+<strong>💻 Code Assistant (Multi-Adapter Strategy):</strong>
+• Base: Code Llama 34B
+• Adapters: 12 language-specific LoRA adapters (r=32)
+• Deployment: Dynamic adapter loading based on detected language
+• Storage: 68GB base + 12×150MB adapters vs 12×68GB models
+• Savings: 94% storage reduction, sub-second task switching
+
+<strong>🌐 Multilingual Customer Service (AdaLoRA):</strong>
+• Base: Mistral 7B
+• Challenge: Limited parameter budget, 23 languages
+• Solution: AdaLoRA with language-importance weighting
+• Result: 15% better performance vs uniform LoRA
+• Key: High-resource languages got higher ranks automatically
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>🛠️ Implementation Best Practices</h3>
+            
+            <div class="warning">
+                <strong>⚠️ Production Considerations:</strong><br>
+                • <strong>Model Versioning:</strong> Track base model + adapter versions separately<br>
+                • <strong>A/B Testing:</strong> Compare adapter variants safely in production<br>
+                • <strong>Fallback Strategy:</strong> Handle adapter loading failures gracefully<br>
+                • <strong>Monitoring:</strong> Track adapter-specific metrics and performance<br>
+                • <strong>Security:</strong> Validate adapter checksums, prevent malicious adapters
+            </div>
+            
+            <div class="success">
+                <strong>✅ Deployment Checklist:</strong><br>
+                • <strong>Memory Profiling:</strong> Test peak memory usage with real workloads<br>
+                • <strong>Latency Testing:</strong> Measure quantization/dequantization overhead<br>
+                • <strong>Quality Validation:</strong> Run comprehensive evaluation suites<br>
+                • <strong>Load Testing:</strong> Verify performance under concurrent requests<br>
+                • <strong>Disaster Recovery:</strong> Plan for adapter corruption/unavailability
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔮 Future of PEFT: What's Next?</h2>
+        
+        <div class="step">
+            <h3>🚀 Emerging Techniques (2024-2025)</h3>
+            
+            <div class="technique-comparison">
+                <div class="technique-card">
+                    <div class="technique-badge experimental-badge">Emerging</div>
+                    <div class="technique-title">LoRA+ (2024)</div>
+                    <div class="technique-description">
+                        Different learning rates for A and B matrices<br>
+                        <span class="parameter-highlight">Simple but effective</span>
+                    </div>
+                </div>
+                
+                <div class="technique-card">
+                    <div class="technique-badge experimental-badge">Research</div>
+                    <div class="technique-title">VeRA (2024)</div>
+                    <div class="technique-description">
+                        Vector-based Random Matrix Adaptation<br>
+                        <span class="parameter-highlight">Even more efficient</span>
+                    </div>
+                </div>
+                
+                <div class="technique-card">
+                    <div class="technique-badge experimental-badge">Cutting-edge</div>
+                    <div class="technique-title">MoLoRA (2024)</div>
+                    <div class="technique-description">
+                        Mixture of LoRA experts<br>
+                        <span class="parameter-highlight">Task-specific routing</span>
+                    </div>
+                </div>
+                
+                <div class="technique-card">
+                    <div class="technique-badge experimental-badge">Future</div>
+                    <div class="technique-title">Neural LoRA</div>
+                    <div class="technique-description">
+                        Neural architecture search for optimal ranks<br>
+                        <span class="parameter-highlight">Automated optimization</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>🎯 Key Takeaways for PEFT Mastery</h3>
+            
+            <div class="success">
+                <strong>🧠 Conceptual Understanding:</strong><br>
+                • PEFT techniques each solve specific efficiency/performance trade-offs<br>
+                • Quantization and low-rank adaptation are highly complementary<br>
+                • Weight decomposition (DoRA) separates magnitude and direction learning<br>
+                • Adaptive allocation (AdaLoRA) optimizes parameter distribution<br><br>
+                
+                <strong>🛠️ Practical Mastery:</strong><br>
+                • QLoRA enables 70B+ models on consumer hardware<br>
+                • DoRA provides 5-15% performance boost over LoRA<br>
+                • Multi-adapter serving enables efficient multi-task deployment<br>
+                • Production systems require careful memory and latency profiling<br><br>
+                
+                <strong>🚀 Strategic Thinking:</strong><br>
+                • Choose methods based on hardware, task, and performance constraints<br>
+                • Combine techniques (QDoRA, AdaLoRA variations) for optimal results<br>
+                • Plan for adapter versioning, fallback, and monitoring in production<br>
+                • Stay updated with emerging techniques but validate thoroughly
+            </div>
+        </div>
+        
+        <div class="info">
+            <strong>🎓 Next Steps:</strong> You now understand the cutting-edge of parameter-efficient fine-tuning. Consider exploring mixture-of-experts architectures, advanced quantization schemes, and neural architecture search for even more sophisticated optimization strategies.
+        </div>
+    </div>
+
+    <script>
+        // Model specifications for advanced PEFT calculations
+        const advancedModelSpecs = {
+            '7B': { hiddenSize: 4096, numLayers: 32, totalParams: 7e9, memoryFP16: 14 },
+            '13B': { hiddenSize: 5120, numLayers: 40, totalParams: 13e9, memoryFP16: 26 },
+            '70B': { hiddenSize: 8192, numLayers: 80, totalParams: 70e9, memoryFP16: 140 },
+            '8B': { hiddenSize: 4096, numLayers: 32, totalParams: 8e9, memoryFP16: 16 }
+        };
+
+        const layerTargets = {
+            'qv': { layers: ['q_proj', 'v_proj'], multiplier: 2 },
+            'attention': { layers: ['q_proj', 'k_proj', 'v_proj', 'o_proj'], multiplier: 4 },
+            'all': { layers: ['q_proj', 'k_proj', 'v_proj', 'o_proj', 'gate_proj', 'up_proj', 'down_proj'], multiplier: 7 }
+        };
+
+        // Update slider values
+        function updateAdvancedSliders() {
+            document.getElementById('qloraRankValue').textContent = document.getElementById('qloraRank').value;
+            document.getElementById('doraRankValue').textContent = document.getElementById('doraRank').value;
+            document.getElementById('adaloraBudgetValue').textContent = document.getElementById('adaloraBudget').value;
+        }
+
+        function calculateQLoRA() {
+            const modelSize = document.getElementById('qloraModel').value;
+            const rank = parseInt(document.getElementById('qloraRank').value);
+            const quantType = document.getElementById('quantizationType').value;
+            const layers = document.getElementById('qloraLayers').value;
+            
+            const spec = advancedModelSpecs[modelSize];
+            const layerConfig = layerTargets[layers];
+            
+            // Memory calculations for different precisions
+            const precisionMultiplier = {
+                'fp16': 1.0,
+                'int8': 0.5,
+                'int4': 0.25
+            };
+            
+            const baseMemoryGB = spec.memoryFP16 * precisionMultiplier[quantType];
+            const loraParamsPerLayer = 2 * spec.hiddenSize * rank;
+            const totalLoRAParams = loraParamsPerLayer * layerConfig.multiplier * spec.numLayers;
+            const loraMemoryGB = totalLoRAParams * 2 / 1024 / 1024 / 1024;
+            
+            const totalMemory = baseMemoryGB + loraMemoryGB;
+            const standardLoRAMemory = spec.memoryFP16 + loraMemoryGB;
+            const memorySavings = ((standardLoRAMemory - totalMemory) / standardLoRAMemory * 100);
+            
+            let html = `
+                <div class="step">
+                    <h4>🔬 QLoRA Analysis: ${modelSize} with ${quantType.toUpperCase()}</h4>
+                    
+                    <table>
+                        <tr><th>Component</th><th>Standard LoRA</th><th>QLoRA</th><th>Savings</th></tr>
+                        <tr>
+                            <td><strong>Base Model</strong></td>
+                            <td>${spec.memoryFP16.toFixed(1)}GB (FP16)</td>
+                            <td class="winner">${baseMemoryGB.toFixed(1)}GB (${quantType.toUpperCase()})</td>
+                            <td class="winner">${((spec.memoryFP16 - baseMemoryGB) / spec.memoryFP16 * 100).toFixed(0)}%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LoRA Adapters</strong></td>
+                            <td>${loraMemoryGB.toFixed(2)}GB (FP16)</td>
+                            <td>${loraMemoryGB.toFixed(2)}GB (FP16)</td>
+                            <td>Same</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Memory</strong></td>
+                            <td>${standardLoRAMemory.toFixed(1)}GB</td>
+                            <td class="winner">${totalMemory.toFixed(1)}GB</td>
+                            <td class="winner">${memorySavings.toFixed(1)}%</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="savings-display">
+                        🚀 QLoRA saves ${(standardLoRAMemory - totalMemory).toFixed(1)}GB memory!<br>
+                        💾 Can train ${modelSize} on ${totalMemory < 24 ? 'consumer GPU' : totalMemory < 48 ? 'single A100' : 'multi-GPU setup'}
+                    </div>
+                    
+                    <div class="parameter-box">
+                        <strong>Performance Trade-offs:</strong><br>
+                        • <span class="parameter-highlight">Dequantization overhead:</span> ~10-15% slower inference<br>
+                        • <span class="parameter-highlight">Quality retention:</span> ${quantType === 'int4' ? '95-98%' : quantType === 'int8' ? '98-99%' : '100%'} of FP16 performance<br>
+                        • <span class="parameter-highlight">Hardware requirements:</span> Modern GPUs with efficient INT4/INT8 kernels
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('qloraResults').innerHTML = html;
+        }
+
+        function compareDoRALoRA() {
+            const model = document.getElementById('doraModel').value;
+            const rank = parseInt(document.getElementById('doraRank').value);
+            const task = document.getElementById('doraTask').value;
+            
+            // Simulated performance improvements based on research findings
+            const taskImprovements = {
+                'instruction': { dora: 8, complexity: 'Medium' },
+                'reasoning': { dora: 15, complexity: 'High' },
+                'coding': { dora: 12, complexity: 'High' },
+                'creative': { dora: 6, complexity: 'Low' }
+            };
+            
+            const improvement = taskImprovements[task];
+            const loraPerformance = 85; // Base LoRA performance %
+            const doraPerformance = loraPerformance + improvement.dora;
+            
+            let html = `
+                <div class="step">
+                    <h4>⚗️ DoRA vs LoRA Performance Comparison</h4>
+                    
+                    <div class="parameter-box">
+                        <strong>Configuration:</strong> ${model} with rank ${rank}<br>
+                        <strong>Task:</strong> ${task.replace('_', ' ').toUpperCase()}<br>
+                        <strong>Task Complexity:</strong> ${improvement.complexity}
+                    </div>
+                    
+                    <table>
+                        <tr><th>Method</th><th>Performance</th><th>Parameters</th><th>Memory</th><th>Training Stability</th></tr>
+                        <tr>
+                            <td><strong>LoRA</strong></td>
+                            <td class="moderate">${loraPerformance}%</td>
+                            <td class="winner">2dr</td>
+                            <td class="winner">Standard</td>
+                            <td class="moderate">Good</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DoRA</strong></td>
+                            <td class="winner">${doraPerformance}%</td>
+                            <td class="winner">2dr + d ≈ 2dr</td>
+                            <td class="winner">+0.1%</td>
+                            <td class="winner">Better</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${loraPerformance}%">
+                            LoRA: ${loraPerformance}%
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${doraPerformance}%">
+                            DoRA: ${doraPerformance}%
+                        </div>
+                    </div>
+                    
+                    <div class="success">
+                        <strong>🎯 DoRA Advantage: ${improvement.dora}% improvement</strong><br>
+                        DoRA's magnitude-direction decomposition provides better adaptation for ${improvement.complexity.toLowerCase()} complexity tasks like ${task.replace('_', ' ')}.
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('doraComparison').innerHTML = html;
+        }
+
+        function simulateAdaLoRA() {
+            const budget = parseInt(document.getElementById('adaloraBudget').value);
+            const task = document.getElementById('adaloraTask').value;
+            const strategy = document.getElementById('adaloraStrategy').value;
+            
+            // Simulate layer importance for different tasks
+            const taskImportance = {
+                'classification': [0.1, 0.2, 0.3, 0.6, 0.8, 0.9, 0.7, 0.5], // Later layers more important
+                'qa': [0.3, 0.4, 0.6, 0.8, 0.9, 0.8, 0.6, 0.4], // Middle layers critical
+                'generation': [0.2, 0.3, 0.5, 0.7, 0.8, 0.9, 0.8, 0.7], // Gradual increase
+                'reasoning': [0.4, 0.5, 0.7, 0.8, 0.9, 0.9, 0.8, 0.6] // Peak in later layers
+            };
+            
+            const importance = taskImportance[task];
+            const numLayers = importance.length;
+            
+            // Allocate ranks based on strategy
+            let ranks;
+            if (strategy === 'importance') {
+                const totalImportance = importance.reduce((a, b) => a + b, 0);
+                ranks = importance.map(imp => Math.max(8, Math.round((imp / totalImportance) * budget)));
+            } else if (strategy === 'uniform') {
+                const uniformRank = Math.floor(budget / numLayers);
+                ranks = new Array(numLayers).fill(uniformRank);
+            } else if (strategy === 'decay') {
+                ranks = importance.map((_, i) => Math.max(8, Math.round(budget * 0.2 * Math.exp(-i * 0.3))));
+            } else { // attention-focused
+                ranks = importance.map((imp, i) => i < 4 ? Math.round(budget * 0.25) : Math.round(budget * 0.05));
+            }
+            
+            // Normalize to budget
+            const totalAllocated = ranks.reduce((a, b) => a + b, 0);
+            ranks = ranks.map(r => Math.round(r * budget / totalAllocated));
+            
+            let html = `
+                <div class="step">
+                    <h4>🧬 AdaLoRA Rank Allocation Simulation</h4>
+                    
+                    <div class="parameter-box">
+                        <strong>Task:</strong> ${task.replace('_', ' ').toUpperCase()}<br>
+                        <strong>Strategy:</strong> ${strategy.replace('_', ' ').toUpperCase()}<br>
+                        <strong>Total Budget:</strong> ${budget} rank-parameters<br>
+                        <strong>Actual Allocation:</strong> ${ranks.reduce((a, b) => a + b, 0)} rank-parameters
+                    </div>
+                    
+                    <table>
+                        <tr><th>Layer</th><th>Importance</th><th>Allocated Rank</th><th>Parameters</th></tr>
+            `;
+            
+            ranks.forEach((rank, i) => {
+                const params = rank * 2 * 4096; // Assuming 4096 hidden size
+                html += `
+                        <tr>
+                            <td><strong>Layer ${i + 1}</strong></td>
+                            <td>${importance[i].toFixed(2)}</td>
+                            <td class="${rank > budget / numLayers * 1.5 ? 'winner' : rank < budget / numLayers * 0.5 ? 'poor' : 'moderate'}">${rank}</td>
+                            <td>${(params / 1000).toFixed(0)}K</td>
+                        </tr>
+                `;
+            });
+            
+            const efficiency = strategy === 'importance' ? 15 : strategy === 'uniform' ? 0 : 8;
+            
+            html += `
+                    </table>
+                    
+                    <div class="savings-display">
+                        📈 Estimated Performance Gain vs Uniform LoRA: +${efficiency}%<br>
+                        🎯 Peak allocation at Layer ${ranks.indexOf(Math.max(...ranks)) + 1} (Rank ${Math.max(...ranks)})
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('adaloraResults').innerHTML = html;
+        }
+
+        function recommendMethod() {
+            const hardware = document.getElementById('hardwareConstraint').value;
+            const complexity = document.getElementById('taskComplexity').value;
+            const priority = document.getElementById('performancePriority').value;
+            
+            // Decision matrix based on constraints
+            let recommendation;
+            let explanation;
+            let alternatives = [];
+            
+            if (hardware === 'consumer') {
+                if (priority === 'efficiency') {
+                    recommendation = 'QLoRA (INT4)';
+                    explanation = 'Maximize memory efficiency for consumer hardware constraints';
+                    alternatives = ['LoRA (lower rank)', 'Gradient checkpointing + LoRA'];
+                } else {
+                    recommendation = 'QLoRA (INT8)';
+                    explanation = 'Balance between memory efficiency and performance on consumer GPUs';
+                    alternatives = ['LoRA with rank 16-32', 'DoRA (if memory permits)'];
+                }
+            } else if (hardware === 'unlimited') {
+                if (complexity === 'research') {
+                    recommendation = 'AdaLoRA + DoRA';
+                    explanation = 'Maximum adaptation capability for research exploration';
+                    alternatives = ['Full Fine-tuning', 'Custom PEFT variants'];
+                } else {
+                    recommendation = 'DoRA';
+                    explanation = 'Best performance with reasonable implementation complexity';
+                    alternatives = ['Full Fine-tuning', 'LoRA+ (different LR)'];
+                }
+            } else { // professional or enterprise
+                if (priority === 'speed') {
+                    recommendation = 'LoRA';
+                    explanation = 'Fast training and deployment, proven reliability';
+                    alternatives = ['LoRA+ for slight improvements', 'Parallel multi-adapter training'];
+                } else if (complexity === 'complex') {
+                    recommendation = 'DoRA';
+                    explanation = 'Superior performance on complex tasks, manageable overhead';
+                    alternatives = ['AdaLoRA for efficiency', 'QLoRA + DoRA hybrid'];
+                } else {
+                    recommendation = 'LoRA';
+                    explanation = 'Optimal balance for most production use cases';
+                    alternatives = ['DoRA for +5-10% performance', 'QLoRA for memory constraints'];
+                }
+            }
+            
+            let html = `
+                <div class="step">
+                    <h4>🎯 Personalized PEFT Recommendation</h4>
+                    
+                    <div class="savings-display">
+                        <strong>Recommended Method: ${recommendation}</strong>
+                    </div>
+                    
+                    <div class="parameter-box">
+                        <strong>Reasoning:</strong> ${explanation}<br>
+                        <strong>Hardware:</strong> ${hardware.replace('_', ' ').toUpperCase()}<br>
+                        <strong>Task Complexity:</strong> ${complexity.replace('_', ' ').toUpperCase()}<br>
+                        <strong>Priority:</strong> ${priority.replace('_', ' ').toUpperCase()}
+                    </div>
+                    
+                    <div class="info">
+                        <strong>💡 Alternative Options:</strong><br>
+                        ${alternatives.map(alt => `• ${alt}`).join('<br>')}
+                    </div>
+                    
+                    <div class="warning">
+                        <strong>⚠️ Implementation Notes:</strong><br>
+                        • Test on your specific dataset and hardware configuration<br>
+                        • Consider hybrid approaches for specialized requirements<br>
+                        • Monitor memory usage and training stability during initial experiments<br>
+                        • Validate performance thoroughly before production deployment
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('methodRecommendation').innerHTML = html;
+        }
+
+        // Event listeners for sliders and initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const sliderIds = ['qloraRank', 'doraRank', 'adaloraBudget'];
+            sliderIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', updateAdvancedSliders);
+                }
+            });
+            
+            // Initialize with default calculations
+            updateAdvancedSliders();
+            calculateQLoRA();
+            compareDoRALoRA();
+            simulateAdaLoRA();
+            recommendMethod();
+        });
+    </script>
+</body>
+</html>
